@@ -10,7 +10,9 @@ AA261 Part II prototype for Tripwire, a receive-only passive radar that turns si
 | `Big Idea Investment Memo v2.pdf` | Seed investment memo (Oct 22, 2026) |
 | `OriginalIdea.rtf` | First "Tripwire Twin" digital-twin pitch to the team |
 | `Context_log.txt` | Chat history that led to the idea (radar papers → passive radar → Starlink) |
-| `PROPOSAL.md` | One-page prototype proposal for the teaching team |
+
+
+Prototype proposal (one page, for the teaching team): [Tripwire Prototype Proposal](https://claude.ai/artifact/3JMB9REso49JbAJ8zzKf1B)
 
 ## Team
 
