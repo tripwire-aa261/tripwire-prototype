@@ -1,0 +1,13 @@
+Part II - Prototype
+
+Create a substantial set of technical artifacts that demonstrate your capabilities and provide investors insight into your design process, tradeoffs, and product capabilities.
+
+The prototype should demonstrate a capability directly relevant to your proposed product, customer value proposition, or competitive differentiation. Explain which critical technical or commercial assumptions underlying your business the prototype is intended to validate.
+
+This should be a significant undertaking, on the order of 40-80+ hours of human effort, tied to substantial computing support. This is not meant to solely be for show purposes.
+
+If you 3d print a shape, it should demonstrate something meaningful that may be difficult to glean from a screen alone. If you create a physics based trade-space evaluator, it should allow for real exploration of the design space, including the financial, cost, and revenue implications of varying assumptions. If you are building a prototype of a user interface, it should actually do something useful and interesting. It should not be something that an investor would believe they can recreate themselves in twenty minutes (and there is a lot today they can recreate themselves in twenty minutes).
+
+Describe the remaining technical work required to transition from the prototype to a commercially viable product, including major engineering challenges, testing requirements, manufacturing considerations, and estimated development costs.
+
+Before you begin building, please send the teaching team a one-page summary of what you plan to build and why you believe that is the appropriate choice for your prototype.

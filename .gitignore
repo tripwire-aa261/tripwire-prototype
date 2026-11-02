@@ -1,0 +1,28 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Secrets: keep keys in .env, commit only .env.example
+.env
+.env.*
+!.env.example
+
+# Large raw captures and simulation outputs
+data/raw/
+*.sigmf-data
+*.iq
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+.vscode/
+.idea/
