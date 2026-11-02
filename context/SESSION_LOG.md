@@ -2,6 +2,13 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-01 · Siddarth · Drop "Path to a product" from the v2 feedback request
+
+**Asked for:** Remove the path-to-product section from the feedback-request version.
+**Done:** Deleted the section (hardware spec, engineering, testing, manufacturing, approvals, cost) from the v2 doc and rebuilt `Tripwire_Prototype_Feedback_Request_v2.docx`. The path-to-product content still exists in `Tripwire_Prototype_Proposal.docx` and in Decisions in force in HANDOFF.md.
+**Decided:** The feedback request describes only the prototype; path to product is saved for the final deliverable.
+**Left open:** Feedback question 4 still mentions "the hardware spec", and the diagram still has a "Hardware spec" box. Neither is explained in v2 any more. Siddarth to decide whether to keep them.
+
 ## 2026-11-01 · Siddarth · Trim the v2 feedback questions
 
 **Asked for:** Remove the v2 feedback question asking the teaching team for datasets or Stanford contacts. Siddarth: "They will shoot back at us that we are supposed to find relevant profs working in this field... this is something we can do on our own."
