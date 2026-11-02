@@ -1,0 +1,35 @@
+# Session log
+
+One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
+
+## 2026-11-01 · Siddarth · Repo setup, prototype proposal, feedback request v1 and v2
+
+**Asked for:**
+- Set up this folder as a git repo shared with the team.
+- Read the brief, memo, idea notes and chat log.
+- Plan a prototype that impresses investors and meets the brief, and can extend to other industries and signal sources.
+- Write a short, low-jargon doc asking the teaching team for feedback.
+- Make every commit carry Claude chat context so teammates can continue.
+
+**Done:**
+- Created the private GitHub repo `sura2903/tripwire-prototype` and pushed it.
+- Wrote a detailed proposal (`Tripwire_Prototype_Proposal.docx`), then two 2-page feedback requests (`..._Feedback_Request.docx` and `..._v2.docx`), each with a Claude Docs version.
+- Added this handoff workflow: `CLAUDE.md`, the `/handoff` skill, and a commit hook in `.claude/settings.json`.
+
+**Decided:**
+- Dropped Starlink as a signal source because its format is proprietary. Using FM radio, digital TV and satellite TV (DVB-S2) instead.
+- Dropped GPU-dependent ray tracing; the team has no GPUs.
+- Owner column left blank (Siddarth cleared it in Word).
+- Pivoted from a 3D digital-twin demo to a trade-space evaluator plus national site survey. Reasons: a simulation-only twin risks looking like a 20-minute rebuild, and building hardware is too risky. Hardware is the written path to product.
+- Kept the detailed proposal at 3 pages rather than trimming it, at Siddarth's request.
+
+**Left open:**
+- v2 not yet sent to the teaching team.
+- Go-to-market ideas for other industries were discussed in chat but not written into any doc:
+  - channel partners (Anduril Lattice, Dedrone)
+  - tower companies as hosts
+  - a low-altitude airspace data feed
+  - bird and bat monitoring for wind farms and airports
+  - perimeter intrusion detection
+  - remote sites
+- The commit hook was tested by piping sample inputs, and on Siddarth's Windows machine. It is not yet confirmed on a teammate's Mac.
