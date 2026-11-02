@@ -12,7 +12,9 @@ AA261 Part II prototype for Tripwire, a receive-only passive radar that turns si
 | `Context_log.txt` | Chat history that led to the idea (radar papers → passive radar → Starlink) |
 
 
-Prototype proposal (one page, for the teaching team): [Tripwire Prototype Proposal](https://claude.ai/artifact/3JMB9REso49JbAJ8zzKf1B)
+Prototype proposal (detailed): [Tripwire Prototype Proposal](https://claude.ai/artifact/3JMB9REso49JbAJ8zzKf1B), Word copy `Tripwire_Prototype_Proposal.docx`
+
+Feedback request for the teaching team (2 pages, plain language): [Tripwire Prototype: Request for Feedback](https://claude.ai/artifact/KUgPGm1Aim2v8S8tVH37m6), Word copy `Tripwire_Prototype_Feedback_Request.docx`
 
 ## Team
 
