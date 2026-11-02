@@ -16,6 +16,8 @@ Prototype proposal (detailed): [Tripwire Prototype Proposal](https://claude.ai/a
 
 Feedback request for the teaching team (2 pages, plain language): [Tripwire Prototype: Request for Feedback](https://claude.ai/artifact/KUgPGm1Aim2v8S8tVH37m6), Word copy `Tripwire_Prototype_Feedback_Request.docx`
 
+Feedback request v2 (trade-space evaluator + national site survey; hardware as path to product): [Tripwire Prototype: Request for Feedback (v2)](https://claude.ai/artifact/D4PNP9zHLZcvhuRSUZMnTz), Word copy `Tripwire_Prototype_Feedback_Request_v2.docx`
+
 ## Team
 
 Ashlynn Sweet, Nimalan S/O Anbhuarasan, Siddarth Ramasubramanian, Taras Yushchenko, Adeline Zuckerman
