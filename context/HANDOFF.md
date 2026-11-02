@@ -19,7 +19,7 @@ Last updated 2026-11-01 by Siddarth. History is in `context/SESSION_LOG.md`.
   - The evaluator links design choices (signal, listeners, antennas, drone size) to detection range, coverage, kit cost, margin and revenue.
   - The survey scores all 8,495 memo facilities on nearby signal strength, using public tower and broadcast data.
   - Reason: the brief names a "physics based trade-space evaluator" with financial implications as an acceptable prototype.
-- **Hardware spec as the bridge to product.** The evaluator outputs what the listener box must do, a parts list and unit cost. This is kept out of the v2 feedback request and saved for the final deliverable.
+- **Hardware spec as the bridge to product.** The evaluator outputs what the listener box must do, a parts list and unit cost. The v2 feedback request does not mention it at all (no section, question or diagram box); it is saved for the final deliverable.
 - **No Starlink.** Its signal format is proprietary. Use LTE/5G, FM radio, terrestrial digital TV and satellite TV (DVB-S2, a published standard).
 - **No GPUs.** Everything runs on team laptops.
 - **Owner column left blank** in the plan table. Module owners are not assigned yet.

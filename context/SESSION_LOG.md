@@ -2,6 +2,13 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-01 · Siddarth · Remove remaining hardware-spec mentions from v2
+
+**Asked for:** Remove feedback question 4 and the diagram's "Hardware spec" box. Siddarth briefly reversed this, then confirmed the removal.
+**Done:** Both removed from the v2 doc. `Tripwire_Prototype_Feedback_Request_v2.docx` rebuilt; it now has 3 feedback questions.
+**Decided:** v2 makes no mention of the hardware spec. It stays in the detailed proposal and the final deliverable.
+**Left open:** Feedback question 1 still says "with hardware as the path to product", which is kept as written.
+
 ## 2026-11-01 · Siddarth · Drop "Path to a product" from the v2 feedback request
 
 **Asked for:** Remove the path-to-product section from the feedback-request version.
