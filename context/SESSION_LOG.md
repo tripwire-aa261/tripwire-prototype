@@ -2,6 +2,13 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-01 · Siddarth · Trim the v2 feedback questions
+
+**Asked for:** Remove the v2 feedback question asking the teaching team for datasets or Stanford contacts. Siddarth: "They will shoot back at us that we are supposed to find relevant profs working in this field... this is something we can do on our own."
+**Done:** Deleted that question from the v2 doc and rebuilt `Tripwire_Prototype_Feedback_Request_v2.docx`, which now has 4 feedback questions. Finding faculty and datasets moved to Next steps in HANDOFF.md.
+**Decided:** The team sources faculty contacts and datasets itself rather than asking the teaching team.
+**Left open:** v2 still not sent to the teaching team.
+
 ## 2026-11-01 · Siddarth · Repo setup, prototype proposal, feedback request v1 and v2
 
 **Asked for:**

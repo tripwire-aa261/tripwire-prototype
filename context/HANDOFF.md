@@ -35,10 +35,10 @@ Last updated 2026-11-01 by Siddarth. History is in `context/SESSION_LOG.md`.
 
 1. Team reviews the v2 feedback request; send it to the teaching team.
 2. Wait for feedback, then assign module owners.
-3. Set up the code skeleton (evaluator, site survey, tests) once the plan is approved.
+3. Find Stanford faculty working on passive radar or drone detection, and public datasets for checking the model. We do this ourselves; it is deliberately not asked of the teaching team.
+4. Set up the code skeleton (evaluator, site survey, tests) once the plan is approved.
 
 ## Open questions
 
 - Is a software-only prototype acceptable to the teaching team? (asked in v2)
-- Are there public radar datasets or Stanford contacts for checking the model? (asked in v2)
 - Can this prototype also be used for another course's project? (not yet asked)
