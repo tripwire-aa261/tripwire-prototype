@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tripwire Twin</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="logo">◎</span> Tripwire Twin <span class="tag">prototype v0.1</span></div>
+    <div class="site" id="siteName"></div>
+    <button id="openSources" class="ghost">Sources &amp; assumptions</button>
+  </header>
+
+  <main>
+    <!-- Design choices -->
+    <aside class="panel" id="controls">
+      <h2>Design choices</h2>
+      <label>Signal source
+        <select id="illumId"></select>
+      </label>
+      <label>Drone
+        <select id="droneId"></select>
+      </label>
+      <label>Listener boxes <output id="listenersOut"></output>
+        <input type="range" id="listeners" min="3" max="12" step="1" />
+      </label>
+      <label>Antenna gain <output id="rxGainDbiOut"></output>
+        <input type="range" id="rxGainDbi" min="0" max="15" step="1" />
+      </label>
+      <label>Drone altitude <output id="altitudeMOut"></output>
+        <input type="range" id="altitudeM" min="20" max="150" step="5" />
+      </label>
+      <label>Integration time <output id="tIntSOut"></output>
+        <input type="range" id="tIntS" min="0.02" max="0.5" step="0.01" />
+      </label>
+      <label>Direct-signal cancellation <output id="cancelDbOut"></output>
+        <input type="range" id="cancelDb" min="40" max="80" step="1" />
+      </label>
+      <button id="reset" class="ghost small">Reset to defaults</button>
+
+      <h2>Flight</h2>
+      <div class="row">
+        <button id="play">Pause</button>
+        <button id="restart" class="ghost">Restart</button>
+      </div>
+      <label class="check"><input type="checkbox" id="showCoverage" checked /> Show coverage map</label>
+      <div class="legend">
+        <span><i class="sw trk"></i>Tracked (located)</span>
+        <span><i class="sw det"></i>Detected only</span>
+        <span><i class="sw gap"></i>Gap in protected zone</span>
+      </div>
+    </aside>
+
+    <!-- 3D twin -->
+    <section id="viewWrap">
+      <div id="view"></div>
+      <div id="hud">
+        <div id="hudState" class="pill">—</div>
+        <div id="hudDetail"></div>
+      </div>
+      <div id="busy" hidden>recomputing…</div>
+    </section>
+
+    <!-- Results -->
+    <aside class="panel" id="results">
+      <h2>Does it work? <span class="hint">memo release gates</span></h2>
+      <div class="gates">
+        <div class="gate" id="gateReach"><b>≥150 m</b> from nearest listener<span></span></div>
+        <div class="gate" id="gateTrack"><b>≥90%</b> track availability<span></span></div>
+      </div>
+      <div class="cards">
+        <div class="card"><small>Worst-direction reach</small><b id="mReachMin">—</b></div>
+        <div class="card"><small>Median reach</small><b id="mReachMed">—</b></div>
+        <div class="card"><small>Zone tracked</small><b id="mTracked">—</b></div>
+        <div class="card"><small>Zone detected</small><b id="mDetected">—</b></div>
+        <div class="card"><small>Track availability (demo flight)</small><b id="mAvail">—</b></div>
+        <div class="card"><small>Median position error</small><b id="mAcc">—</b></div>
+      </div>
+
+      <h2>Can we make money?</h2>
+      <div class="cards">
+        <div class="card"><small>Kit cost to us</small><b id="eKitCost">—</b></div>
+        <div class="card"><small>Hardware margin</small><b id="eMargin">—</b></div>
+        <div class="card"><small>Customer upfront</small><b id="eUpfront">—</b></div>
+        <div class="card"><small id="eYearsLabel">Customer total</small><b id="eTotal">—</b></div>
+      </div>
+      <div class="compare" id="compare"></div>
+      <div class="cards">
+        <div class="card"><small>Recurring revenue at 400 sites</small><b id="eTargetArr">—</b></div>
+        <div class="card"><small>Recurring revenue, all suitable sites</small><b id="eSamArr">—</b></div>
+      </div>
+      <button id="openEcon" class="ghost small">Edit cost &amp; price assumptions</button>
+
+      <h2>Where should engineering money go? <span class="hint">zone tracked %, one change at a time</span></h2>
+      <div id="tornado"></div>
+    </aside>
+  </main>
+
+  <dialog id="sourcesDlg">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <h2>Sources &amp; assumptions</h2>
+    <p class="note">Every number is either cited or labelled an assumption. Assumptions are placeholders for the team to replace with sourced values.</p>
+    <h3>Physics</h3>
+    <table id="physicsTable"></table>
+    <h3>Economics</h3>
+    <table id="econTable"></table>
+  </dialog>
+
+  <dialog id="econDlg">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <h2>Cost &amp; price assumptions</h2>
+    <p class="note">Edits apply immediately. Values tagged "memo" come from the investment memo.</p>
+    <div id="econForm"></div>
+    <button id="econReset" class="ghost small">Reset to defaults</button>
+  </dialog>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
