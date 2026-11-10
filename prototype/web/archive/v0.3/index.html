@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tripwire Twin</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="logo">◎</span> Tripwire Twin <span class="tag">v0.3 archive · also plays the v0.2 runs</span> <a class="tag" href="../../">← back to the current version</a></div>
+    <div class="site" id="siteName">loading…</div>
+    <button id="openSweep">Coverage vs cost</button>
+    <button id="openCal" class="ghost">Calibration</button>
+    <button id="openSources" class="ghost">Sources &amp; assumptions</button>
+  </header>
+
+  <main>
+    <aside class="panel" id="left">
+      <h2>Simulation run</h2>
+      <select id="runSelect"></select>
+      <div id="runSummary" class="note small"></div>
+
+      <h2>Playback</h2>
+      <div class="row">
+        <button id="play">Pause</button>
+        <select id="speed"><option value="1">1×</option><option value="4" selected>4×</option><option value="10">10×</option></select>
+      </div>
+      <input type="range" id="timeline" min="0" max="0" value="0" step="0.01" />
+      <div class="note small" id="timeLabel">t = 0 s</div>
+      <label class="check"><input type="checkbox" id="showCoverage" checked /> Coverage map (expected)</label>
+      <label class="check"><input type="checkbox" id="showAllTowers" checked /> All registered towers</label>
+      <label class="check"><input type="checkbox" id="showBeams" checked /> Antenna beams (half-power)</label>
+      <div class="legend">
+        <span><i class="sw trk"></i>Located (≥3 pairs)</span>
+        <span><i class="sw det"></i>Detected only</span>
+        <span><i class="sw gap"></i>Gap in protected zone</span>
+        <span><i class="dot fix"></i>Position fix this frame</span>
+        <span><i class="dot trk2"></i>Confirmed track</span>
+      </div>
+
+      <h2>New simulation <span class="hint" id="liveHint"></span></h2>
+      <div class="row">
+        <button class="ghost small" id="presetSeed" title="Off-the-shelf radios: 4 omnis + full-signal processing + microphones">Seed node</button>
+        <button class="ghost small" id="presetA" title="Custom receiver: 8 omnis + full-signal processing">Series A node</button>
+        <button class="ghost small" id="presetV02" title="The v0.2 model: gain toward every direction (optimistic)">v0.2 model</button>
+      </div>
+      <form id="runForm">
+        <label>Drone <select name="drone" id="f_drone"></select></label>
+        <label>Listener nodes <output></output><input type="range" name="n_listeners" min="3" max="12" step="1" /></label>
+        <label>Antenna type <select name="antenna" id="f_antenna"></select></label>
+        <label>Antenna elements per node <select name="rx_elements"><option>1</option><option>2</option><option>4</option><option>8</option></select></label>
+        <label>Faces (directions the elements are split over) <select name="faces"><option>1</option><option>2</option><option>4</option><option>8</option></select></label>
+        <label>Pointing <select name="pointing"><option value="inward">Face the facility</option><option value="auto">Auto (maximise detections)</option></select></label>
+        <label id="gainRow">Element gain (v0.2 model only) <output></output><input type="range" name="rx_gain_dbi" min="0" max="15" step="1" /></label>
+        <label>Processing <select name="processing" id="f_processing"></select></label>
+        <label>Microphone range (0 = none) <output></output><input type="range" name="mic_range_m" min="0" max="200" step="25" /></label>
+        <label>Integration time <output></output><input type="range" name="cit_s" min="0.2" max="1.0" step="0.1" /></label>
+        <label>ADC bits <select name="adc_bits"><option>8</option><option>12</option><option>14</option><option>16</option></select></label>
+        <label>Drone height <output></output><input type="range" name="altitude_agl_m" min="20" max="150" step="10" /></label>
+        <label>Network load <output></output><input type="range" name="network_load" min="0" max="1" step="0.1" /></label>
+        <label>LTE cells processed <output></output><input type="range" name="max_illuminators" min="1" max="14" step="1" /></label>
+        <label class="check"><input type="checkbox" name="bird" /> Add a bird</label>
+        <label>Run name <input type="text" name="id" placeholder="optional" /></label>
+        <button type="submit" id="runBtn">Run physics simulation</button>
+        <div class="progress" hidden><div></div></div>
+        <div class="note small" id="runStatus"></div>
+      </form>
+    </aside>
+
+    <section id="viewWrap">
+      <div id="view"></div>
+      <div id="hud"><div id="hudState" class="pill">—</div><div id="hudDetail"></div></div>
+    </section>
+
+    <aside class="panel" id="right">
+      <h2>Memo release gates <span class="hint">this run</span></h2>
+      <div class="gates">
+        <div class="gate" id="gateTrack"><b>≥ 90 %</b>track availability in zone<span></span></div>
+        <div class="gate" id="gateReach"><b>≥ 150 m</b>first track from nearest node<span></span></div>
+      </div>
+      <div class="cards">
+        <div class="card"><small>Zone located (coverage map)</small><b id="mZone">—</b></div>
+        <div class="card"><small>Median track error</small><b id="mErr">—</b></div>
+        <div class="card"><small>Frames with a position fix</small><b id="mLoc">—</b></div>
+        <div class="card"><small>False tracks / bird tracks</small><b id="mFalse">—</b></div>
+      </div>
+
+      <h2>Range-Doppler map <span class="hint" id="rdHint"></span></h2>
+      <div class="tabs" id="rdTabs"></div>
+      <canvas id="rd" width="300" height="300"></canvas>
+      <div class="note small" id="rdNote"></div>
+      <div id="noiseBar"></div>
+
+      <h2>Compare runs</h2>
+      <table class="cmp" id="cmp"></table>
+
+      <h2>Economics <span class="hint">this run's node design</span></h2>
+      <div class="tabs" id="radioTabs"></div>
+      <div class="gates">
+        <div class="gate" id="gateHw"><b>≤ $24,000</b>hardware per 3-node zone<span></span></div>
+        <div class="gate" id="gateMargin"><b>≥ 40 %</b>installation margin<span></span></div>
+      </div>
+      <div class="cards">
+        <div class="card"><small>Parts per node</small><b id="eNode">—</b></div>
+        <div class="card"><small>Facility hardware</small><b id="eFac">—</b></div>
+        <div class="card"><small>Zones billed</small><b id="eZones">—</b></div>
+        <div class="card"><small>Customer 5-yr</small><b id="eCust">—</b></div>
+      </div>
+      <div class="note small" id="eItems"></div>
+    </aside>
+  </main>
+
+  <dialog id="calDlg">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <h2>Calibration against the Fraunhofer LTE450 trials</h2>
+    <p class="note">Demissie &amp; Steffes, "Drone Detection With a LTE450-Based Passive Radar", IET Radar, Sonar &amp; Navigation 19:e70092 (2025).</p>
+    <div id="calBody"></div>
+    <canvas id="fig11" width="640" height="300"></canvas>
+  </dialog>
+
+  <dialog id="sweepDlg" class="wide">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <h2>Coverage vs number of nodes, and what it costs</h2>
+    <p class="note">Hays State Prison. Each line is a node design; more nodes give diminishing returns. Pick the fewest nodes that reach the coverage tier the customer buys. Solid = Seed (off-the-shelf radios), dashed = Series A (custom receiver), dotted = the optimistic v0.2 model.</p>
+    <div class="row wrap">
+      <label>Drone <select id="swSel"></select></label>
+      <label>Metric <select id="swMetric"><option value="located">Zone located (coverage map)</option><option value="flights">Track availability, scored flights (estimate)</option></select></label>
+      <label>Radio for costs <select id="swRadio"><option value="design">Each design's own</option><option value="bladerf">bladeRF (all)</option><option value="b210">B210 (all)</option><option value="custom">Custom receiver (all)</option></select></label>
+    </div>
+    <svg id="swChart" viewBox="0 0 760 360" role="img" aria-label="Coverage versus nodes chart"></svg>
+    <div id="swTip" class="note small"></div>
+    <table class="cmp" id="swTable"></table>
+    <p class="note small" id="swNotes"></p>
+    <details>
+      <summary>Sweep your own design (~30 s, needs serve.py)</summary>
+      <form id="swForm" class="row wrap">
+        <label>Drone <select name="drone" id="swf_drone"></select></label>
+        <label>Antenna <select name="antenna" id="swf_antenna"></select></label>
+        <label>Elements <select name="rx_elements"><option>1</option><option>2</option><option selected>4</option><option>8</option></select></label>
+        <label>Faces <select name="faces"><option>1</option><option>2</option><option>4</option></select></label>
+        <label>Processing <select name="processing" id="swf_processing"></select></label>
+        <label>Mic range m <input type="number" name="mic_range_m" value="0" min="0" max="300" step="25" /></label>
+        <label>Radio <select name="radio"><option value="bladerf">bladeRF</option><option value="b210">B210</option><option value="custom">Custom</option></select></label>
+        <label>Name <input type="text" name="label" placeholder="my design" /></label>
+        <button type="submit" id="swBtn">Run sweep</button>
+        <span class="note small" id="swStatus"></span>
+      </form>
+    </details>
+  </dialog>
+
+  <dialog id="srcDlg">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <h2>Sources &amp; assumptions</h2>
+    <p class="note">Tags: CITED (published), STANDARD (specification or textbook method), MEASURED (fetched data), ASSUMPTION (placeholder to replace).</p>
+    <h3>Model</h3><table id="srcTable"></table>
+    <h3>Parameters in this run</h3><table id="paramTable"></table>
+    <h3>Data</h3><table id="dataTable"></table>
+  </dialog>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

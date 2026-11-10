@@ -1,0 +1,3 @@
+numpy>=2.0
+pillow>=10.0   # only for tools/fetch_site.py (reads USGS terrain TIFFs)
+pytest>=8.0    # tests

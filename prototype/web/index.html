@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tripwire Twin</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body class="app">
+  <header>
+    <div class="brand"><span class="logo">◎</span> Tripwire <span class="tag">digital twin v0.4</span></div>
+    <nav class="tabbar" role="tablist">
+      <button role="tab" data-tab="overview" class="on">Overview</button>
+      <button role="tab" data-tab="sim">Simulation</button>
+      <button role="tab" data-tab="fin">Financials</button>
+    </nav>
+    <div class="spacer"></div>
+    <button id="openSources" class="ghost small">Sources &amp; assumptions</button>
+  </header>
+
+  <!-- ===================================================================== OVERVIEW -->
+  <section class="tab on" id="tab-overview">
+    <div class="page">
+      <div class="hero">
+        <div>
+          <h1>A drone tripwire made from cell-tower signals</h1>
+          <p class="lead">Small receive-only sensors on the prison fence listen for drone echoes of the signals cell towers already send. Nothing is transmitted, so there is no license, no interference and nothing for a drone pilot to detect. This page shows what that would deliver at three real Georgia facilities, and what it would cost.</p>
+        </div>
+      </div>
+
+      <div class="chips" id="ovSites"></div>
+      <div class="row wrap ctl">
+        <label>Drone <select id="ovDrone"></select></label>
+        <label title="How much interference from neighboring cell towers the processing removes. Not yet measured.">Interference removal <select id="ovInterf"></select></label>
+      </div>
+
+      <div class="ov-grid">
+        <div class="panel-card">
+          <h3 id="ovMapTitle">Coverage</h3>
+          <canvas id="ovMap" width="560" height="460" aria-label="Coverage map of the facility"></canvas>
+          <div class="legend inline">
+            <span><i class="sw trk"></i>Covered</span><span><i class="sw gap"></i>Gap inside the protected zone</span>
+            <span><i class="dot rx"></i>Sensor</span><span><i class="tri"></i>Cell tower used</span>
+          </div>
+        </div>
+        <div class="panel-card">
+          <h3>What the customer gets <span class="hint" id="ovReqHint"></span></h3>
+          <div class="kpis" id="ovKpis"></div>
+          <div class="note small" id="ovDesign"></div>
+        </div>
+      </div>
+
+      <h2>Which design suits which site</h2>
+      <p class="note">Cheapest sensor design that meets the default requirements (drones 60 m up, 150 m around the fence, 90% of the area covered, tracked 80% of the time, within 25 m), under today's interference assumption and under the optimistic one that the Seed recordings will test. Change the requirements in the Simulation tab.</p>
+      <table class="cmp big" id="ovSitesTable"></table>
+
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="step"><b>1 · Listen</b><span>Each sensor hears a cell tower twice: once directly, and once bounced off the drone, a moment later and slightly shifted in pitch.</span></div>
+        <div class="step"><b>2 · Measure</b><span>The delay gives the drone's distance along an ellipse; the pitch shift (Doppler) separates moving drones from buildings and trees.</span></div>
+        <div class="step"><b>3 · Locate</b><span>Several sensors and towers give crossing ellipses: the drone's position, tracked over time and sent to the control room.</span></div>
+      </div>
+
+      <h2>What we know, and what we still assume</h2>
+      <div class="kn3">
+        <div class="kn ok"><b>Shown</b><ul>
+          <li>A published field trial (Fraunhofer, LTE450) detected a 5 kg drone this way; our model reproduces it.</li>
+          <li>Real terrain, buildings and registered towers for all three facilities.</li></ul></div>
+        <div class="kn mid"><b>Simulated only</b><ul>
+          <li>Coverage, tracking and accuracy at each facility.</li>
+          <li>Hardware and installation cost with off-the-shelf parts.</li></ul></div>
+        <div class="kn bad"><b>Still to prove</b><ul>
+          <li>Enhanced processing gain and interference removal: they decide the remote and city sites.</li>
+          <li>Tower details (direction, power, channel) at each site, and network busyness by hour.</li>
+          <li>Next step: record real LTE signals at two or more sites (the Seed milestone).</li></ul></div>
+      </div>
+
+      <h2>Compared with today's options</h2>
+      <div class="compare" id="ovBench"></div>
+      <p class="note small">Benchmarks from the Seed data package: Axon hardware + installation configuration (ref [3]); AirSight annual subscriptions (ref [4]). Tripwire figures use the editable assumptions in the Financials tab.</p>
+    </div>
+  </section>
+
+  <!-- ===================================================================== SIMULATION -->
+  <section class="tab" id="tab-sim">
+    <div class="sim-layout">
+      <aside class="panel" id="reqPanel">
+        <h2>Customer requirements</h2>
+        <label>Facility <select id="rqSite"></select></label>
+        <label>Drone <select id="rqDrone"></select></label>
+        <label>Protected distance around the fence <output></output><input type="range" id="rqRadius" min="0" max="4" step="1" /></label>
+        <label>Drone height <select id="rqHeight"></select></label>
+        <label>Area covered, at least <select id="rqCov"><option value="80">80%</option><option value="90">90%</option><option value="95">95%</option></select></label>
+        <label>Time tracked, at least <output></output><input type="range" id="rqTrk" min="50" max="95" step="5" /></label>
+        <label>Position accuracy, within <output></output><input type="range" id="rqAcc" min="5" max="50" step="5" /></label>
+        <label>Position update, at least every <output></output><input type="range" id="rqUpd" min="1" max="5" step="0.5" /></label>
+        <h2>Scenario</h2>
+        <label title="Interference from neighboring cell towers on the same carrier that the processing removes. 20 dB is today's assumption; 40 dB needs rebuilding and subtracting neighbor cells (unproven).">Interference removal <select id="rqInterf"></select></label>
+        <button class="ghost small" id="rqReset">Reset to defaults</button>
+        <p class="note small" id="rqNote"></p>
+      </aside>
+
+      <div class="sim-main">
+        <h2>Designs that meet these requirements</h2>
+        <p class="note">For each sensor design: the fewest sensors that meet every requirement, and what that costs. Click a row to explore it below and in Financials.</p>
+        <table class="cmp big" id="dsTable"></table>
+
+        <div class="two">
+          <div class="panel-card">
+            <h3>More sensors, diminishing returns</h3>
+            <div class="row wrap ctl"><label>Show <select id="chMetric"><option value="cov">Area covered</option><option value="trk">Time tracked</option><option value="acc">Position accuracy</option></select></label></div>
+            <svg id="chNodes" viewBox="0 0 640 330" role="img" aria-label="Outcome versus number of sensors"></svg>
+            <div class="note small" id="chTip">Hover a point for details.</div>
+          </div>
+          <div class="panel-card">
+            <h3>What moves the result <span class="hint" id="tzBase"></span></h3>
+            <div class="row wrap ctl"><label>Outcome <select id="tzMetric"><option value="cov">Area covered</option><option value="trk">Time tracked</option><option value="acc">Position accuracy</option><option value="cost">Upfront cost</option></select></label></div>
+            <svg id="tornado" viewBox="0 0 640 330" role="img" aria-label="Sensitivity of the outcome to each input"></svg>
+            <div class="note small">Each bar: the range of the outcome when one input changes and the rest stay as in the selected design. The line marks the selected design.</div>
+          </div>
+        </div>
+
+        <details id="v3d" class="panel-card">
+          <summary><h3>Watch a simulated intrusion (3D, full signal simulation)</h3></summary>
+          <div class="v3d-layout">
+            <div class="v3d-left">
+              <label>Simulation run <select id="runSelect"></select></label>
+              <div id="runSummary" class="note small"></div>
+              <div class="row">
+                <button id="play">Pause</button>
+                <select id="speed"><option value="1">1×</option><option value="4" selected>4×</option><option value="10">10×</option></select>
+              </div>
+              <input type="range" id="timeline" min="0" max="0" value="0" step="0.01" />
+              <div class="note small" id="timeLabel">t = 0 s</div>
+              <label class="check"><input type="checkbox" id="showCoverage" checked /> Coverage (expected)</label>
+              <label class="check"><input type="checkbox" id="showBeams" checked /> Antenna beams</label>
+              <label class="check"><input type="checkbox" id="showAllTowers" /> All registered towers</label>
+              <div class="legend">
+                <span><i class="sw trk"></i>Covered</span><span><i class="sw det"></i>Detected only</span>
+                <span><i class="sw gap"></i>Gap in the protected zone</span><span><i class="dot fix"></i>Position fix</span><span><i class="dot trk2"></i>Track</span>
+              </div>
+              <details class="newsim">
+                <summary>Run a new full simulation</summary>
+                <form id="runForm">
+                  <label>Facility <select name="site" id="f_site"></select></label>
+                  <label>Drone <select name="drone" id="f_drone"></select></label>
+                  <label>Sensor design <select name="design" id="f_design"></select></label>
+                  <label>Sensors <output></output><input type="range" name="n_listeners" min="3" max="16" step="1" /></label>
+                  <label>Drone height <output></output><input type="range" name="altitude_agl_m" min="30" max="120" step="10" /></label>
+                  <details><summary>More settings</summary>
+                    <label>Interference removal <output></output><input type="range" name="cochannel_suppression_db" min="10" max="45" step="5" /></label>
+                    <label>Network busyness <output></output><input type="range" name="network_load" min="0" max="1" step="0.1" /></label>
+                    <label>Integration time <output></output><input type="range" name="cit_s" min="0.2" max="1.0" step="0.1" /></label>
+                    <label>Receiver bits <select name="adc_bits"><option>8</option><option selected>12</option><option>14</option></select></label>
+                    <label>Cell towers used per sensor <output></output><input type="range" name="max_illuminators" min="1" max="14" step="1" /></label>
+                    <label>Antenna pointing <select name="pointing"><option value="inward">Face the facility</option><option value="auto">Auto</option></select></label>
+                    <label class="check"><input type="checkbox" name="bird" checked /> Add a bird</label>
+                  </details>
+                  <label>Run name <input type="text" name="id" placeholder="optional" /></label>
+                  <button type="submit" id="runBtn">Run simulation (2–7 min)</button>
+                  <div class="progress" hidden><div></div></div>
+                  <div class="note small" id="runStatus"></div>
+                </form>
+              </details>
+            </div>
+            <div class="v3d-view"><div id="view"></div><div id="hud"><div id="hudState" class="pill">—</div><div id="hudDetail"></div></div></div>
+            <div class="v3d-right">
+              <h3>This run</h3>
+              <div class="cards" id="runCards"></div>
+              <details>
+                <summary>Technical details: raw radar view</summary>
+                <div class="tabs" id="rdTabs"></div>
+                <canvas id="rd" width="300" height="300"></canvas>
+                <div class="note small" id="rdNote"></div>
+                <div id="noiseBar"></div>
+                <button class="ghost small" id="openCal">Calibration against the field trial</button>
+              </details>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== FINANCIALS -->
+  <section class="tab" id="tab-fin">
+    <div class="page">
+      <h2>Facility economics</h2>
+      <div class="row wrap ctl">
+        <label>Facility <select id="fnSite"></select></label>
+        <label>Sensor design <select id="fnDesign"></select></label>
+        <label>Sensors <input type="number" id="fnN" min="1" max="40" step="1" /></label>
+        <label>Radio <select id="fnRadio"></select></label>
+        <label>Coverage tier sold <select id="fnTier"><option value="80">80%</option><option value="90">90%</option><option value="95">95%</option></select></label>
+      </div>
+      <p class="note small" id="fnFrom"></p>
+      <div class="kpis wide" id="fnKpis"></div>
+
+      <div class="two">
+        <div class="panel-card">
+          <h3>Five years at one facility</h3>
+          <div id="fnStack"></div>
+        </div>
+        <div class="panel-card">
+          <h3>Customer's five-year cost vs today's options</h3>
+          <div class="compare" id="fnBench"></div>
+        </div>
+      </div>
+
+      <h2>Across the three facilities</h2>
+      <p class="note">Each facility with its cheapest design that meets the current requirements (Simulation tab).</p>
+      <table class="cmp big" id="fnSites"></table>
+
+      <h2>Inputs <span class="hint">assumptions; edit any value</span> <button class="ghost small" id="fnReset">Reset to assumptions</button></h2>
+      <div class="inputs" id="fnInputs"></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Tripwire digital twin · AA261 prototype · every number is cited or labeled an assumption (Sources &amp; assumptions).</span>
+    <span>Earlier versions: <a href="archive/v0.3/">v0.3 (archived; also plays the v0.2 runs)</a> · <a href="/v0.1/">v0.1</a></span>
+  </footer>
+
+  <dialog id="calDlg">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <h2>Calibration against the Fraunhofer LTE450 trials</h2>
+    <p class="note">Demissie &amp; Steffes, "Drone Detection With a LTE450-Based Passive Radar", IET Radar, Sonar &amp; Navigation 19:e70092 (2025).</p>
+    <div id="calBody"></div>
+    <canvas id="fig11" width="640" height="300"></canvas>
+  </dialog>
+
+  <dialog id="srcDlg">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <h2>Sources &amp; assumptions</h2>
+    <p class="note">Tags: CITED (published), STANDARD (specification or textbook method), MEASURED (fetched data), FIT (calibrated), ASSUMPTION (placeholder to replace).</p>
+    <div id="srcNotes"></div>
+    <h3>Model</h3><table id="srcTable"></table>
+    <h3>Parameters (selected 3D run)</h3><table id="paramTable"></table>
+    <h3>Data</h3><table id="dataTable"></table>
+  </dialog>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

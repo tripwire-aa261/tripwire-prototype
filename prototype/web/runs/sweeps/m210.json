@@ -1,0 +1,2362 @@
+{
+ "id": "m210",
+ "drone": "m210",
+ "created": "2026-11-10T04:52:06",
+ "node_counts": [
+  3,
+  4,
+  5,
+  6,
+  8,
+  10,
+  12,
+  16
+ ],
+ "tiers": [
+  80,
+  90,
+  95
+ ],
+ "flights_per_point": 40,
+ "base": {
+  "cit_s": 0.8,
+  "adc_bits": 12,
+  "bird": false,
+  "network_load": 0.3
+ },
+ "designs": [
+  {
+   "id": "v02_iso",
+   "label": "v0.2 model: 4 x 10 dBi toward every direction (optimistic)",
+   "stage": "reference",
+   "radio": "b210",
+   "params": {
+    "antenna": "iso",
+    "rx_elements": 4,
+    "faces": 1,
+    "rx_gain_dbi": 10.0,
+    "processing": "crs_p0",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 6524.0,
+    "bladerf": 2830.0,
+    "custom": 2342.88
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 50.8,
+     "detected_pct": 97.5,
+     "flights": {
+      "n": 40,
+      "mean_pct": 27.5,
+      "p10_pct": 3.0,
+      "median_pct": 22.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 40.0
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 19572,
+      "hardware_facility": 19572,
+      "hardware_gate_pass": true,
+      "install_margin": 0.489,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 73.3,
+     "detected_pct": 99.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 43.6,
+      "p10_pct": 11.5,
+      "median_pct": 47.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 2.5,
+      "share_reach_150m_pct": 37.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 19572,
+      "hardware_facility": 26096,
+      "hardware_gate_pass": true,
+      "install_margin": 0.489,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 84.3,
+     "detected_pct": 99.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 59.4,
+      "p10_pct": 28.3,
+      "median_pct": 63.1,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 7.5,
+      "share_reach_150m_pct": 45.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 19572,
+      "hardware_facility": 32620,
+      "hardware_gate_pass": true,
+      "install_margin": 0.489,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 90.7,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 69.4,
+      "p10_pct": 45.9,
+      "median_pct": 70.9,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 10.0,
+      "share_reach_150m_pct": 62.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 19572,
+      "hardware_facility": 39144,
+      "hardware_gate_pass": true,
+      "install_margin": 0.489,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 95.8,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 77.5,
+      "p10_pct": 56.7,
+      "median_pct": 79.6,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 22.5,
+      "share_reach_150m_pct": 67.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 19572,
+      "hardware_facility": 52192,
+      "hardware_gate_pass": true,
+      "install_margin": 0.489,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 97.5,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 82.5,
+      "p10_pct": 63.1,
+      "median_pct": 84.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 27.5,
+      "share_reach_150m_pct": 72.5
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 19572,
+      "hardware_facility": 65240,
+      "hardware_gate_pass": true,
+      "install_margin": 0.489,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 99.6,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 85.4,
+      "p10_pct": 70.4,
+      "median_pct": 87.4,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 42.5,
+      "share_reach_150m_pct": 82.5
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 19572,
+      "hardware_facility": 78288,
+      "hardware_gate_pass": true,
+      "install_margin": 0.489,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 87.2,
+      "p10_pct": 73.5,
+      "median_pct": 87.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 42.5,
+      "share_reach_150m_pct": 92.5
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 19572,
+      "hardware_facility": 104384,
+      "hardware_gate_pass": true,
+      "install_margin": 0.489,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": 5,
+    "90": 6,
+    "95": 8
+   }
+  },
+  {
+   "id": "patch1",
+   "label": "1 patch",
+   "stage": "Seed",
+   "radio": "bladerf",
+   "params": {
+    "antenna": "patch",
+    "rx_elements": 1,
+    "faces": 1,
+    "rx_gain_dbi": 5.0,
+    "processing": "crs_p0",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 3467.0,
+    "bladerf": 1620.0,
+    "custom": 1773.94
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 0.4,
+     "detected_pct": 18.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 0.3,
+      "p10_pct": 0.0,
+      "median_pct": 0.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 2.5
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 4860,
+      "hardware_facility": 4860,
+      "hardware_gate_pass": true,
+      "install_margin": 0.783,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 4.7,
+     "detected_pct": 27.1,
+     "flights": {
+      "n": 40,
+      "mean_pct": 0.6,
+      "p10_pct": 0.0,
+      "median_pct": 0.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 7.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 4860,
+      "hardware_facility": 6480,
+      "hardware_gate_pass": true,
+      "install_margin": 0.783,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 8.5,
+     "detected_pct": 27.5,
+     "flights": {
+      "n": 40,
+      "mean_pct": 1.8,
+      "p10_pct": 0.0,
+      "median_pct": 0.1,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 25.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 4860,
+      "hardware_facility": 8100,
+      "hardware_gate_pass": true,
+      "install_margin": 0.783,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 10.2,
+     "detected_pct": 32.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 3.3,
+      "p10_pct": 0.0,
+      "median_pct": 0.5,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 27.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 4860,
+      "hardware_facility": 9720,
+      "hardware_gate_pass": true,
+      "install_margin": 0.783,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 12.7,
+     "detected_pct": 33.9,
+     "flights": {
+      "n": 40,
+      "mean_pct": 6.8,
+      "p10_pct": 0.1,
+      "median_pct": 1.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 27.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 4860,
+      "hardware_facility": 12960,
+      "hardware_gate_pass": true,
+      "install_margin": 0.783,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 15.3,
+     "detected_pct": 37.3,
+     "flights": {
+      "n": 40,
+      "mean_pct": 11.0,
+      "p10_pct": 0.4,
+      "median_pct": 5.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 40.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 4860,
+      "hardware_facility": 16200,
+      "hardware_gate_pass": true,
+      "install_margin": 0.783,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 20.8,
+     "detected_pct": 39.8,
+     "flights": {
+      "n": 40,
+      "mean_pct": 16.7,
+      "p10_pct": 1.9,
+      "median_pct": 13.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 45.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 4860,
+      "hardware_facility": 19440,
+      "hardware_gate_pass": true,
+      "install_margin": 0.783,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 23.3,
+     "detected_pct": 42.4,
+     "flights": {
+      "n": 40,
+      "mean_pct": 26.7,
+      "p10_pct": 6.0,
+      "median_pct": 24.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 80.0
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 4860,
+      "hardware_facility": 25920,
+      "hardware_gate_pass": true,
+      "install_margin": 0.783,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": null,
+    "90": null,
+    "95": null
+   }
+  },
+  {
+   "id": "patch2_fan",
+   "label": "2 patches, fanned (2 faces)",
+   "stage": "Seed",
+   "radio": "bladerf",
+   "params": {
+    "antenna": "patch",
+    "rx_elements": 2,
+    "faces": 2,
+    "rx_gain_dbi": 5.0,
+    "processing": "crs_p0",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 3547.0,
+    "bladerf": 1700.0,
+    "custom": 1861.44
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 0.4,
+     "detected_pct": 38.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 0.5,
+      "p10_pct": 0.0,
+      "median_pct": 0.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 12.5
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 5100,
+      "hardware_facility": 5100,
+      "hardware_gate_pass": true,
+      "install_margin": 0.778,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 10.2,
+     "detected_pct": 44.1,
+     "flights": {
+      "n": 40,
+      "mean_pct": 0.8,
+      "p10_pct": 0.0,
+      "median_pct": 0.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 2.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 5100,
+      "hardware_facility": 6800,
+      "hardware_gate_pass": true,
+      "install_margin": 0.778,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 17.4,
+     "detected_pct": 47.5,
+     "flights": {
+      "n": 40,
+      "mean_pct": 3.8,
+      "p10_pct": 0.0,
+      "median_pct": 0.6,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 17.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 5100,
+      "hardware_facility": 8500,
+      "hardware_gate_pass": true,
+      "install_margin": 0.778,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 19.9,
+     "detected_pct": 50.8,
+     "flights": {
+      "n": 40,
+      "mean_pct": 6.9,
+      "p10_pct": 0.0,
+      "median_pct": 3.1,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 17.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 5100,
+      "hardware_facility": 10200,
+      "hardware_gate_pass": true,
+      "install_margin": 0.778,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 27.1,
+     "detected_pct": 54.7,
+     "flights": {
+      "n": 40,
+      "mean_pct": 13.5,
+      "p10_pct": 0.2,
+      "median_pct": 7.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 17.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 5100,
+      "hardware_facility": 13600,
+      "hardware_gate_pass": true,
+      "install_margin": 0.778,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 34.3,
+     "detected_pct": 57.2,
+     "flights": {
+      "n": 40,
+      "mean_pct": 20.3,
+      "p10_pct": 1.0,
+      "median_pct": 14.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 35.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 5100,
+      "hardware_facility": 17000,
+      "hardware_gate_pass": true,
+      "install_margin": 0.778,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 36.9,
+     "detected_pct": 58.5,
+     "flights": {
+      "n": 40,
+      "mean_pct": 27.2,
+      "p10_pct": 2.9,
+      "median_pct": 24.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 42.5
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 5100,
+      "hardware_facility": 20400,
+      "hardware_gate_pass": true,
+      "install_margin": 0.778,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 45.3,
+     "detected_pct": 61.4,
+     "flights": {
+      "n": 40,
+      "mean_pct": 39.0,
+      "p10_pct": 10.7,
+      "median_pct": 38.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 80.0
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 5100,
+      "hardware_facility": 27200,
+      "hardware_gate_pass": true,
+      "install_margin": 0.778,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": null,
+    "90": null,
+    "95": null
+   }
+  },
+  {
+   "id": "patch4_2x2",
+   "label": "4 patches: 2 faces x 2",
+   "stage": "Seed",
+   "radio": "bladerf",
+   "params": {
+    "antenna": "patch",
+    "rx_elements": 4,
+    "faces": 2,
+    "rx_gain_dbi": 5.0,
+    "processing": "crs_p0",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 6444.0,
+    "bladerf": 2750.0,
+    "custom": 2262.88
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 9.7,
+     "detected_pct": 61.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 3.9,
+      "p10_pct": 0.0,
+      "median_pct": 1.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 22.5
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 8250,
+      "hardware_facility": 8250,
+      "hardware_gate_pass": true,
+      "install_margin": 0.715,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 25.4,
+     "detected_pct": 68.2,
+     "flights": {
+      "n": 40,
+      "mean_pct": 7.3,
+      "p10_pct": 0.0,
+      "median_pct": 4.9,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 7.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 8250,
+      "hardware_facility": 11000,
+      "hardware_gate_pass": true,
+      "install_margin": 0.715,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 32.2,
+     "detected_pct": 69.1,
+     "flights": {
+      "n": 40,
+      "mean_pct": 15.7,
+      "p10_pct": 0.1,
+      "median_pct": 11.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 15.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 8250,
+      "hardware_facility": 13750,
+      "hardware_gate_pass": true,
+      "install_margin": 0.715,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 42.4,
+     "detected_pct": 69.5,
+     "flights": {
+      "n": 40,
+      "mean_pct": 22.1,
+      "p10_pct": 0.2,
+      "median_pct": 19.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 7.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 8250,
+      "hardware_facility": 16500,
+      "hardware_gate_pass": true,
+      "install_margin": 0.715,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 52.5,
+     "detected_pct": 72.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 30.3,
+      "p10_pct": 2.1,
+      "median_pct": 29.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 12.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 8250,
+      "hardware_facility": 22000,
+      "hardware_gate_pass": true,
+      "install_margin": 0.715,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 55.1,
+     "detected_pct": 72.5,
+     "flights": {
+      "n": 40,
+      "mean_pct": 37.7,
+      "p10_pct": 4.5,
+      "median_pct": 40.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 30.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 8250,
+      "hardware_facility": 27500,
+      "hardware_gate_pass": true,
+      "install_margin": 0.715,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 62.7,
+     "detected_pct": 74.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 44.5,
+      "p10_pct": 9.7,
+      "median_pct": 49.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 40.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 8250,
+      "hardware_facility": 33000,
+      "hardware_gate_pass": true,
+      "install_margin": 0.715,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 67.4,
+     "detected_pct": 74.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 54.7,
+      "p10_pct": 23.7,
+      "median_pct": 56.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 2.5,
+      "share_reach_150m_pct": 80.0
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 8250,
+      "hardware_facility": 44000,
+      "hardware_gate_pass": true,
+      "install_margin": 0.715,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": null,
+    "90": null,
+    "95": null
+   }
+  },
+  {
+   "id": "omni4",
+   "label": "4 omnis, circular array",
+   "stage": "Seed",
+   "radio": "bladerf",
+   "params": {
+    "antenna": "omni",
+    "rx_elements": 4,
+    "faces": 1,
+    "rx_gain_dbi": 5.0,
+    "processing": "crs_p0",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 6284.0,
+    "bladerf": 2590.0,
+    "custom": 2102.88
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 2.1,
+     "detected_pct": 64.8,
+     "flights": {
+      "n": 40,
+      "mean_pct": 1.4,
+      "p10_pct": 0.0,
+      "median_pct": 0.1,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 10.0
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 7770,
+      "hardware_facility": 7770,
+      "hardware_gate_pass": true,
+      "install_margin": 0.725,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 12.3,
+     "detected_pct": 71.2,
+     "flights": {
+      "n": 40,
+      "mean_pct": 2.4,
+      "p10_pct": 0.0,
+      "median_pct": 1.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 7.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 7770,
+      "hardware_facility": 10360,
+      "hardware_gate_pass": true,
+      "install_margin": 0.725,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 25.4,
+     "detected_pct": 75.4,
+     "flights": {
+      "n": 40,
+      "mean_pct": 7.6,
+      "p10_pct": 0.1,
+      "median_pct": 4.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 5.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 7770,
+      "hardware_facility": 12950,
+      "hardware_gate_pass": true,
+      "install_margin": 0.725,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 36.4,
+     "detected_pct": 79.7,
+     "flights": {
+      "n": 40,
+      "mean_pct": 14.9,
+      "p10_pct": 0.3,
+      "median_pct": 9.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 2.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 7770,
+      "hardware_facility": 15540,
+      "hardware_gate_pass": true,
+      "install_margin": 0.725,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 52.1,
+     "detected_pct": 85.2,
+     "flights": {
+      "n": 40,
+      "mean_pct": 26.5,
+      "p10_pct": 1.6,
+      "median_pct": 20.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 20.0
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 7770,
+      "hardware_facility": 20720,
+      "hardware_gate_pass": true,
+      "install_margin": 0.725,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 58.1,
+     "detected_pct": 86.4,
+     "flights": {
+      "n": 40,
+      "mean_pct": 38.4,
+      "p10_pct": 5.8,
+      "median_pct": 35.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 35.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 7770,
+      "hardware_facility": 25900,
+      "hardware_gate_pass": true,
+      "install_margin": 0.725,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 66.9,
+     "detected_pct": 89.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 47.7,
+      "p10_pct": 11.1,
+      "median_pct": 47.9,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 2.5,
+      "share_reach_150m_pct": 60.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 7770,
+      "hardware_facility": 31080,
+      "hardware_gate_pass": true,
+      "install_margin": 0.725,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 75.4,
+     "detected_pct": 90.3,
+     "flights": {
+      "n": 40,
+      "mean_pct": 60.0,
+      "p10_pct": 29.9,
+      "median_pct": 66.6,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 7.5,
+      "share_reach_150m_pct": 82.5
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 7770,
+      "hardware_facility": 41440,
+      "hardware_gate_pass": true,
+      "install_margin": 0.725,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": null,
+    "90": null,
+    "95": null
+   }
+  },
+  {
+   "id": "omni8",
+   "label": "8 omnis, circular array",
+   "stage": "Series A",
+   "radio": "custom",
+   "params": {
+    "antenna": "omni",
+    "rx_elements": 8,
+    "faces": 1,
+    "rx_gain_dbi": 5.0,
+    "processing": "crs_p0",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 11518.0,
+    "bladerf": 4130.0,
+    "custom": 3045.76
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 20.8,
+     "detected_pct": 85.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 7.4,
+      "p10_pct": 0.0,
+      "median_pct": 2.1,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 30.0
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 9137,
+      "hardware_facility": 9137,
+      "hardware_gate_pass": true,
+      "install_margin": 0.697,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 41.5,
+     "detected_pct": 89.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 15.6,
+      "p10_pct": 0.2,
+      "median_pct": 10.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 15.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 9137,
+      "hardware_facility": 12183,
+      "hardware_gate_pass": true,
+      "install_margin": 0.697,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 53.4,
+     "detected_pct": 91.5,
+     "flights": {
+      "n": 40,
+      "mean_pct": 28.6,
+      "p10_pct": 1.7,
+      "median_pct": 24.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 10.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 9137,
+      "hardware_facility": 15229,
+      "hardware_gate_pass": true,
+      "install_margin": 0.697,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 68.6,
+     "detected_pct": 93.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 38.4,
+      "p10_pct": 2.8,
+      "median_pct": 39.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 20.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 9137,
+      "hardware_facility": 18275,
+      "hardware_gate_pass": true,
+      "install_margin": 0.697,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 75.8,
+     "detected_pct": 96.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 51.7,
+      "p10_pct": 18.5,
+      "median_pct": 55.4,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 7.5,
+      "share_reach_150m_pct": 37.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 9137,
+      "hardware_facility": 24366,
+      "hardware_gate_pass": true,
+      "install_margin": 0.697,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 78.0,
+     "detected_pct": 96.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 61.3,
+      "p10_pct": 29.9,
+      "median_pct": 69.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 7.5,
+      "share_reach_150m_pct": 57.5
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 9137,
+      "hardware_facility": 30458,
+      "hardware_gate_pass": true,
+      "install_margin": 0.697,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 86.0,
+     "detected_pct": 98.3,
+     "flights": {
+      "n": 40,
+      "mean_pct": 68.5,
+      "p10_pct": 41.2,
+      "median_pct": 75.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 15.0,
+      "share_reach_150m_pct": 70.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 9137,
+      "hardware_facility": 36549,
+      "hardware_gate_pass": true,
+      "install_margin": 0.697,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 89.8,
+     "detected_pct": 99.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 76.4,
+      "p10_pct": 50.5,
+      "median_pct": 79.5,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 25.0,
+      "share_reach_150m_pct": 87.5
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 9137,
+      "hardware_facility": 48732,
+      "hardware_gate_pass": true,
+      "install_margin": 0.697,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": 12,
+    "90": null,
+    "95": null
+   }
+  },
+  {
+   "id": "patch8_2x4",
+   "label": "8 patches: 2 faces x 4",
+   "stage": "Series A",
+   "radio": "custom",
+   "params": {
+    "antenna": "patch",
+    "rx_elements": 8,
+    "faces": 2,
+    "rx_gain_dbi": 5.0,
+    "processing": "crs_p0",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 11838.0,
+    "bladerf": 4450.0,
+    "custom": 3365.76
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 23.3,
+     "detected_pct": 72.9,
+     "flights": {
+      "n": 40,
+      "mean_pct": 15.4,
+      "p10_pct": 0.0,
+      "median_pct": 13.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 22.5
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 10097,
+      "hardware_facility": 10097,
+      "hardware_gate_pass": true,
+      "install_margin": 0.678,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 44.5,
+     "detected_pct": 76.7,
+     "flights": {
+      "n": 40,
+      "mean_pct": 20.8,
+      "p10_pct": 0.5,
+      "median_pct": 19.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 12.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 10097,
+      "hardware_facility": 13463,
+      "hardware_gate_pass": true,
+      "install_margin": 0.678,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 52.5,
+     "detected_pct": 78.4,
+     "flights": {
+      "n": 40,
+      "mean_pct": 31.6,
+      "p10_pct": 1.5,
+      "median_pct": 33.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 10.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 10097,
+      "hardware_facility": 16829,
+      "hardware_gate_pass": true,
+      "install_margin": 0.678,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 62.7,
+     "detected_pct": 79.7,
+     "flights": {
+      "n": 40,
+      "mean_pct": 38.6,
+      "p10_pct": 3.5,
+      "median_pct": 39.5,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 0.0,
+      "share_reach_150m_pct": 7.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 10097,
+      "hardware_facility": 20195,
+      "hardware_gate_pass": true,
+      "install_margin": 0.678,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 68.6,
+     "detected_pct": 80.9,
+     "flights": {
+      "n": 40,
+      "mean_pct": 47.8,
+      "p10_pct": 17.5,
+      "median_pct": 47.6,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 5.0,
+      "share_reach_150m_pct": 22.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 10097,
+      "hardware_facility": 26926,
+      "hardware_gate_pass": true,
+      "install_margin": 0.678,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 71.6,
+     "detected_pct": 81.4,
+     "flights": {
+      "n": 40,
+      "mean_pct": 55.6,
+      "p10_pct": 30.8,
+      "median_pct": 56.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 5.0,
+      "share_reach_150m_pct": 45.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 10097,
+      "hardware_facility": 33658,
+      "hardware_gate_pass": true,
+      "install_margin": 0.678,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 75.0,
+     "detected_pct": 81.8,
+     "flights": {
+      "n": 40,
+      "mean_pct": 60.8,
+      "p10_pct": 34.5,
+      "median_pct": 63.4,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 5.0,
+      "share_reach_150m_pct": 55.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 10097,
+      "hardware_facility": 40389,
+      "hardware_gate_pass": true,
+      "install_margin": 0.678,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 76.7,
+     "detected_pct": 82.2,
+     "flights": {
+      "n": 40,
+      "mean_pct": 67.6,
+      "p10_pct": 49.9,
+      "median_pct": 71.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 7.5,
+      "share_reach_150m_pct": 82.5
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 10097,
+      "hardware_facility": 53852,
+      "hardware_gate_pass": true,
+      "install_margin": 0.678,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": null,
+    "90": null,
+    "95": null
+   }
+  },
+  {
+   "id": "patch2_fan_full",
+   "label": "2 patches, fanned + full-signal processing",
+   "stage": "Seed",
+   "radio": "bladerf",
+   "params": {
+    "antenna": "patch",
+    "rx_elements": 2,
+    "faces": 2,
+    "rx_gain_dbi": 5.0,
+    "processing": "full",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 3947.0,
+    "bladerf": 2100.0,
+    "custom": 2261.44
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 56.8,
+     "detected_pct": 92.8,
+     "flights": {
+      "n": 40,
+      "mean_pct": 42.2,
+      "p10_pct": 10.8,
+      "median_pct": 42.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 2.5,
+      "share_reach_150m_pct": 30.0
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 6300,
+      "hardware_facility": 6300,
+      "hardware_gate_pass": true,
+      "install_margin": 0.754,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 74.2,
+     "detected_pct": 91.5,
+     "flights": {
+      "n": 40,
+      "mean_pct": 51.1,
+      "p10_pct": 26.3,
+      "median_pct": 49.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 2.5,
+      "share_reach_150m_pct": 35.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 6300,
+      "hardware_facility": 8400,
+      "hardware_gate_pass": true,
+      "install_margin": 0.754,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 79.7,
+     "detected_pct": 89.8,
+     "flights": {
+      "n": 40,
+      "mean_pct": 63.3,
+      "p10_pct": 39.8,
+      "median_pct": 64.4,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 7.5,
+      "share_reach_150m_pct": 32.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 6300,
+      "hardware_facility": 10500,
+      "hardware_gate_pass": true,
+      "install_margin": 0.754,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 85.2,
+     "detected_pct": 94.5,
+     "flights": {
+      "n": 40,
+      "mean_pct": 68.7,
+      "p10_pct": 51.1,
+      "median_pct": 72.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 7.5,
+      "share_reach_150m_pct": 42.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 6300,
+      "hardware_facility": 12600,
+      "hardware_gate_pass": true,
+      "install_margin": 0.754,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 86.9,
+     "detected_pct": 94.1,
+     "flights": {
+      "n": 40,
+      "mean_pct": 74.3,
+      "p10_pct": 52.4,
+      "median_pct": 76.5,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 7.5,
+      "share_reach_150m_pct": 57.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 6300,
+      "hardware_facility": 16800,
+      "hardware_gate_pass": true,
+      "install_margin": 0.754,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 90.7,
+     "detected_pct": 96.2,
+     "flights": {
+      "n": 40,
+      "mean_pct": 80.2,
+      "p10_pct": 62.7,
+      "median_pct": 82.1,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 17.5,
+      "share_reach_150m_pct": 72.5
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 6300,
+      "hardware_facility": 21000,
+      "hardware_gate_pass": true,
+      "install_margin": 0.754,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 91.5,
+     "detected_pct": 98.3,
+     "flights": {
+      "n": 40,
+      "mean_pct": 82.9,
+      "p10_pct": 66.9,
+      "median_pct": 83.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 30.0,
+      "share_reach_150m_pct": 82.5
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 6300,
+      "hardware_facility": 25200,
+      "hardware_gate_pass": true,
+      "install_margin": 0.754,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 94.1,
+     "detected_pct": 99.6,
+     "flights": {
+      "n": 40,
+      "mean_pct": 85.5,
+      "p10_pct": 71.2,
+      "median_pct": 86.6,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 40.0,
+      "share_reach_150m_pct": 90.0
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 6300,
+      "hardware_facility": 33600,
+      "hardware_gate_pass": true,
+      "install_margin": 0.754,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": 6,
+    "90": 10,
+    "95": null
+   }
+  },
+  {
+   "id": "omni4_full",
+   "label": "4 omnis + full-signal processing",
+   "stage": "Seed",
+   "radio": "bladerf",
+   "params": {
+    "antenna": "omni",
+    "rx_elements": 4,
+    "faces": 1,
+    "rx_gain_dbi": 5.0,
+    "processing": "full",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 6684.0,
+    "bladerf": 2990.0,
+    "custom": 2502.88
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 89.4,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 61.7,
+      "p10_pct": 36.2,
+      "median_pct": 64.1,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 10.0,
+      "share_reach_150m_pct": 70.0
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 8970,
+      "hardware_facility": 8970,
+      "hardware_gate_pass": true,
+      "install_margin": 0.701,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 95.3,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 73.2,
+      "p10_pct": 50.2,
+      "median_pct": 76.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 15.0,
+      "share_reach_150m_pct": 75.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 8970,
+      "hardware_facility": 11960,
+      "hardware_gate_pass": true,
+      "install_margin": 0.701,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 97.5,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 81.4,
+      "p10_pct": 61.3,
+      "median_pct": 83.6,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 27.5,
+      "share_reach_150m_pct": 82.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 8970,
+      "hardware_facility": 14950,
+      "hardware_gate_pass": true,
+      "install_margin": 0.701,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 83.1,
+      "p10_pct": 64.8,
+      "median_pct": 83.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 30.0,
+      "share_reach_150m_pct": 77.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 8970,
+      "hardware_facility": 17940,
+      "hardware_gate_pass": true,
+      "install_margin": 0.701,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 86.5,
+      "p10_pct": 71.6,
+      "median_pct": 86.1,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 40.0,
+      "share_reach_150m_pct": 87.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 8970,
+      "hardware_facility": 23920,
+      "hardware_gate_pass": true,
+      "install_margin": 0.701,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 88.0,
+      "p10_pct": 75.1,
+      "median_pct": 87.5,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 42.5,
+      "share_reach_150m_pct": 95.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 8970,
+      "hardware_facility": 29900,
+      "hardware_gate_pass": true,
+      "install_margin": 0.701,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 88.7,
+      "p10_pct": 76.5,
+      "median_pct": 87.9,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 45.0,
+      "share_reach_150m_pct": 95.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 8970,
+      "hardware_facility": 35880,
+      "hardware_gate_pass": true,
+      "install_margin": 0.701,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 89.4,
+      "p10_pct": 77.5,
+      "median_pct": 88.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 45.0,
+      "share_reach_150m_pct": 95.0
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 8970,
+      "hardware_facility": 47840,
+      "hardware_gate_pass": true,
+      "install_margin": 0.701,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": 3,
+    "90": 4,
+    "95": 4
+   }
+  },
+  {
+   "id": "omni4_full_mic",
+   "label": "4 omnis + full signal + microphones",
+   "stage": "Seed",
+   "radio": "bladerf",
+   "params": {
+    "antenna": "omni",
+    "rx_elements": 4,
+    "faces": 1,
+    "rx_gain_dbi": 5.0,
+    "processing": "full",
+    "mic_range_m": 100.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 6784.0,
+    "bladerf": 3090.0,
+    "custom": 2602.88
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 89.4,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 68.1,
+      "p10_pct": 47.1,
+      "median_pct": 66.5,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 17.5,
+      "share_reach_150m_pct": 70.0
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 9270,
+      "hardware_facility": 9270,
+      "hardware_gate_pass": true,
+      "install_margin": 0.695,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 95.3,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 78.1,
+      "p10_pct": 60.4,
+      "median_pct": 78.6,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 27.5,
+      "share_reach_150m_pct": 75.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 9270,
+      "hardware_facility": 12360,
+      "hardware_gate_pass": true,
+      "install_margin": 0.695,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 97.5,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 87.5,
+      "p10_pct": 71.4,
+      "median_pct": 87.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 45.0,
+      "share_reach_150m_pct": 82.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 9270,
+      "hardware_facility": 15450,
+      "hardware_gate_pass": true,
+      "install_margin": 0.695,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 88.7,
+      "p10_pct": 72.9,
+      "median_pct": 90.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 50.0,
+      "share_reach_150m_pct": 77.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 9270,
+      "hardware_facility": 18540,
+      "hardware_gate_pass": true,
+      "install_margin": 0.695,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 93.3,
+      "p10_pct": 83.2,
+      "median_pct": 97.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 72.5,
+      "share_reach_150m_pct": 87.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 9270,
+      "hardware_facility": 24720,
+      "hardware_gate_pass": true,
+      "install_margin": 0.695,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 95.1,
+      "p10_pct": 84.9,
+      "median_pct": 99.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 75.0,
+      "share_reach_150m_pct": 95.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 9270,
+      "hardware_facility": 30900,
+      "hardware_gate_pass": true,
+      "install_margin": 0.695,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 95.4,
+      "p10_pct": 85.4,
+      "median_pct": 100.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 77.5,
+      "share_reach_150m_pct": 95.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 9270,
+      "hardware_facility": 37080,
+      "hardware_gate_pass": true,
+      "install_margin": 0.695,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 96.4,
+      "p10_pct": 85.9,
+      "median_pct": 100.0,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 80.0,
+      "share_reach_150m_pct": 95.0
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 9270,
+      "hardware_facility": 49440,
+      "hardware_gate_pass": true,
+      "install_margin": 0.695,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": 3,
+    "90": 4,
+    "95": 4
+   }
+  },
+  {
+   "id": "omni8_full",
+   "label": "8 omnis + full-signal processing",
+   "stage": "Series A",
+   "radio": "custom",
+   "params": {
+    "antenna": "omni",
+    "rx_elements": 8,
+    "faces": 1,
+    "rx_gain_dbi": 5.0,
+    "processing": "full",
+    "mic_range_m": 0.0,
+    "cit_s": 0.8,
+    "adc_bits": 12
+   },
+   "node_cost_usd": {
+    "b210": 12218.0,
+    "bladerf": 4830.0,
+    "custom": 3745.76
+   },
+   "points": [
+    {
+     "n": 3,
+     "located_pct": 97.9,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 74.6,
+      "p10_pct": 55.6,
+      "median_pct": 76.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 15.0,
+      "share_reach_150m_pct": 77.5
+     },
+     "economics": {
+      "zones": 1,
+      "hardware_per_zone": 11237,
+      "hardware_facility": 11237,
+      "hardware_gate_pass": true,
+      "install_margin": 0.655,
+      "customer_5yr": 140000,
+      "vs_incumbent": 1.35
+     }
+    },
+    {
+     "n": 4,
+     "located_pct": 99.2,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 79.6,
+      "p10_pct": 62.2,
+      "median_pct": 81.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 27.5,
+      "share_reach_150m_pct": 77.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 11237,
+      "hardware_facility": 14983,
+      "hardware_gate_pass": true,
+      "install_margin": 0.655,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 5,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 84.7,
+      "p10_pct": 66.0,
+      "median_pct": 85.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 32.5,
+      "share_reach_150m_pct": 87.5
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 11237,
+      "hardware_facility": 18729,
+      "hardware_gate_pass": true,
+      "install_margin": 0.655,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 6,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 86.1,
+      "p10_pct": 72.4,
+      "median_pct": 85.3,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 37.5,
+      "share_reach_150m_pct": 90.0
+     },
+     "economics": {
+      "zones": 2,
+      "hardware_per_zone": 11237,
+      "hardware_facility": 22475,
+      "hardware_gate_pass": true,
+      "install_margin": 0.655,
+      "customer_5yr": 280000,
+      "vs_incumbent": 2.69
+     }
+    },
+    {
+     "n": 8,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 88.3,
+      "p10_pct": 74.5,
+      "median_pct": 87.2,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 40.0,
+      "share_reach_150m_pct": 92.5
+     },
+     "economics": {
+      "zones": 3,
+      "hardware_per_zone": 11237,
+      "hardware_facility": 29966,
+      "hardware_gate_pass": true,
+      "install_margin": 0.655,
+      "customer_5yr": 420000,
+      "vs_incumbent": 4.04
+     }
+    },
+    {
+     "n": 10,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 89.1,
+      "p10_pct": 76.6,
+      "median_pct": 88.7,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 45.0,
+      "share_reach_150m_pct": 95.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 11237,
+      "hardware_facility": 37458,
+      "hardware_gate_pass": true,
+      "install_margin": 0.655,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 12,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 89.5,
+      "p10_pct": 78.2,
+      "median_pct": 88.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 45.0,
+      "share_reach_150m_pct": 95.0
+     },
+     "economics": {
+      "zones": 4,
+      "hardware_per_zone": 11237,
+      "hardware_facility": 44949,
+      "hardware_gate_pass": true,
+      "install_margin": 0.655,
+      "customer_5yr": 560000,
+      "vs_incumbent": 5.38
+     }
+    },
+    {
+     "n": 16,
+     "located_pct": 100.0,
+     "detected_pct": 100.0,
+     "flights": {
+      "n": 40,
+      "mean_pct": 89.8,
+      "p10_pct": 79.7,
+      "median_pct": 88.8,
+      "hover_share_pct": 8.6,
+      "share_flights_90_pct": 45.0,
+      "share_reach_150m_pct": 95.0
+     },
+     "economics": {
+      "zones": 6,
+      "hardware_per_zone": 11237,
+      "hardware_facility": 59932,
+      "hardware_gate_pass": true,
+      "install_margin": 0.655,
+      "customer_5yr": 840000,
+      "vs_incumbent": 8.08
+     }
+    }
+   ],
+   "min_nodes": {
+    "80": 3,
+    "90": 3,
+    "95": 3
+   }
+  }
+ ],
+ "notes": "Located = 3+ tower-node pairs over the detection threshold (coverage map, drone at 60 m). Scored flights = fast estimate over random contraband flights (flights.py). Costs: parts per node (cost.py); facility billed as ceil(nodes/3) zones."
+}

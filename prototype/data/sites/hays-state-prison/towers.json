@@ -1,0 +1,2177 @@
+{
+ "site": "hays-state-prison",
+ "radius_m": 12000,
+ "fetched": "2026-11-08",
+ "sources": [
+  "FCC Antenna Structure Registration bulk data (r_tower.zip), constructed structures only",
+  "likely_cellular inferred from owner name (ASSUMPTION)",
+  "OpenCelliD LTE cells (CC BY-SA 4.0): 194 cells within 8 km; matched to towers within 600 m (ASSUMPTION)"
+ ],
+ "towers": [
+  {
+   "id": "ASR-1062299",
+   "source": "FCC ASR",
+   "lat": 34.52472222222222,
+   "lon": -85.30944444444444,
+   "x": 183.9,
+   "y": 1943.2,
+   "distance_m": 1952,
+   "bearing_deg": 5.4,
+   "ground_m": 208.0,
+   "height_agl_m": 76.2,
+   "structure_type": "TOWER",
+   "owner": "NORTH GEORGIA EMC",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 1,
+   "carriers": [
+    "AT&T"
+   ]
+  },
+  {
+   "id": "ASR-1020096",
+   "source": "FCC ASR",
+   "lat": 34.487944444444445,
+   "lon": -85.28616666666667,
+   "x": 2321.6,
+   "y": -2136.6,
+   "distance_m": 3155,
+   "bearing_deg": 132.6,
+   "ground_m": 448.7,
+   "height_agl_m": 96.0,
+   "structure_type": "LTOWER",
+   "owner": "Crown Castle South LLC",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 0,
+   "carriers": []
+  },
+  {
+   "id": "ASR-1040980",
+   "source": "FCC ASR",
+   "lat": 34.47138888888889,
+   "lon": -85.3236111111111,
+   "x": -1117.0,
+   "y": -3973.1,
+   "distance_m": 4127,
+   "bearing_deg": 195.7,
+   "ground_m": 228.0,
+   "height_agl_m": 144.5,
+   "structure_type": "TOWER",
+   "owner": "Pinnacle Towers LLC",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 2,
+   "carriers": [
+    "AT&T"
+   ]
+  },
+  {
+   "id": "ASR-1312112",
+   "source": "FCC ASR",
+   "lat": 34.473416666666665,
+   "lon": -85.33566666666667,
+   "x": -2224.1,
+   "y": -3748.2,
+   "distance_m": 4358,
+   "bearing_deg": 210.7,
+   "ground_m": 200.3,
+   "height_agl_m": 70.1,
+   "structure_type": "LTOWER",
+   "owner": "TowerCom V, LLC",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 5,
+   "carriers": [
+    "AT&T",
+    "Verizon"
+   ]
+  },
+  {
+   "id": "ASR-1275901",
+   "source": "FCC ASR",
+   "lat": 34.46861111111111,
+   "lon": -85.29777777777778,
+   "x": 1255.3,
+   "y": -4281.3,
+   "distance_m": 4462,
+   "bearing_deg": 163.7,
+   "ground_m": 435.0,
+   "height_agl_m": 24.0,
+   "structure_type": "TOWER",
+   "owner": "American Towers LLC",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 2,
+   "carriers": [
+    "AT&T"
+   ]
+  },
+  {
+   "id": "ASR-1209379",
+   "source": "FCC ASR",
+   "lat": 34.54816666666667,
+   "lon": -85.29638888888888,
+   "x": 1382.8,
+   "y": 4543.9,
+   "distance_m": 4750,
+   "bearing_deg": 16.9,
+   "ground_m": 201.2,
+   "height_agl_m": 92.7,
+   "structure_type": "LTOWER",
+   "owner": "SBA Structures, LLC",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 3,
+   "carriers": [
+    "AT&T"
+   ]
+  },
+  {
+   "id": "ASR-1220304",
+   "source": "FCC ASR",
+   "lat": 34.48825,
+   "lon": -85.36725,
+   "x": -5124.5,
+   "y": -2102.7,
+   "distance_m": 5539,
+   "bearing_deg": 247.7,
+   "ground_m": 289.8,
+   "height_agl_m": 93.7,
+   "structure_type": "LTOWER",
+   "owner": "American Towers LLC",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 0,
+   "carriers": []
+  },
+  {
+   "id": "ASR-1047588",
+   "source": "FCC ASR",
+   "lat": 34.46472222222222,
+   "lon": -85.35333333333334,
+   "x": -3846.5,
+   "y": -4712.7,
+   "distance_m": 6083,
+   "bearing_deg": 219.2,
+   "ground_m": 193.5,
+   "height_agl_m": 76.2,
+   "structure_type": "TOWER",
+   "owner": "Azteca Communications, Inc.",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 2,
+   "carriers": [
+    "AT&T",
+    "T-Mobile"
+   ]
+  },
+  {
+   "id": "ASR-1023046",
+   "source": "FCC ASR",
+   "lat": 34.4615,
+   "lon": -85.35830555555556,
+   "x": -4303.1,
+   "y": -5070.1,
+   "distance_m": 6650,
+   "bearing_deg": 220.3,
+   "ground_m": 197.8,
+   "height_agl_m": 82.9,
+   "structure_type": "TOWER",
+   "owner": "GEORGIA POWER COMPANY",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 1,
+   "carriers": [
+    "AT&T"
+   ]
+  },
+  {
+   "id": "ASR-1213732",
+   "source": "FCC ASR",
+   "lat": 34.44111111111111,
+   "lon": -85.24738888888888,
+   "x": 5882.6,
+   "y": -7331.9,
+   "distance_m": 9400,
+   "bearing_deg": 141.3,
+   "ground_m": 198.4,
+   "height_agl_m": 93.3,
+   "structure_type": "LTOWER",
+   "owner": "SBA Structures, LLC",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 4,
+   "carriers": [
+    "T-Mobile",
+    "Verizon"
+   ]
+  },
+  {
+   "id": "ASR-1220634",
+   "source": "FCC ASR",
+   "lat": 34.59425,
+   "lon": -85.29102777777778,
+   "x": 1875.2,
+   "y": 9656.0,
+   "distance_m": 9836,
+   "bearing_deg": 11.0,
+   "ground_m": 271.2,
+   "height_agl_m": 78.6,
+   "structure_type": "GTOWER",
+   "owner": "American Towers LLC",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 0,
+   "carriers": []
+  },
+  {
+   "id": "ASR-1019166",
+   "source": "FCC ASR",
+   "lat": 34.40472222222222,
+   "lon": -85.34833333333333,
+   "x": -3387.3,
+   "y": -11368.6,
+   "distance_m": 11862,
+   "bearing_deg": 196.6,
+   "ground_m": 429.2,
+   "height_agl_m": 89.6,
+   "structure_type": "TOWER",
+   "owner": "Cellco Partnership",
+   "likely_cellular": true,
+   "opencellid_lte_cells": 0,
+   "carriers": []
+  }
+ ],
+ "opencellid_cells": [
+  {
+   "x": -8223.8,
+   "y": -3794.4,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 163531029,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -8591.2,
+   "y": -3461.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187477263,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -8958.5,
+   "y": -2574.2,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447169,
+   "range": 3989,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -7489.2,
+   "y": 1863.1,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105815,
+   "range": 7348,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -7121.8,
+   "y": -8897.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187477256,
+   "range": 3517,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -6387.2,
+   "y": -8009.8,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44267814,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -6387.2,
+   "y": -8009.8,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44267779,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -5836.2,
+   "y": -4460.0,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983830,
+   "range": 2410,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -6754.5,
+   "y": -4016.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188401120,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -6570.9,
+   "y": -3905.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 56719880,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -6479.0,
+   "y": -3461.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446986,
+   "range": 4903,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -6846.4,
+   "y": -1686.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447168,
+   "range": 4984,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -4642.4,
+   "y": -8120.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225963804,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -4642.4,
+   "y": -8009.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225962007,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -4642.4,
+   "y": -6234.9,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225963811,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -4183.2,
+   "y": -6124.0,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 44267779,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -4183.2,
+   "y": -6124.0,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 44267810,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -3815.9,
+   "y": -5014.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441169,
+   "range": 1306,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -5377.0,
+   "y": -4792.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447205,
+   "range": 7200,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -3999.6,
+   "y": -4238.1,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983870,
+   "range": 3135,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -3724.1,
+   "y": -4016.3,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165152,
+   "range": 2402,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -3907.7,
+   "y": -4016.3,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44267812,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -4550.5,
+   "y": -3905.4,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 108676098,
+   "range": 2509,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -4917.9,
+   "y": -3794.4,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105804,
+   "range": 12029,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -5009.7,
+   "y": -3461.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447000,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -3632.2,
+   "y": -3239.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446985,
+   "range": 1407,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -5101.5,
+   "y": -3128.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447169,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -5101.5,
+   "y": -2907.0,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447000,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -3724.1,
+   "y": -1908.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188400904,
+   "range": 6209,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2346.6,
+   "y": -4127.2,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44267798,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -3540.4,
+   "y": -4127.2,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983820,
+   "range": 2543,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -3356.7,
+   "y": -4127.2,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983810,
+   "range": 2071,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -3540.4,
+   "y": -4127.2,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441376,
+   "range": 3449,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2530.2,
+   "y": -4016.3,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44164108,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -2989.4,
+   "y": -4016.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188401119,
+   "range": 2571,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2071.1,
+   "y": -3905.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188401088,
+   "range": 2891,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2805.7,
+   "y": -3572.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188400905,
+   "range": 1733,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -3356.7,
+   "y": -3461.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188401088,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2805.7,
+   "y": -3350.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188400901,
+   "range": 8546,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2438.4,
+   "y": -3350.7,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 120965152,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -2622.1,
+   "y": -3239.8,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44164354,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -3448.6,
+   "y": -3239.8,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105854,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -3448.6,
+   "y": -3239.8,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105855,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -3448.6,
+   "y": -3239.8,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44267788,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -2254.7,
+   "y": -3239.8,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165123,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -2989.4,
+   "y": -3128.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225964974,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2530.2,
+   "y": -3128.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447126,
+   "range": 3820,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2989.4,
+   "y": -3128.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188400912,
+   "range": 1969,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -3264.9,
+   "y": -3017.9,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188401094,
+   "range": 2066,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2162.9,
+   "y": -2796.0,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225924515,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -3173.1,
+   "y": -2685.1,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44164374,
+   "range": 2038,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -2805.7,
+   "y": -2685.1,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 8274,
+   "range": 4315,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -2897.6,
+   "y": -2685.1,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983871,
+   "range": 4076,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -3448.6,
+   "y": -2574.2,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446999,
+   "range": 2760,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2805.7,
+   "y": -2352.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441162,
+   "range": 1648,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2622.1,
+   "y": -2352.3,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983821,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -2897.6,
+   "y": -2352.3,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983831,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -2346.6,
+   "y": -2241.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441169,
+   "range": 6221,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2530.2,
+   "y": -2241.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446992,
+   "range": 1842,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2530.2,
+   "y": -2241.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447168,
+   "range": 2014,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2713.9,
+   "y": -2130.4,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983811,
+   "range": 3507,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -2071.1,
+   "y": -2130.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446985,
+   "range": 1130,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2622.1,
+   "y": -2019.5,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225924521,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2622.1,
+   "y": -2019.5,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188401119,
+   "range": 2327,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2622.1,
+   "y": -1908.6,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 120965152,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -2622.1,
+   "y": -1908.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225963810,
+   "range": 1525,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2071.1,
+   "y": -1353.9,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 8323,
+   "range": 8376,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -2622.1,
+   "y": -1132.1,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19124246,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -2346.6,
+   "y": -1021.1,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441376,
+   "range": 9480,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2071.1,
+   "y": -910.2,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447167,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -1887.4,
+   "y": -799.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447167,
+   "range": 1389,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2071.1,
+   "y": -244.6,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 8371,
+   "range": 6102,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -2989.4,
+   "y": -22.7,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44164353,
+   "range": 1155,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -3356.7,
+   "y": 421.0,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105805,
+   "range": 10817,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -1795.6,
+   "y": 642.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446984,
+   "range": 8051,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -2989.4,
+   "y": 4525.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188447203,
+   "range": 9972,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -418.1,
+   "y": -4127.2,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44267810,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -142.6,
+   "y": -4016.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441176,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -142.6,
+   "y": -4016.3,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983809,
+   "range": 1137,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -1060.9,
+   "y": -3905.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441162,
+   "range": 3088,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -1428.3,
+   "y": -3572.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441162,
+   "range": 2270,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -418.1,
+   "y": -3572.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441303,
+   "range": 2870,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -601.8,
+   "y": -2019.5,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 8321,
+   "range": 3662,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -1060.9,
+   "y": -1686.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 42269712,
+   "range": 16404,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -1703.7,
+   "y": -1021.1,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225951518,
+   "range": 1109,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -1428.3,
+   "y": -133.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188477120,
+   "range": 2046,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -50.8,
+   "y": -133.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 33306881,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -50.8,
+   "y": -133.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 44165121,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -50.8,
+   "y": -133.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 33382657,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -50.8,
+   "y": -133.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188132581,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -50.8,
+   "y": -133.7,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 33332481,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -50.8,
+   "y": -133.7,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 33382657,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -1336.4,
+   "y": -22.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225924515,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -142.6,
+   "y": 88.2,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 108676117,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -969.1,
+   "y": 421.0,
+   "mcc": 311,
+   "mnc": 870,
+   "cellid": 47971,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -969.1,
+   "y": 421.0,
+   "mcc": 311,
+   "mnc": 870,
+   "cellid": 47091,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -877.3,
+   "y": 642.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188400901,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -969.1,
+   "y": 642.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476951,
+   "range": 3782,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -693.6,
+   "y": 753.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225964974,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -601.8,
+   "y": 975.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225964980,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -1244.6,
+   "y": 1086.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 206361980,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -509.9,
+   "y": 1197.5,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188401118,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -1428.3,
+   "y": 1197.5,
+   "mcc": 310,
+   "mnc": 0,
+   "cellid": 8371,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "other"
+  },
+  {
+   "x": -418.1,
+   "y": 1197.5,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446991,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -326.3,
+   "y": 1419.4,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44164364,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -418.1,
+   "y": 1530.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476951,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -50.8,
+   "y": 1530.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188400912,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -418.1,
+   "y": 1641.2,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188477120,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -418.1,
+   "y": 1641.2,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441160,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -785.4,
+   "y": 1863.1,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476952,
+   "range": 2561,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -1611.9,
+   "y": 1974.0,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 8273,
+   "range": 19777,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -877.3,
+   "y": 2195.9,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19124236,
+   "range": 9163,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": -326.3,
+   "y": 2861.5,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188477151,
+   "range": 2464,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -509.9,
+   "y": 2972.4,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 8370,
+   "range": 18604,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -50.8,
+   "y": 3416.1,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446991,
+   "range": 3924,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -50.8,
+   "y": 4303.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476938,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": -693.6,
+   "y": 4747.3,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165891,
+   "range": 1554,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": -326.3,
+   "y": 5634.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476945,
+   "range": 3096,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1326.7,
+   "y": -4792.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446992,
+   "range": 8109,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 224.7,
+   "y": -3905.4,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983819,
+   "range": 1410,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 959.4,
+   "y": -3794.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188132369,
+   "range": 1575,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 41.1,
+   "y": -3683.5,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105803,
+   "range": 5577,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 1602.2,
+   "y": -3461.6,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105813,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 1326.7,
+   "y": -3350.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188400912,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1602.2,
+   "y": -3350.7,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105853,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 1326.7,
+   "y": -2352.3,
+   "mcc": 311,
+   "mnc": 490,
+   "cellid": 8321,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 775.7,
+   "y": -1243.0,
+   "mcc": 310,
+   "mnc": 0,
+   "cellid": 8321,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "other"
+  },
+  {
+   "x": 775.7,
+   "y": -1243.0,
+   "mcc": 310,
+   "mnc": 0,
+   "cellid": 8257,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "other"
+  },
+  {
+   "x": 1143.0,
+   "y": -244.6,
+   "mcc": 311,
+   "mnc": 490,
+   "cellid": 8370,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 41.1,
+   "y": 199.1,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 108676157,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 41.1,
+   "y": 199.1,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165136,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 1051.2,
+   "y": 421.0,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105558,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 316.6,
+   "y": 1308.4,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105548,
+   "range": 1815,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 867.6,
+   "y": 2195.9,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188446998,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 41.1,
+   "y": 2639.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476937,
+   "range": 1422,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 408.4,
+   "y": 2861.5,
+   "mcc": 311,
+   "mnc": 490,
+   "cellid": 47090,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 592.1,
+   "y": 2861.5,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165890,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 775.7,
+   "y": 3194.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188477121,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1051.2,
+   "y": 3748.9,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225964974,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 500.2,
+   "y": 3859.9,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225964980,
+   "range": 2949,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1694.0,
+   "y": 4636.4,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225964980,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1602.2,
+   "y": 4747.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476950,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1694.0,
+   "y": 4747.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 42359056,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1326.7,
+   "y": 6300.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476936,
+   "range": 6226,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 132.9,
+   "y": 6411.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225964974,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 775.7,
+   "y": 8297.1,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 206357427,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 316.6,
+   "y": 8629.9,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476952,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 224.7,
+   "y": 8740.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 42242307,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 224.7,
+   "y": 8740.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476945,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 2704.2,
+   "y": -4460.0,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19106070,
+   "range": 8225,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 3530.7,
+   "y": -4460.0,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 53672471,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 3530.7,
+   "y": -4460.0,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 69999639,
+   "range": 1574,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 3347.0,
+   "y": -4349.1,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441375,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 2979.7,
+   "y": -4349.1,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188132368,
+   "range": 14927,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 2704.2,
+   "y": -4016.3,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983829,
+   "range": 1571,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 2061.4,
+   "y": -3683.5,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 68983869,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 1969.5,
+   "y": -3683.5,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188132368,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1877.7,
+   "y": -3683.5,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188132581,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 2428.7,
+   "y": -3572.6,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165121,
+   "range": 4223,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 2336.9,
+   "y": -3350.7,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 120965132,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 3071.5,
+   "y": -2796.0,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165132,
+   "range": 4630,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 3163.4,
+   "y": 4081.7,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441167,
+   "range": 6198,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 2428.7,
+   "y": 4303.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441160,
+   "range": 11968,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 2796.0,
+   "y": 4636.4,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165904,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 2061.4,
+   "y": 5523.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225964973,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 2153.2,
+   "y": 5856.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225964973,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1969.5,
+   "y": 5967.6,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19105547,
+   "range": 1705,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 2153.2,
+   "y": 6078.5,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165889,
+   "range": 1560,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 1877.7,
+   "y": 7298.7,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165900,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 2612.4,
+   "y": 7742.5,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 206361980,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 1969.5,
+   "y": 7964.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188476943,
+   "range": 3770,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 2428.7,
+   "y": 8408.0,
+   "mcc": 310,
+   "mnc": 120,
+   "cellid": 60954882,
+   "range": 2040,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 4724.5,
+   "y": -6678.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441168,
+   "range": 2838,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 4724.5,
+   "y": -5680.3,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188400394,
+   "range": 2926,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 3989.8,
+   "y": -5458.4,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19106060,
+   "range": 9677,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 4816.3,
+   "y": -5347.5,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441302,
+   "range": 1647,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 4816.3,
+   "y": -5236.5,
+   "mcc": 311,
+   "mnc": 870,
+   "cellid": 4899,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 4357.2,
+   "y": -4903.7,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 120965142,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 3989.8,
+   "y": -4792.8,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 69999679,
+   "range": 2064,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 3806.2,
+   "y": -4792.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441161,
+   "range": 3006,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 3806.2,
+   "y": -4570.9,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 120965142,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 3806.2,
+   "y": -4570.9,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 187441161,
+   "range": 2017,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 5826.5,
+   "y": -8897.3,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 69999627,
+   "range": 786,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 6010.2,
+   "y": -8786.3,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 69999617,
+   "range": 1590,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 5918.3,
+   "y": -8342.6,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 19106059,
+   "range": 4563,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 6102.0,
+   "y": -8231.7,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165122,
+   "range": 13639,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 5734.7,
+   "y": -8120.8,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188400393,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 5734.7,
+   "y": -7898.9,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 69999628,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 5826.5,
+   "y": -7788.0,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 69999618,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 6377.5,
+   "y": -7566.1,
+   "mcc": 311,
+   "mnc": 480,
+   "cellid": 44165142,
+   "range": 3335,
+   "samples": 1,
+   "carrier": "Verizon"
+  },
+  {
+   "x": 5734.7,
+   "y": -6789.6,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 69999629,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  },
+  {
+   "x": 5459.2,
+   "y": -6678.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 225924514,
+   "range": 1000,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 5642.8,
+   "y": -6678.6,
+   "mcc": 310,
+   "mnc": 410,
+   "cellid": 188477201,
+   "range": 3279,
+   "samples": 1,
+   "carrier": "AT&T"
+  },
+  {
+   "x": 5642.8,
+   "y": -6456.8,
+   "mcc": 310,
+   "mnc": 260,
+   "cellid": 69999619,
+   "range": 1282,
+   "samples": 1,
+   "carrier": "T-Mobile"
+  }
+ ]
+}

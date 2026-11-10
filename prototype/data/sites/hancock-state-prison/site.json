@@ -1,0 +1,131 @@
+{
+ "id": "hancock-state-prison",
+ "name": "Hancock State Prison",
+ "place": "Sparta, Hancock County, GA",
+ "osm_way": 509152141,
+ "origin": {
+  "lat": 33.245892587499995,
+  "lon": -82.9507896375,
+  "elev_m": 149.3
+ },
+ "fence": [
+  [
+   140.2,
+   -217.4
+  ],
+  [
+   233.5,
+   -63.1
+  ],
+  [
+   151.6,
+   54.2
+  ],
+  [
+   46.8,
+   118.8
+  ],
+  [
+   28.8,
+   141.7
+  ],
+  [
+   -136.4,
+   103.0
+  ],
+  [
+   -253.8,
+   20.2
+  ],
+  [
+   -210.8,
+   -157.5
+  ],
+  [
+   140.2,
+   -217.4
+  ]
+ ],
+ "fence_area_m2": 120322.0,
+ "buildings": [
+  {
+   "osm_id": 618582463,
+   "poly": [
+    [
+     441.1,
+     -223.7
+    ],
+    [
+     437.0,
+     -233.4
+    ],
+    [
+     452.4,
+     -239.9
+    ],
+    [
+     458.7,
+     -225.0
+    ],
+    [
+     457.8,
+     -224.7
+    ],
+    [
+     459.7,
+     -220.2
+    ],
+    [
+     457.9,
+     -219.4
+    ],
+    [
+     460.5,
+     -213.2
+    ],
+    [
+     451.2,
+     -209.4
+    ],
+    [
+     444.6,
+     -225.1
+    ],
+    [
+     441.1,
+     -223.7
+    ]
+   ],
+   "height_m": 7.0,
+   "height_source": "default (assumption)",
+   "kind": "house",
+   "area_m2": 373.9
+  }
+ ],
+ "terrain": {
+  "coarse": {
+   "file": "terrain_coarse.bin",
+   "x0": -10000,
+   "y0": -10000,
+   "step_m": 50,
+   "nx": 401,
+   "ny": 401
+  },
+  "fine": {
+   "file": "terrain_fine.bin",
+   "x0": -1500,
+   "y0": -1500,
+   "step_m": 10,
+   "nx": 301,
+   "ny": 301
+  },
+  "dtype": "int16 little-endian, decimetres, row 0 = south edge",
+  "datum": "NAVD88 metres"
+ },
+ "sources": [
+  "Facility outline and buildings: (c) OpenStreetMap contributors, ODbL",
+  "Terrain: USGS 3D Elevation Program (3DEP), exportImage service",
+  "Default building height 7.0 m where OSM has none (ASSUMPTION)"
+ ],
+ "fetched": "2026-11-10"
+}

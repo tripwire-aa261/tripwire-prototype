@@ -29,3 +29,18 @@ desktop.ini
 
 # Claude Code: personal settings stay local; .claude/settings.json is shared
 .claude/settings.local.json
+
+# More secrets: never commit keys, tokens or credentials
+*.pem
+*.key
+*.p12
+*secret*
+*credentials*.json
+*token*.txt
+
+# Research papers stay local (cite them instead): the Fraunhofer LTE450 paper
+content (1).pdf
+papers/
+
+# Old downloaded copy of this repository
+tripwire-prototype-main/

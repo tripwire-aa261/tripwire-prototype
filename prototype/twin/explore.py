@@ -1,0 +1,209 @@
+"""Precompute everything the viewer's Overview, Simulation and Financials tabs need to answer
+"which sensor design meets the customer's requirements at each site, and what does it cost".
+
+    .venv/bin/python -m twin.explore            (~30 min on 4 cores; writes web/data/explore.json)
+
+Grid: 3 real sites x 2 drones x 6 sensor designs x 3 drone heights x 3 interference-removal levels x
+node counts. For each point, at several zone radii (distance protected around the fence):
+  area covered  share of the zone where 3+ tower-sensor pairs detect the drone (coverage map)
+  accuracy      median expected position error over the covered area (coverage.position_error_m)
+  time tracked  scored-flight track availability (flights.py), flights at that height
+  warning       median distance outside the fence when a flight is first tracked
+Costs are computed in the browser from the per-sensor hardware cost and the editable financial inputs.
+"""
+from __future__ import annotations
+
+import datetime as dt
+import json
+import multiprocessing as mp
+import os
+import time
+from concurrent.futures import ProcessPoolExecutor
+from dataclasses import replace
+from pathlib import Path
+
+import numpy as np
+
+from .antenna import ANTENNAS, zone_samples
+from .config import DRONES, Params
+from .cost import FINANCE, RADIOS, facility_costs, node_cost
+from .coverage import acoustic_count, albersheim_db, coverage_grid, pair_snr_db, position_error_m
+from .flights import scored_flights
+from .geo import distance_to_polygon
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "web" / "data" / "explore.json"
+
+SITES = ["hays", "hancock", "fulton"]
+DRONE_KEYS = ["m210", "mavic"]
+HEIGHTS = [30, 60, 120]
+INTERFERENCE = [20, 30, 40]  # dB of neighbor-cell interference removed (cochannel_suppression_db)
+NODES = [3, 4, 6, 8, 12, 16]
+RADII = [50, 100, 150, 200, 300]
+FLIGHTS = 20
+BASE = dict(cit_s=0.8, adc_bits=12, bird=False, network_load=0.3)
+DEFAULT_REQ = {"radius_m": 150, "height_m": 60, "coverage_pct": 90, "tracked_pct": 80, "accuracy_m": 25,
+               "update_s": 2.0, "interference_db": 20}
+
+DESIGNS = {
+    "basic": dict(label="1 antenna, standard processing", short="1 antenna · standard",
+                  radio="bladerf", p=dict(antenna="patch", rx_elements=1, processing="crs_p0")),
+    "ring4": dict(label="4-antenna ring, standard processing", short="4 antennas · standard",
+                  radio="bladerf", p=dict(antenna="omni", rx_elements=4, processing="crs_p0")),
+    "fan2_enh": dict(label="2 antennas, enhanced processing", short="2 antennas · enhanced",
+                     radio="bladerf", p=dict(antenna="patch", rx_elements=2, faces=2, processing="full")),
+    "ring4_enh": dict(label="4-antenna ring, enhanced processing", short="4 antennas · enhanced",
+                      radio="bladerf", p=dict(antenna="omni", rx_elements=4, processing="full")),
+    "ring4_enh_mic": dict(label="4-antenna ring, enhanced processing + microphone", short="4 antennas · enhanced · mic",
+                          radio="bladerf", p=dict(antenna="omni", rx_elements=4, processing="full", mic_range_m=100.0)),
+    "ring8_enh_mic": dict(label="8-antenna ring, enhanced processing + microphone (custom receiver)",
+                          short="8 antennas · enhanced · mic", radio="custom",
+                          p=dict(antenna="omni", rx_elements=8, processing="full", mic_range_m=100.0)),
+}
+
+
+def _params(site, drone, design, height, interf, n) -> Params:
+    d = DESIGNS[design]
+    return Params.from_dict({**BASE, **d["p"], "drone": drone, "altitude_agl_m": height,
+                             "cochannel_suppression_db": interf, "n_listeners": n, "zone_buffer_m": 150})
+
+
+def _point(args):
+    from .scenarios import site_scene
+    site, drone, design, height, interf, n = args
+    p = _params(site, drone, design, height, interf, n)
+    sc = site_scene(site, p)
+    zs = zone_samples(sc.site, max(RADII), height, 40.0)
+    dist = np.asarray(distance_to_polygon(zs[:, 0], zs[:, 1], sc.site.fence))
+    thr = albersheim_db(0.9, p.pfa)
+    snrs = [pair_snr_db(sc, pr, zs) for pr in sc.pairs]
+    cnt = np.sum([s >= thr for s in snrs], axis=0)
+    mic = acoustic_count(sc, zs)
+    located = (cnt >= 3) | (mic >= 2)
+    err = position_error_m(sc, zs, snrs, thr)
+    cov, acc = [], []
+    for r in RADII:
+        m = dist <= r
+        cov.append(round(float(100 * located[m].mean()), 1))
+        e = err[m & np.isfinite(err)]
+        acc.append(round(float(np.median(e)), 1) if len(e) else None)
+    fl = scored_flights(sc, FLIGHTS, agl=height, radii=RADII)
+    return {"k": [site, drone, design, height, interf, n], "cov": cov, "acc": acc,
+            "trk": [fl["by_radius"][r] for r in RADII], "warn": fl["warning_m"]}
+
+
+def _map(args):
+    """Coverage map snapshot for the Overview tab."""
+    from .scenarios import site_scene
+    site, drone, design, height, interf, n = args
+    p = _params(site, drone, design, height, interf, n)
+    sc = site_scene(site, p)
+    c = np.asarray(sc.site.fence)[:-1].mean(axis=0)
+    ext = float(np.max(np.abs(np.asarray(sc.site.fence) - c))) + 450
+    half = float(np.ceil(ext / 25) * 25)
+    g = coverage_grid(sc, half_m=half, step_m=25.0)
+    # coverage_grid is centred on (0, 0) = site origin; record that for drawing.
+    return {"k": list(args), "x0": g["x0"], "y0": g["y0"], "step": g["step_m"], "n": g["n"],
+            "state": "".join(str(int(v)) for v in g["state"].ravel()),
+            "sensors": [np.round(l.pos[:2], 1).tolist() for l in sc.listeners],
+            "towers_used": sorted({i.id.split(":")[0] for i in sc.illuminators})}
+
+
+def _pool(fn, jobs, label):
+    blas = ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS")
+    os.environ.update({k: "1" for k in blas})
+    out, t0 = [], time.time()
+    with ProcessPoolExecutor(max_workers=min(4, os.cpu_count() or 1), mp_context=mp.get_context("spawn")) as ex:
+        for k, r in enumerate(ex.map(fn, jobs, chunksize=4)):
+            out.append(r)
+            if (k + 1) % 40 == 0 or k + 1 == len(jobs):
+                el = time.time() - t0
+                print(f"\r  {label}: {k + 1}/{len(jobs)}  ({el / 60:.1f} min, ~{el / (k + 1) * (len(jobs) - k - 1) / 60:.0f} min left)", end="", flush=True)
+    print()
+    return out
+
+
+def node_costs() -> dict:
+    out = {}
+    for key, d in DESIGNS.items():
+        p = Params.from_dict({**BASE, **d["p"]})
+        radios = [d["radio"]] if d["radio"] == "custom" else ["bladerf", "b210"]
+        out[key] = {r: node_cost(p.rx_elements, p.antenna, r, p.processing, p.mic_range_m > 0) for r in radios}
+    return out
+
+
+def recommend(results, costs, site, drone, interf, req=DEFAULT_REQ):
+    """Cheapest (upfront) design + node count meeting the requirements; else the best-covering option."""
+    ri = RADII.index(req["radius_m"])
+    best, fallback = None, None
+    for r in results:
+        s, dr, de, h, i, n = r["k"]
+        if (s, dr, h, i) != (site, drone, req["height_m"], interf):
+            continue
+        node_usd = costs[de][DESIGNS[de]["radio"]]["total"]
+        cost = facility_costs(n, node_usd)["upfront"]
+        ok = (r["cov"][ri] >= req["coverage_pct"] and (r["trk"][ri] or 0) >= req["tracked_pct"]
+              and r["acc"][ri] is not None and r["acc"][ri] <= req["accuracy_m"])
+        if ok and (best is None or cost < best[0]):
+            best = (cost, de, n)
+        score = (r["cov"][ri], -cost)
+        if fallback is None or score > fallback[0]:
+            fallback = (score, de, n)
+    return (best[1], best[2], True) if best else (fallback[1], fallback[2], False)
+
+
+def site_info(key):
+    from .scenarios import SITE_IDS, SITE_LABELS, fence_centre, load_site
+    s = load_site(key)
+    towers = json.loads((ROOT / "data" / "sites" / SITE_IDS[key] / "towers.json").read_text())["towers"]
+    cell = [t for t in towers if t.get("likely_cellular")]
+    return {"key": key, "id": SITE_IDS[key], "name": s.name, "place": s.meta.get("place", ""), "type": SITE_LABELS[key],
+            "fence": np.round(np.asarray(s.fence), 1).tolist(), "centre": np.round(fence_centre(s), 1).tolist(),
+            "fence_area_ha": round(s.meta["fence_area_m2"] / 1e4, 1), "buildings": len(s.buildings),
+            "towers_5km": sum(t["distance_m"] <= 5000 for t in cell), "towers_10km": sum(t["distance_m"] <= 10000 for t in cell),
+            "nearest_tower_km": round(min(t["distance_m"] for t in cell) / 1000, 1),
+            "towers": [{"id": t["id"], "x": round(t["x"]), "y": round(t["y"]), "carriers": t.get("carriers") or []}
+                       for t in cell if t["distance_m"] <= 6000]}
+
+
+def main():
+    t0 = time.time()
+    jobs = [(s, d, de, h, i, n) for s in SITES for d in DRONE_KEYS for de in DESIGNS for h in HEIGHTS
+            for i in INTERFERENCE for n in NODES]
+    print(f"{len(jobs)} design points")
+    results = _pool(_point, jobs, "points")
+    costs = node_costs()
+    recs, map_jobs = {}, []
+    for s in SITES:
+        for d in DRONE_KEYS:
+            for i in INTERFERENCE:
+                de, n, ok = recommend(results, costs, s, d, i)
+                recs[f"{s}|{d}|{i}"] = {"design": de, "n": n, "meets": ok}
+                map_jobs.append((s, d, de, DEFAULT_REQ["height_m"], i, n))
+    maps = _pool(_map, map_jobs, "maps")
+    doc = {
+        "created": dt.datetime.now().isoformat(timespec="seconds"), "runtime_min": round((time.time() - t0) / 60, 1),
+        "sites": {k: site_info(k) for k in SITES},
+        "drones": {k: {"name": DRONES[k].name, "rcs_m2": DRONES[k].rcs_m2} for k in DRONE_KEYS},
+        "designs": {k: {"label": d["label"], "short": d["short"], "radio": d["radio"], "params": d["p"],
+                        "node_cost": costs[k]} for k, d in DESIGNS.items()},
+        "antennas": {k: {"name": a.name, "gain_dbi": a.gain_dbi, "price_usd": a.price_usd} for k, a in ANTENNAS.items()},
+        "radios": {k: {"name": r["name"], "usd": r["usd"], "stage": r["stage"], "source": r["source"]} for k, r in RADIOS.items()},
+        "axes": {"heights": HEIGHTS, "interference": INTERFERENCE, "nodes": NODES, "radii": RADII},
+        "default_req": DEFAULT_REQ, "update_interval_s": BASE["cit_s"] and 1.5,
+        "finance": FINANCE, "results": results, "recommended": recs, "maps": maps,
+        "notes": {
+            "area_covered": "Share of the zone (fence + radius) where 3+ tower-sensor pairs detect the drone, or 2+ microphones hear it.",
+            "accuracy": "Median expected position error over the covered area; rough (within ~2x of the full simulation).",
+            "time_tracked": f"Scored-flight estimate: {FLIGHTS} random contraband flights at the chosen height, share of in-zone time with a held track.",
+            "interference": "dB of interference from neighboring cells on the same carrier that the processing removes: 20 = current assumption; 40 = rebuilding and subtracting neighbor cells (unproven).",
+            "update": "One position update per processed frame: every 1.5 s (0.8 s integration).",
+        },
+    }
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(json.dumps(doc, separators=(",", ":")))
+    print(f"wrote {OUT} ({OUT.stat().st_size / 1e6:.1f} MB) in {(time.time() - t0) / 60:.1f} min")
+
+
+if __name__ == "__main__":
+    main()
