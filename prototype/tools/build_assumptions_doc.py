@@ -63,7 +63,7 @@ def priced(n, node_usd, model):
 # ----------------------------------------------------------------------------------------- recommendations
 RES = {tuple(r["k"]): r for r in X["results"]}
 RI = RADII.index(DEFAULT_REQ["radius_m"])
-TGT = (DEFAULT_REQ["coverage_pct"], DEFAULT_REQ["tracked_pct"], DEFAULT_REQ["accuracy_m"])
+TGT = (DEFAULT_REQ["coverage_pct"], DEFAULT_REQ["tracked_pct"], DEFAULT_REQ["accuracy_m"], DEFAULT_REQ.get("detection_m", 0))
 
 
 def best_for(site, drone, interf, radio):
@@ -72,7 +72,8 @@ def best_for(site, drone, interf, radio):
     ok = []
     for n in X["axes"]["nodes"]:
         r = RES.get((site, drone, de, DEFAULT_REQ["height_m"], interf, n))
-        if r and r["cov"][RI] >= TGT[0] and r["trk"][RI] >= TGT[1] and r["acc"][RI] is not None and r["acc"][RI] <= TGT[2]:
+        if r and r["cov"][RI] >= TGT[0] and r["trk"][RI] >= TGT[1] and r["acc"][RI] is not None and r["acc"][RI] <= TGT[2] \
+                and r.get("det50", r.get("warn") or 0) >= TGT[3]:
             ok.append((priced(n, nc, "install_sub")["cost5"], n, r))
     if not ok:
         rs = [RES.get((site, drone, de, DEFAULT_REQ["height_m"], interf, n)) for n in X["axes"]["nodes"]]
@@ -270,8 +271,9 @@ def main():
     # 8
     w("## 8. What each facility needs and earns\n")
     w(f"Recommended setup = the radio and number of sensors with the lowest cost to us that covers {TGT[0]}% of the area "
-      f"within {DEFAULT_REQ['radius_m']} m of the fence, tracks a drone {TGT[1]}% of the time and places it within "
-      f"{TGT[2]} m (DECISION: viewer slider defaults), drones {DEFAULT_REQ['height_m']} m up, 5 kg drone. Results from `web/data/explore.json` "
+      f"within {DEFAULT_REQ['radius_m']} m of the fence, tracks a drone {TGT[1]}% of the time, places it within "
+      f"{TGT[2]} m and first tracks the typical incoming drone at least {TGT[3]} m outside the fence (DECISION: viewer "
+      f"slider defaults), drones {DEFAULT_REQ['height_m']} m up, 5 kg drone. Results from `web/data/explore.json` "
       f"(created {X['created']}). Sensors spaced evenly on the fence.\n")
     rows = []
     for site in [k for k in ("hancock", "hays", "fulton") if k in X["sites"]]:  # sparse, moderate, dense towers
@@ -286,11 +288,12 @@ def main():
                 n, ndu = rb["n"], rb["node"]
                 a, s = priced(n, ndu, "install_sub"), priced(n, ndu, "set")
                 rows.append([f"{X['sites'][site]['name']} ({SITE_LABELS[site]})", f"{interf} dB", C.RADIOS[radio]["name"], n,
-                             f"{r['cov'][RI]:.0f}% / {r['trk'][RI]:.0f}% / {r['caught']:.0f}% / {r['acc'][RI]:.0f} m",
+                             f"{r['cov'][RI]:.0f}% / {r['trk'][RI]:.0f}% / {r['caught']:.0f}% / {r['acc'][RI]:.0f} m / "
+                             f"{r.get('det50', 0):.0f} m; {r.get('det80', 0):.0f} m",
                              f"{usd(a['upfront'])} + {usd(a['yearly'])}/yr", f"{usd(a['price'])} + {usd(a['sub'])}/yr",
                              f"{usd(a['gp'] / Y)} ({math.ceil(OVERHEAD / (a['gp'] / Y))})",
                              f"{usd(s['gp'] / Y)} ({math.ceil(OVERHEAD / (s['gp'] / Y))})", f"{s['gm']:.0%}"])
-    w(table(["Facility", "Interference removal", "Radio", "Sensors", "Area / tracked / caught / accuracy", "Our cost (upfront + yearly)",
+    w(table(["Facility", "Interference removal", "Radio", "Sensors", "Area / tracked / caught / accuracy / detection range (typical; 8 in 10)", "Our cost (upfront + yearly)",
              "Price at cost + 40%", "Gross profit/yr at cost + 40% (facilities to cover $1M/yr)",
              "Gross profit/yr at data-package prices (facilities)", "Gross margin at data-package prices"], rows))
     w("\n20 dB of interference removal is today's assumption; 30 and 40 dB are unproven (section 11). The custom receiver "
@@ -335,6 +338,12 @@ def main():
     w(f"- **Background stability (hover hold):** {p.background_stability_db:g} dB default (ASSUMPTION); needs about -30 to "
       f"-40 dB; listening up to {p.hover_dwell_s:g} s on a stopped track. Microphone range {DESIGNS['ring4_enh_mic']['p']['mic_range_m']:g} m (ASSUMPTION).")
     w(f"- **Fast estimate:** chain loss {5.0:g} dB (FIT to 7 full-simulation runs); 20 scored flights per design point.")
+    w("- **Detection range:** distance outside the fence when the track that guards see begins (held for 3 updates), "
+      "only before the drone crosses the fence; drones never tracked count as 0 m. The requirement uses the typical drone "
+      "(median over 20 flights x 16 draws, DECISION Nov 12); the 8-in-10 figure is reported alongside. Flights start "
+      "1,800 m from the drop point from random directions. At Hays drones arriving from the south-southwest (bearings "
+      "~180-230 deg, along the line between the southern towers and the sensors) are picked up only ~50-300 m out even "
+      "with 16 sensors, so the 8-in-10 range is much shorter than the typical one; sensor placement is the likely fix.")
     w(f"- **Processing:** listening time per update {BASE['cit_s']} s, one update every 1.5 s, 12-bit radios, network "
       f"{BASE['network_load']:.0%} busy (ASSUMPTION), false-alarm rate {p.pfa:g} per cell (ASSUMPTION).")
     w(f"- **Sensors:** {p.mast_m:g} m mast (ASSUMPTION; see section 12 for 15 and 25 m), evenly spaced on the fence.")

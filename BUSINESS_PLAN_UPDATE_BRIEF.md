@@ -1,7 +1,7 @@
 # Brief: updating the business plan from the prototype
 
 For a new Claude Code session (any computer) whose job is to bring the business plan and its financials in line with the
-prototype. Written 2026-11-12 at twin v0.4.4.
+prototype. Written 2026-11-12 at twin v0.4.5.
 
 ## 1. Set up
 
@@ -23,7 +23,7 @@ cd tripwire-prototype
    costs, per-facility results, competitor figures, technical assumptions, sources). Each figure is tagged CITED,
    MEASURED, FIT, STANDARD, ASSUMPTION or DECISION.
 2. `context/HANDOFF.md`: current state, decisions in force, open questions.
-3. `prototype/README.md`: what the twin does and the findings per version (v0.4.4 at the top).
+3. `prototype/README.md`: what the twin does and the findings per version (v0.4.5 at the top).
 4. `Iterations.docx`: one short entry per build (what did not work, what changed), lessons for the product, risks, key
    assumptions.
 5. Background only: `Your Seed Pitch Data Package and Prototype.pdf` (the team's earlier planning numbers),
@@ -42,7 +42,7 @@ cd tripwire-prototype
 
 ## 4. What changed since the Seed data package (headline)
 
-| | Data package | Prototype v0.4.4 |
+| | Data package | Prototype v0.4.5 |
 |---|---|---|
 | Hardware per 3 sensors | $24,000 | ~$5,500 (standard bladeRF sensor $1,825) |
 | Deployment per 3 sensors | $6,000 | ~$1,530 + $3,000 per facility (set-up + on-site hub) |
@@ -67,6 +67,10 @@ Exact figures and their basis: sections 2-10 of the assumptions file.
   RF-only Dedrone $57,915 hardware + installation.
 - **Technology risk to retire first:** interference removal. Today's assumption (20 dB) works only at the moderate-tower
   site (Hays); the sparse-tower (Hancock) and dense-tower (Fulton) sites need 30-40 dB, unproven.
+- **Customer requirements** the plan can quote: 90% of the area within 150 m of the fence covered, a drone tracked 80%
+  of the time, located within 25 m, and the typical incoming drone first tracked at least 300 m outside the fence
+  (DECISION: defaults; section 11 of the assumptions file). At Hays the typical drone is picked up ~440-500 m out, but
+  drones from one direction (south-southwest) only ~50-300 m out, so do not promise a range for every drone.
 - **Known model optimism:** full simulations track less than the fast estimate at Hancock and Fulton; treat those sensor
   counts as minimums.
 

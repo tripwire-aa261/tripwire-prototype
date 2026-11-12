@@ -1,4 +1,4 @@
-# Tripwire Twin: prototype v0.4.4
+# Tripwire Twin: prototype v0.4.5
 
 A signal-level digital twin of a passive LTE radar at **three real Georgia facilities**: Hancock State Prison
 (sparse towers), Hays State Prison (moderate towers) and Fulton County Jail (dense towers, Atlanta).
@@ -6,6 +6,20 @@ It generates the LTE reference signals defined in the standard, propagates them 
 buildings, adds drone, bird and clutter echoes, and runs the processing chain the product would run:
 direct-signal cancellation, range-Doppler maps, CFAR detection, multistatic location and tracking.
 The model is calibrated against the only published LTE450 drone-detection field trials (Fraunhofer FKIE).
+
+**v0.4.5 (Nov 12): detection range as a customer requirement.** A fifth slider in "What the customer wants": how
+far outside the fence an incoming drone is when guards get a confirmed track (held 3 updates), counting only tracks
+before the drone crosses the fence (never tracked = 0 m). The requirement is the *typical* drone (half of incoming drones
+at least that far out; 300 m default, DECISION); the card also shows the distance **8 in 10** drones reach and the compass
+directions from which drones are picked up late. Scored flights now start 1,800 m from the drop point (was 1,100 m, which
+capped measurable ranges at ~700 m); `explore.json` stores `det50`, `det80` and per-flight `[bearing, range]`.
+Finding: at Hays drones arriving from the south-southwest (~180-230 deg, along the line between the southern towers and the
+sensors) are first tracked only ~50-300 m out even with 16 sensors, while other directions reach 1-1.6 km; that is why the
+8-in-10 range is far shorter than the typical one. Deliberate sensor placement is the likely fix (not yet built).
+With the 300 m requirement the cheapest recommendations are unchanged (Hays 4 custom or 6 bladeRF sensors, typical range
+497 m and 442 m; Hancock 40 dB 6 custom; Fulton 30 dB 12 custom, 40 dB 4 custom). bladeRF needs more sensors at two
+sites: Fulton at 40 dB 6 (was 4; 4 reach only 216 m) and Hancock at 40 dB 12 (was 6; 6 reach 205 m). The explorer now
+takes ~78 min.
 
 **v0.4.4 (Nov 12): hover held in software, re-priced costs, pricing models.**
 - *Hover by background history* (`twin/hover.py`, `Params.hover_history`): the normal Doppler chain still does everything;
@@ -116,7 +130,7 @@ On Windows, use `.venv\Scripts\python` instead of `.venv/bin/python`.
 
 | Command | What it does |
 |---|---|
-| `.venv/bin/python -m twin.explore` | precompute the requirements explorer for all three sites (~40 min, 4 cores) |
+| `.venv/bin/python -m twin.explore` | precompute the requirements explorer for all three sites (~80 min, 4 cores) |
 | `.venv/bin/python -m twin.explore --maps` | recompute only the recommendations and the Overview's coverage maps (~6 min) |
 | `.venv/bin/python tools/make_replays.py` | the 12 precomputed 3D replays (facility x drone x radio; ~45 min) |
 | `.venv/bin/python tools/hover_feasibility.py` | hover-by-background-history and pole-height study (~3 min) |

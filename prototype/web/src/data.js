@@ -78,7 +78,10 @@ function orderSites() {
   const keys = [...SITE_ORDER.filter((k) => X.sites[k]), ...Object.keys(X.sites).filter((k) => !SITE_ORDER.includes(k))];
   X.sites = Object.fromEntries(keys.map((k) => [k, { ...X.sites[k], type: SITE_TYPES[k] ?? X.sites[k].type }]));
 }
-export const defaultTargets = () => ({ area: X.default_req.coverage_pct, tracked: X.default_req.tracked_pct, accuracy: X.default_req.accuracy_m ?? 25 });
+// Detection range: how far outside the fence the typical incoming drone (half of them) is first tracked; 300 m default
+// (default_req.detection_m, DECISION Nov 12). The 8-in-10 figure and weak directions are shown as information.
+export const defaultTargets = () => ({ area: X.default_req.coverage_pct, tracked: X.default_req.tracked_pct, accuracy: X.default_req.accuracy_m ?? 25,
+  detection: X.default_req.detection_m ?? 300 });
 export function defaultReq() {
   const d = X.default_req;
   return { radius_m: d.radius_m, height_m: d.height_m };
@@ -129,7 +132,8 @@ export function outcome(site, drone, design, height, interf, n, radius) {
   const r = lookup(site, drone, design, height, interf, n);
   if (!r) return null;
   const i = X.axes.radii.indexOf(radius);
-  return { cov: r.cov[i], acc: r.acc[i], trk: r.trk[i], warn: r.warn, caught: r.caught ?? null, n };
+  return { cov: r.cov[i], acc: r.acc[i], trk: r.trk[i], warn: r.warn, caught: r.caught ?? null, n,
+    det: r.det50 ?? r.warn ?? 0, det80: r.det80 ?? null, dirs: r.dirs ?? [] };
 }
 
 
@@ -206,9 +210,17 @@ export function setup(site, drone, interf, radio, n, req = state.req, design = f
   return { radio, design, n, o, fin, total: fin.customer5 };
 }
 export const meetsAcc = (o, t = state.targets) => !!o && o.acc != null && o.acc <= (t.accuracy ?? Infinity);
-export const meets = (o, t = state.targets) => !!o && o.cov >= t.area && (o.trk ?? 0) >= t.tracked && meetsAcc(o, t);
+export const meetsDet = (o, t = state.targets) => !!o && (o.det ?? 0) >= (t.detection ?? 0);
+export const meets = (o, t = state.targets) => !!o && o.cov >= t.area && (o.trk ?? 0) >= t.tracked && meetsAcc(o, t) && meetsDet(o, t);
 // One line naming the targets, for notes and table captions.
-export const targetsText = (t = state.targets) => `${t.area}% area covered, ${t.tracked}% time tracked, accuracy within ${t.accuracy} m`;
+export const targetsText = (t = state.targets) => `${t.area}% area covered, ${t.tracked}% time tracked, accuracy within ${t.accuracy} m${t.detection ? `, detection ${t.detection} m out` : ''}`;
+// Compass directions from which drones are first tracked closer than the range asked for (per simulated flight).
+const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+export function weakDirections(o, range) {
+  if (!o?.dirs?.length || !range) return [];
+  const bad = new Set(o.dirs.filter(([, m]) => m < range).map(([b]) => COMPASS[Math.round(b / 45) % 8]));
+  return COMPASS.filter((c) => bad.has(c));
+}
 
 // For one radio: the fewest sensors that meet the targets (cheapest), and the best it can do (most area).
 export function forRadio(site, drone, interf, radio, t = state.targets, req = state.req, design = fixedBuild(radio)) {

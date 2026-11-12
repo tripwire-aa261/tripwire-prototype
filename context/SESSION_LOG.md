@@ -2,6 +2,23 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Nimalan · Twin v0.4.5: detection range as a customer requirement
+
+**Asked for:** "when the drone is first detected. Essentially the range. For example, 600m. Customer can also choose what is the drone detection range in the overview page." Also in this session (discussion only, nothing built): a check of the numbers in Nimalan's "What we learnt from the prototype" text, more lessons from the prototype, how to demo the idea with ESP32 WiFi boards (then with only 3 ESP32s and RFID tags), whether the tracking estimate uses filters, the sensor pole height, and adding Clemson Memorial Stadium (SC) as a stadium-customer site with sensors on the stadium structure (approved; next session's work).
+**Done:**
+- `twin/flights.py`: detection range = distance outside the fence where the first held track (3 updates) began, only before the drone crosses the fence; never tracked = 0 m. Scored flights now start 1,800 m out (was 1,100 m, which capped ranges at ~700 m). `twin/explore.py`: stores `det50` (typical drone), `det80` (8 in 10) and per-flight `[bearing, range]`; recommendation requires det50 >= `detection_m` (300 m default). Explorer re-run 2026-11-12 (~78 min).
+- Viewer: fifth requirement slider "Detection range" (`web/src/requirements.js`), Detection range card on Overview and Trade space simulator (typical, 8 in 10, late directions), help text, 5-column requirements grid.
+- `Tripwire_Assumptions_and_Figures.md` regenerated (detection column + note), `BUSINESS_PLAN_UPDATE_BRIEF.md` (v0.4.5, detection requirement), README v0.4.5, `Iterations.docx` entry 9. 38 tests pass; Overview/Simulation/Financials checked in headless Chromium at 1280 and 390 px with the new data (no errors, no overflow).
+**Decided:**
+- Detection range measured outside the fence; requirement on the typical (median) drone, 300 m default ("Typical drone, 300 m default"). Rejected: 8 in 10 as the requirement, because no setup at Hays meets it (drones from the south-southwest are first tracked only ~50-300 m out even with 16 sensors); 8 in 10 and the weak directions are shown as information.
+- Result: cheapest recommendations unchanged (Hays 4 custom / 6 bladeRF; Hancock 40 dB 6 custom; Fulton 30 dB 12 custom, 40 dB 4 custom). bladeRF needs more at two sites: Fulton 40 dB 6 (was 4), Hancock 40 dB 12 (was 6).
+- Advice given: ESP32 demo = phone hotspot as the "tower", 3 ESP32s running Espressif's `csi_recv_router`, a change detector vs a background-history detector to show the hover fix; RFID tags add little (ground-truth timing at most). Stadium: model sensors both on 6 m poles and on the stadium structure and let the twin decide.
+**Left open:**
+- Stale figures in the `Iterations.docx` lessons (off-the-shelf receiver costs: now $10,553 / $3,165 / $1,601 per 8-antenna sensor, 12 sensors $127k / $38k / $19k) and a pitch point that still mentions microphones; new lessons 4-16 discussed but not added.
+- Tracker settings (Kalman q = 1.5 m/s², 15 m / 40 m noise, 4-sigma gate, 2-of-3 confirmation, 40 m merge) are only in `twin/locate.py`; not yet listed as assumptions. The fast estimate runs no Kalman filter (rules only, accuracy x4.5 FIT).
+- Pole assumptions to state: customer provides 6 m poles, power and network; new poles are not priced; sensors sit exactly on the fence (no setback).
+- Stadium site (Clemson Memorial Stadium): approved, not started. In-stadium cell antennas (DAS), game-day network load and crowd clutter are not modeled.
+
 ## 2026-11-12 · Nimalan · Twin v0.4.3–v0.4.4: hover in software, realistic costs, pricing models, business-plan inputs
 
 Two Claude sessions worked in parallel and coordinated by message; this entry covers both.

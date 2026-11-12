@@ -79,7 +79,12 @@ c.push(B("**Did not work:** the hover depended on a microphone ($100, ASSUMPTION
 c.push(B("**Changed:** a hovering drone is held in software by comparing each sensor's echo pattern with a learned history of the quiet scene (only where a track stopped); the standard sensors drop the microphone. Parts re-priced from listings: a $249 edge GPU computer, $16 GPS, $30 clock sharing, $190 enclosure: $1,825 per bladeRF sensor (was $2,990), $1,601 per custom sensor (was $3,312). Installation $510 per sensor (6 h at $60/h: BLS median wage about doubled for benefits, overhead and travel) plus a $500 on-site hub. Both margins 40%. The $400k design cost is a separate company cost. Three pricing models (cost + margin, all-in yearly fee, value-based)."));
 c.push(B("**Found:** at cost + 40% a facility earns only ~$3,000-4,000 a year, so ~250-330 facilities would be needed to cover a $1M/yr company; at the data package's prices (~$50,000 + $18,000/yr) it is ~45. Cost + margin is the floor, the price must come from value. Taller poles make things worse at the dense-tower site. The hover hold needs the background steady to about -30 to -40 dB: to be measured at Seed."));
 
-c.push(H2("9. Next (proposed)"));
+c.push(H2("9. v0.4.5: detection range (Nov 12)"));
+c.push(B("**Did not work:** customers could not ask how early a drone must be picked up; the early-warning number ignored drones that were never tracked and was capped at ~700 m because simulated flights started too close."));
+c.push(B("**Changed:** a fifth requirement, detection range: how far outside the fence the typical incoming drone is first tracked (300 m by default), with the distance 8 in 10 drones reach and the directions where drones are seen late. Flights now start 1.8 km out."));
+c.push(B("**Found:** at Hays drones flying in from the south-southwest, along the line between the southern towers and the sensors, are picked up only ~50-300 m out even with 16 sensors, against 1-1.6 km from other directions. Placing sensors deliberately (not evenly) is the next fix. With 300 m required, the cheapest answers do not change (Hays: 4 custom or 6 bladeRF sensors); with bladeRF, Fulton at 40 dB needs 6 sensors (was 4) and Hancock at 40 dB 12 (was 6)."));
+
+c.push(H2("10. Next (proposed)"));
 c.push(B("Record real LTE signals and measure interference removal and enhanced-processing gain; model network busyness by hour; check which carriers a radio can capture at once."));
 
 c.push(H1("What the iterations taught us about the product"));

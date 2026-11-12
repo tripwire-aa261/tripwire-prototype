@@ -1,5 +1,5 @@
-// "What the customer wants": the four settings a customer chooses (drone, area covered, time tracked, tracking
-// accuracy). The same block appears on the Overview and in Financials; both edit the shared state.targets.
+// "What the customer wants": the five settings a customer chooses (drone, area covered, time tracked, tracking
+// accuracy, detection range). The same block appears on the Overview and in Financials; both edit the shared state.targets.
 import { $, esc, X, state, emit, onChange } from './data.js';
 import { info } from './help.js';
 
@@ -8,6 +8,7 @@ const SLIDERS = [
   ['area', 'Area covered', 'target_area', 50, 100, 5, (v) => `${v}%`],
   ['tracked', 'Time tracked', 'target_tracked', 50, 100, 5, (v) => `${v}%`],
   ['accuracy', 'Tracking accuracy', 'target_accuracy', 5, 50, 5, (v) => `within ${v} m`],
+  ['detection', 'Detection range', 'target_detection', 0, 1500, 50, (v) => (v ? `${v} m out` : 'no requirement')],
 ];
 
 export function mountRequirements(id, note) {

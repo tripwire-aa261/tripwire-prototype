@@ -259,7 +259,8 @@ td.pick.on { background: var(--panel2); box-shadow: 0 0 0 1px var(--accent) inse
 .seg button b { display: block; font-size: 14px; }
 .seg button small { color: var(--muted); font-size: 11px; }
 .seg button[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
-.kpis.five { grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 4px 0 0; }
+.kpis.five { grid-template-columns: repeat(6, minmax(0, 1fr)); margin: 4px 0 0; }
+@media (max-width: 1400px) { .kpis.five { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 #spRec { font-size: 13px; line-height: 1.5; }
 @media (max-width: 1000px) {
   .kpis.five { grid-template-columns: 1fr 1fr; }
@@ -279,12 +280,13 @@ svg#chNodes text, svg#chCost text { font-size: 13px; }
   border-radius: 12px; padding: 14px 18px 16px; margin: 14px 0 18px; }
 .req-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 10px; }
 .req-head h2 { margin: 0; font-size: 15px; color: var(--accent); }
-.req-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 22px; }
+.req-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px 22px; }
 .req-card label.req { display: flex; flex-direction: column; gap: 4px; margin: 0; min-width: 0; }
 .req-lab { font-size: 15px; font-weight: 650; color: var(--text); }
 .req-card output { float: none; font-size: 24px; font-weight: 700; color: var(--accent); line-height: 1.15; }
 .req-card select { font-size: 16px; padding: 9px 10px; margin-top: 2px; }
 .req-card input[type=range] { height: 22px; margin-top: 2px; }
+@media (max-width: 1200px) { .req-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 1000px) { .req-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .req-grid { grid-template-columns: 1fr; } }
 .ctl .ro { display: block; background: var(--panel2); border: 1px dashed var(--line); border-radius: 6px; padding: 6px 10px; color: var(--text); font-weight: 600; min-width: 120px; }

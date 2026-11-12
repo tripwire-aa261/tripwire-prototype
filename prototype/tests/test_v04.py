@@ -81,10 +81,11 @@ def test_recommend_picks_cheapest_radio_meeting_area_and_tracking_targets():
     from twin.explore import BUILDS, DEFAULT_REQ, RADII, node_costs, recommend
     ri, h = RADII.index(DEFAULT_REQ["radius_m"]), DEFAULT_REQ["height_m"]
 
-    def point(design, n, cov, trk):
+    def point(design, n, cov, trk, det50=500.0):
         c, t = [0.0] * len(RADII), [0.0] * len(RADII)
         c[ri], t[ri] = cov, trk
-        return {"k": ["hays", "m210", design, h, 20, n], "cov": c, "trk": t, "caught": 90.0}
+        return {"k": ["hays", "m210", design, h, 20, n], "cov": c, "trk": t, "caught": 90.0,
+                "acc": [10.0] * len(RADII), "det50": det50}
     ots, custom = BUILDS["bladerf"], BUILDS["custom"]
     res = [point(ots, 4, 95, 70),      # misses the tracking target
            point(ots, 8, 99, 90),      # meets
@@ -95,6 +96,9 @@ def test_recommend_picks_cheapest_radio_meeting_area_and_tracking_targets():
     # No point meets the targets -> best area, flagged as not meeting.
     de, radio, n, ok = recommend([point(ots, 4, 60, 50), point(ots, 8, 80, 70)], node_costs(), "hays", "m210", 20)
     assert not ok and n == 8 and radio == "bladerf"
+    # Detection range: a setup whose typical drone is first tracked too close to the fence does not qualify.
+    de, radio, n, ok = recommend([point(ots, 4, 99, 90, det50=100), point(ots, 8, 99, 90, det50=400)], node_costs(), "hays", "m210", 20)
+    assert ok and n == 8
     # bladeRF and B210 share a build; the B210 is never the cheaper of the two.
     assert BUILDS["bladerf"] == BUILDS["b210"]
 

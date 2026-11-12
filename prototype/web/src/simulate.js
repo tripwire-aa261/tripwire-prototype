@@ -5,6 +5,14 @@
 import { $, esc, usd, pct, meters, X, state, defaultReq, fillSelect, INTERF_LABEL, onChange, emit,
   DESIGN, RADIO, RADIO_KEYS, fixedBuild, designFor, OTS_BUILDS, BUILDS_FOR, setup, recommendAt, radioOption, nearestN, outcome, facility, targetsText } from './data.js';
 import { info } from './help.js';
+import { weakDirections } from './data.js';
+
+// Detection range card: the typical drone (the requirement), with the 8-in-10 figure and weak directions.
+function detCard(o, t, card) {
+  const weak = weakDirections(o, Math.max(t.detection || 0, 300));
+  const sub = `${t.detection ? `target ${t.detection} m · ` : ''}8 in 10: ${o.det80 == null ? '—' : `${Math.round(o.det80)} m`}${weak.length ? ` · late from ${weak.join(', ')}` : ''}`;
+  return card('Detection range', 'detection', `${Math.round(o.det ?? 0)} m`, sub, !t.detection ? '' : (o.det ?? 0) >= t.detection ? 'ok' : 'bad');
+}
 
 export const RCOL = { bladerf: '#38bdf8', b210: '#a78bfa', custom: '#fb923c' };
 const METRIC = {
@@ -41,6 +49,7 @@ function picker() {
     card('Time tracked', 'tracked', pct(o.trk), `target ${t.tracked}%`, o.trk >= t.tracked ? 'ok' : 'bad'),
     card('Drones caught', 'caught', pct(o.caught), 'before they reach the fence'),
     card('Tracking accuracy', 'accuracy', o.acc == null ? '—' : `~${Math.round(o.acc)} m`, `target within ${t.accuracy} m`, o.acc != null && o.acc <= t.accuracy ? 'ok' : 'bad'),
+    detCard(o, t, card),
     card('Customer pays', 'price', `${usd(f.price)}`, `+ ${usd(f.sub)}/yr · ${usd(x.total)} over ${state.fin.years} yrs`),
   ].join('');
   const { rec } = recommendAt(state.site, state.drone, state.interf, t, state.req);

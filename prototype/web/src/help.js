@@ -27,6 +27,10 @@ export const HELP = {
     'Guards need to know roughly where to look; about 25 m is enough to send someone. More sensors and towers make it better.', 'Simulated; rough (within about 2× of the full simulation)'],
   warning: ['Early warning', 'How far outside the fence a drone usually is when it is first tracked.',
     'More warning distance means more time to respond before the drop.', 'Simulated (scored flights, median)'],
+  detection: ['Detection range', 'How far outside the fence an incoming drone is when guards get a confirmed track (held for 3 updates). The headline is the typical drone: half of incoming drones are tracked at least this far out. "8 in 10" is the distance most drones reach; weak directions are where drones are picked up late.',
+    'More range means more time to respond before the drop. It depends on where the towers and sensors are: drones flying in along the line between a tower and the sensors are seen late, which better sensor placement could fix.', 'Simulated: 20 flights from random directions, starting 1.8 km from the drop point'],
+  target_detection: ['Detection range the customer wants', 'How far outside the fence the typical incoming drone must be when it is first tracked. 0 = no requirement.',
+    'Longer ranges need more sensors or a better radio. Ranges above ~1 km are rarely reached.', 'Customer choice; 300 m by default (DECISION)'],
   update: ['Position update', 'How often the drone\'s position is refreshed: every 1.5 s, from 0.8 s of listening per update.',
     'Faster updates would need shorter listening, which loses sensitivity.', 'Model setting'],
   // ------------------------------------------------------------------ the design

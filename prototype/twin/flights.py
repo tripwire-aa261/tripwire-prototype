@@ -28,6 +28,8 @@ NOTCH_HZ = 6.0  # CFAR zero-Doppler mask (processing.cfar_detect)
 SUSTAIN = 3  # frames a track must be held to count (run.score)
 MAX_MISSES = 2  # tracker deletes a track at the 3rd consecutive miss (locate.Tracker)
 DRAWS = 16
+APPROACH_M = 1800.0  # flights start this far from the drop point (was 1,100 m: too close to measure detection ranges
+# above ~700 m outside the fence). The best detection range in the calibrated model is ~1.5 km (Fraunhofer: ~1.6 km).
 # FIT: losses of the full chain that the link budget leaves out (CFAR loss, targets between range-Doppler
 # cells, the locator's consistency checks). 5 dB minimises the error against 7 full-simulation runs of the
 # demo flight (RMS 6 points of track availability, worst 10). All 7 share one flight path: a limited check.
@@ -43,7 +45,7 @@ def pd_from_snr(snr_db, pfa):
 
 
 def random_flights(site, p: Params, n: int, seed: int = 1, agl: float | None = None) -> list[Trajectory]:
-    """In from a random direction ~1.1 km out, hover over a random drop point inside the fence, out in
+    """In from a random direction APPROACH_M out, hover over a random drop point inside the fence, out in
     another random direction (ASSUMPTIONS: heights 30-90 m unless agl is given, speeds 8-15 m/s,
     hover 0-2x hover_s)."""
     rng = np.random.default_rng(seed)
@@ -55,7 +57,7 @@ def random_flights(site, p: Params, n: int, seed: int = 1, agl: float | None = N
         if not bool(site.in_zone(drop[0], drop[1], 0.0)):
             continue
         a_in, a_out = rng.random() * 2 * np.pi, rng.random() * 2 * np.pi
-        start = drop + 1100 * np.array([np.sin(a_in), np.cos(a_in)])
+        start = drop + APPROACH_M * np.array([np.sin(a_in), np.cos(a_in)])
         end = drop + 1000 * np.array([np.sin(a_out), np.cos(a_out)])
         h = float(rng.uniform(30, 90)) if agl is None else float(agl)
         out.append(Trajectory(np.array([start, drop, end]), float(rng.uniform(8, 15)), h,
@@ -154,11 +156,15 @@ def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = 
         by_r[r] = float(100 * tracked[:, zr].mean()) if zr.any() else float("nan")
     # Warning distance: how far outside the fence the drone was when first tracked (median over draws).
     fence_d = np.asarray(distance_to_polygon(pos[:, 0], pos[:, 1], site.fence)) if hasattr(site, "fence") else np.zeros(len(ts))
-    warn = []
+    warn, detect = [], []
     for srow in tracked:
         idx = np.nonzero(srow)[0]
         warn.append(float(fence_d[max(idx[0] - SUSTAIN + 1, 0)]) if len(idx) else np.nan)
-    return {"availability_pct": float(avail), "by_radius": by_r, "caught_pct": float(caught),
+        # Detection range (customer requirement): how far outside the fence the drone was when the track that is
+        # held for SUSTAIN frames began, counting only tracks before the drone crosses the fence; 0 if none.
+        pre = idx[idx < cross]
+        detect.append(float(fence_d[max(pre[0] - SUSTAIN + 1, 0)]) if len(pre) else 0.0)
+    return {"availability_pct": float(avail), "by_radius": by_r, "caught_pct": float(caught), "detect_m": detect,
             "warning_m": None if np.all(np.isnan(warn)) else float(np.nanmedian(warn)),
             "first_track_m": None if np.all(np.isnan(firsts)) else float(np.nanmedian(firsts)),
             "frames_in_zone": int(zone.sum()),
@@ -166,8 +172,13 @@ def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = 
 
 
 def scored_flights(scene, n: int = 40, seed: int = 1, agl: float | None = None, radii=None) -> dict:
-    res = [score_flight(scene, tr, seed=k, radii=radii)
-           for k, tr in enumerate(random_flights(scene.site, scene.params, n, seed, agl))]
+    fls = random_flights(scene.site, scene.params, n, seed, agl)
+    res = [score_flight(scene, tr, seed=k, radii=radii) for k, tr in enumerate(fls)]
+    # Approach bearing (deg from north, the direction the drone comes from) and median detection range per flight.
+    dirs = []
+    for tr, r in zip(fls, res):
+        a = tr.waypoints[0] - tr.waypoints[1]
+        dirs.append([int(round(float(np.degrees(np.arctan2(a[0], a[1]))) % 360)), int(round(float(np.median(r["detect_m"]))))])
     av = np.array([r["availability_pct"] for r in res if np.isfinite(r["availability_pct"])])
     ft = [r["first_track_m"] for r in res]
     reach = np.array([f is not None and f >= 150 for f in ft])
@@ -177,6 +188,11 @@ def scored_flights(scene, n: int = 40, seed: int = 1, agl: float | None = None, 
             "share_flights_90_pct": round(float(100 * np.mean(av >= 90)), 1),
             "share_reach_150m_pct": round(float(100 * reach.mean()), 1),
             "caught_pct": round(float(np.mean([r["caught_pct"] for r in res])), 1),
+            # Detection range met by 8 in 10 incoming drones (20th percentile over all flights x draws, untracked = 0)
+            # and by the typical drone (median).
+            "detect80_m": round(float(np.percentile(np.concatenate([r["detect_m"] for r in res]), 20)), 0),
+            "detect50_m": round(float(np.median(np.concatenate([r["detect_m"] for r in res]))), 0),
+            "detect_dirs": sorted(dirs),
             "by_radius": {r: round(float(np.nanmean([x["by_radius"][r] for x in res])), 1) for r in (radii or [])},
             "warning_m": (None if all(x["warning_m"] is None for x in res) else
                           round(float(np.nanmedian([np.nan if x["warning_m"] is None else x["warning_m"] for x in res])), 0))}

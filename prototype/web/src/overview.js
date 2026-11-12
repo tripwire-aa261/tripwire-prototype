@@ -4,6 +4,14 @@
 import { $, esc, usd, pct, X, state, defaultReq, defaultTargets, fillSelect, INTERF_SHORT, onChange, emit, targetsText, competitors,
   RADIO, RADIO_KEYS, recommendOverall, radioOption } from './data.js';
 import { info } from './help.js';
+import { weakDirections } from './data.js';
+
+// Detection range card: the typical drone (the requirement), with the 8-in-10 figure and weak directions.
+function detCard(o, t, card) {
+  const weak = weakDirections(o, Math.max(t.detection || 0, 300));
+  const sub = `${t.detection ? `target ${t.detection} m · ` : ''}8 in 10: ${o.det80 == null ? '—' : `${Math.round(o.det80)} m`}${weak.length ? ` · late from ${weak.join(', ')}` : ''}`;
+  return card('Detection range', 'detection', `${Math.round(o.det ?? 0)} m`, sub, !t.detection ? '' : (o.det ?? 0) >= t.detection ? 'ok' : 'bad');
+}
 import { distToPolygon } from './viewer3d.js';
 import { mountRequirements } from './requirements.js';
 
@@ -99,6 +107,7 @@ function kpis(H) {
     card('Time tracked', 'tracked', pct(o.trk), `target ${t.tracked}%`, o.trk >= t.tracked ? 'ok' : 'bad'),
     card('Drones caught', 'caught', pct(o.caught), 'tracked before they reach the fence'),
     card('Tracking accuracy', 'accuracy', o.acc == null ? '—' : `~${Math.round(o.acc)} m`, `target within ${t.accuracy} m`, o.acc != null && o.acc <= t.accuracy ? 'ok' : 'bad'),
+    detCard(o, t, card),
   ].join('');
   const Y = state.fin.years, C = competitors(), lo = C.radar.lo, hi = C.radar.hi;
   const vsAir = f.customer5 < lo ? 'below' : f.customer5 > hi ? 'above' : 'within';
@@ -190,7 +199,7 @@ function render() {
 export function initOverview() {
   $('ovSites').innerHTML = Object.keys(X.sites).map((k) => `<button data-k="${k}"><b>${esc(X.sites[k].name)}</b><span>${esc(X.sites[k].type)}</span></button>`).join('');
   $('ovSites').querySelectorAll('button').forEach((b) => (b.onclick = () => { state.site = b.dataset.k; pick = null; emit('overview'); }));
-  mountRequirements('ovReq', 'change these four; the recommendation, map, price and tables below follow');
+  mountRequirements('ovReq', 'change these five; the recommendation, map, price and tables below follow');
   onChange((src) => { if (src === 'targets' || src === 'overview') pick = null; render(); }); // a new requirement drops a clicked cell
   render();
 }

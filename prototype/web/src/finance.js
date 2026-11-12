@@ -1,4 +1,4 @@
-// Financials tab: what the customer wants (the same four requirements as the Overview) sets the setup: the chosen
+// Financials tab: what the customer wants (the same five requirements as the Overview) sets the setup: the chosen
 // radio (default: the recommended one) with the fewest sensors that meet the requirements. The number of sensors is
 // not an input here. Every cost and price assumption is editable (saved in this browser); the three facilities
 // are shown side by side.
@@ -178,7 +178,7 @@ export function initFinance() {
   $('fnRadio').onchange = () => { finRadio = $('fnRadio').value; emit('fin'); };
   $('fnModel').onchange = () => { state.fin.model = $('fnModel').value; saveFin(); emit('fin-input'); };
   $('fnReset').onclick = () => { resetFin(); inputs(); emit('fin-input'); };
-  mountRequirements('fnReq', 'the same four as on the Overview; they set the number of sensors priced below');
+  mountRequirements('fnReq', 'the same five as on the Overview; they set the number of sensors priced below');
   inputs();
   bom();
   onChange(render);

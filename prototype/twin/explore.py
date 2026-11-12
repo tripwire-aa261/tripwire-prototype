@@ -43,7 +43,7 @@ NODES = [3, 4, 6, 8, 12, 16]
 RADII = [50, 100, 150, 200, 300]
 FLIGHTS = 20
 BASE = dict(cit_s=0.8, adc_bits=12, bird=False, network_load=0.3)
-DEFAULT_REQ = {"radius_m": 150, "height_m": 60, "coverage_pct": 90, "tracked_pct": 80, "accuracy_m": 25,
+DEFAULT_REQ = {"radius_m": 150, "height_m": 60, "coverage_pct": 90, "tracked_pct": 80, "accuracy_m": 25, "detection_m": 300,
                "update_s": 2.0, "interference_db": 20}
 
 DESIGNS = {
@@ -97,7 +97,8 @@ def _point(args):
         acc.append(round(float(np.median(e)), 1) if len(e) else None)
     fl = scored_flights(sc, FLIGHTS, agl=height, radii=RADII)
     return {"k": [site, drone, design, height, interf, n], "cov": cov, "acc": acc,
-            "trk": [fl["by_radius"][r] for r in RADII], "warn": fl["warning_m"], "caught": fl["caught_pct"]}
+            "trk": [fl["by_radius"][r] for r in RADII], "warn": fl["warning_m"], "caught": fl["caught_pct"],
+            "det80": fl["detect80_m"], "det50": fl["detect50_m"], "dirs": fl["detect_dirs"]}
 
 
 def _map(args):
@@ -149,7 +150,8 @@ BUILDS = {"bladerf": "ring4_enh_hist", "b210": "ring4_enh_hist", "custom": "ring
 # The option the Overview recommends by default: the cheapest (customer's total over the contract) radio and
 # sensor count that covers at least 90 % of the protected area and holds a track 80 % of the time (ASSUMPTION
 # default targets; the Overview has sliders for both). If none does: the one covering the most area.
-RECOMMEND = {"area_pct": float(DEFAULT_REQ["coverage_pct"]), "tracked_pct": float(DEFAULT_REQ["tracked_pct"])}
+RECOMMEND = {"area_pct": float(DEFAULT_REQ["coverage_pct"]), "tracked_pct": float(DEFAULT_REQ["tracked_pct"]),
+             "accuracy_m": float(DEFAULT_REQ["accuracy_m"]), "detection_m": float(DEFAULT_REQ["detection_m"])}
 
 
 def recommend(results, costs, site, drone, interf, req=DEFAULT_REQ, target=RECOMMEND):
@@ -167,7 +169,10 @@ def recommend(results, costs, site, drone, interf, req=DEFAULT_REQ, target=RECOM
         for radio in by_design[de]:
             fc = facility_costs(n, costs[de][radio]["total"])
             total = customer_price(fc["upfront"], fc["yearly"])["customer_total"]
-            ok = r["cov"][ri] >= target["area_pct"] and r["trk"][ri] >= target["tracked_pct"]
+            acc = r["acc"][ri]
+            ok = (r["cov"][ri] >= target["area_pct"] and r["trk"][ri] >= target["tracked_pct"]
+                  and acc is not None and acc <= target.get("accuracy_m", 1e9)
+                  and r.get("det50", 0) >= target.get("detection_m", 0))
             if ok and (best is None or total < best[0]):
                 best = (total, de, radio, n)
             score = (r["cov"][ri], r["trk"][ri], -total)
@@ -247,6 +252,7 @@ def main():
             "accuracy": "Median expected position error over the covered area; rough (within ~2x of the full simulation).",
             "time_tracked": f"Scored-flight estimate: {FLIGHTS} random contraband flights at the chosen height, share of in-zone time with a held track.",
             "drones_caught": f"Scored-flight estimate: share of {FLIGHTS} random contraband flights at the chosen height that are tracked before the drone crosses the fence.",
+            "detection_range": f"Scored-flight estimate: how far outside the fence an incoming drone is when its track begins (only tracks before it crosses; untracked = 0). det50 = typical drone (median over {FLIGHTS} flights x 16 draws; the customer requirement, DECISION Nov 12); det80 = met by 8 in 10 drones (information); dirs = [approach bearing, median range] per flight. Flights start {int(__import__('twin.flights', fromlist=['APPROACH_M']).APPROACH_M)} m from the drop point.",
             "interference": "dB of interference from neighboring cells on the same carrier that the processing removes: 20 = current assumption; 40 = rebuilding and subtracting neighbor cells (unproven).",
             "update": "One position update per processed frame: every 1.5 s (0.8 s integration).",
         },

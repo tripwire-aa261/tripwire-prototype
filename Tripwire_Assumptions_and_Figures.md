@@ -120,28 +120,28 @@ Architecture (ASSUMPTION): four 2-channel LMS7002M transceivers on one GNSS-disc
 
 ## 8. What each facility needs and earns
 
-Recommended setup = the radio and number of sensors with the lowest cost to us that covers 90% of the area within 150 m of the fence, tracks a drone 80% of the time and places it within 25 m (DECISION: viewer slider defaults), drones 60 m up, 5 kg drone. Results from `web/data/explore.json` (created 2026-11-12T04:26:26). Sensors spaced evenly on the fence.
+Recommended setup = the radio and number of sensors with the lowest cost to us that covers 90% of the area within 150 m of the fence, tracks a drone 80% of the time, places it within 25 m and first tracks the typical incoming drone at least 300 m outside the fence (DECISION: viewer slider defaults), drones 60 m up, 5 kg drone. Results from `web/data/explore.json` (created 2026-11-12T06:38:19). Sensors spaced evenly on the fence.
 
-| Facility | Interference removal | Radio | Sensors | Area / tracked / caught / accuracy | Our cost (upfront + yearly) | Price at cost + 40% | Gross profit/yr at cost + 40% (facilities to cover $1M/yr) | Gross profit/yr at data-package prices (facilities) | Gross margin at data-package prices |
+| Facility | Interference removal | Radio | Sensors | Area / tracked / caught / accuracy / detection range (typical; 8 in 10) | Our cost (upfront + yearly) | Price at cost + 40% | Gross profit/yr at cost + 40% (facilities to cover $1M/yr) | Gross profit/yr at data-package prices (facilities) | Gross margin at data-package prices |
 |---|---|---|---|---|---|---|---|---|---|
-| Hancock State Prison (sparse towers) | 20 dB | bladeRF 2.0 micro xA4 | not possible | best 0% / 8% (16 sensors) |  |  |  |  |  |
+| Hancock State Prison (sparse towers) | 20 dB | bladeRF 2.0 micro xA4 | not possible | best 0% / 7% (16 sensors) |  |  |  |  |  |
 | Hancock State Prison (sparse towers) | 20 dB | Custom multichannel receiver | not possible | best 2% / 11% (16 sensors) |  |  |  |  |  |
-| Hancock State Prison (sparse towers) | 30 dB | bladeRF 2.0 micro xA4 | not possible | best 50% / 56% (16 sensors) |  |  |  |  |  |
-| Hancock State Prison (sparse towers) | 30 dB | Custom multichannel receiver | not possible | best 84% / 85% (16 sensors) |  |  |  |  |  |
-| Hancock State Prison (sparse towers) | 40 dB | bladeRF 2.0 micro xA4 | 6 | 92% / 81% / 90% / 12 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
-| Hancock State Prison (sparse towers) | 40 dB | Custom multichannel receiver | 6 | 99% / 94% / 98% / 8 m | $15,666 + $2,760/yr | $26,110 + $4,601/yr | $3,929 (255) | $22,106 (46) | 79% |
-| Hays State Prison (moderate towers) | 20 dB | bladeRF 2.0 micro xA4 | 6 | 99% / 89% / 92% / 10 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
-| Hays State Prison (moderate towers) | 20 dB | Custom multichannel receiver | 4 | 100% / 85% / 82% / 11 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
-| Hays State Prison (moderate towers) | 30 dB | bladeRF 2.0 micro xA4 | 6 | 99% / 90% / 92% / 10 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
-| Hays State Prison (moderate towers) | 30 dB | Custom multichannel receiver | 4 | 100% / 87% / 83% / 11 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
-| Hays State Prison (moderate towers) | 40 dB | bladeRF 2.0 micro xA4 | 4 | 98% / 91% / 92% / 9 m | $12,341 + $2,285/yr | $20,568 + $3,808/yr | $3,169 (316) | $23,247 (44) | 83% |
-| Hays State Prison (moderate towers) | 40 dB | Custom multichannel receiver | 3 | 100% / 90% / 88% / 8 m | $9,333 + $1,980/yr | $15,555 + $3,300/yr | $2,565 (390) | $24,153 (42) | 86% |
-| Fulton County Jail (dense towers) | 20 dB | bladeRF 2.0 micro xA4 | not possible | best 13% / 19% (16 sensors) |  |  |  |  |  |
-| Fulton County Jail (dense towers) | 20 dB | Custom multichannel receiver | not possible | best 33% / 34% (16 sensors) |  |  |  |  |  |
-| Fulton County Jail (dense towers) | 30 dB | bladeRF 2.0 micro xA4 | not possible | best 80% / 76% (16 sensors) |  |  |  |  |  |
-| Fulton County Jail (dense towers) | 30 dB | Custom multichannel receiver | 12 | 93% / 82% / 98% / 12 m | $28,332 + $4,321/yr | $47,220 + $7,201/yr | $6,658 (151) | $18,013 (56) | 64% |
-| Fulton County Jail (dense towers) | 40 dB | bladeRF 2.0 micro xA4 | 4 | 100% / 84% / 98% / 8 m | $12,341 + $2,285/yr | $20,568 + $3,808/yr | $3,169 (316) | $23,247 (44) | 83% |
-| Fulton County Jail (dense towers) | 40 dB | Custom multichannel receiver | 4 | 100% / 96% / 100% / 5 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
+| Hancock State Prison (sparse towers) | 30 dB | bladeRF 2.0 micro xA4 | not possible | best 50% / 55% (16 sensors) |  |  |  |  |  |
+| Hancock State Prison (sparse towers) | 30 dB | Custom multichannel receiver | not possible | best 84% / 84% (16 sensors) |  |  |  |  |  |
+| Hancock State Prison (sparse towers) | 40 dB | bladeRF 2.0 micro xA4 | 12 | 98% / 99% / 100% / 7 m / 1075 m; 550 m | $31,023 + $4,455/yr | $51,704 + $7,425/yr | $7,106 (141) | $17,340 (58) | 62% |
+| Hancock State Prison (sparse towers) | 40 dB | Custom multichannel receiver | 6 | 99% / 95% / 97% / 8 m / 418 m; 274 m | $15,666 + $2,760/yr | $26,110 + $4,601/yr | $3,929 (255) | $22,106 (46) | 79% |
+| Hays State Prison (moderate towers) | 20 dB | bladeRF 2.0 micro xA4 | 6 | 99% / 89% / 91% / 10 m / 442 m; 49 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
+| Hays State Prison (moderate towers) | 20 dB | Custom multichannel receiver | 4 | 100% / 85% / 89% / 11 m / 497 m; 31 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
+| Hays State Prison (moderate towers) | 30 dB | bladeRF 2.0 micro xA4 | 6 | 99% / 91% / 92% / 10 m / 442 m; 51 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
+| Hays State Prison (moderate towers) | 30 dB | Custom multichannel receiver | 4 | 100% / 87% / 90% / 11 m / 501 m; 33 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
+| Hays State Prison (moderate towers) | 40 dB | bladeRF 2.0 micro xA4 | 4 | 98% / 91% / 94% / 9 m / 313 m; 54 m | $12,341 + $2,285/yr | $20,568 + $3,808/yr | $3,169 (316) | $23,247 (44) | 83% |
+| Hays State Prison (moderate towers) | 40 dB | Custom multichannel receiver | 3 | 100% / 91% / 93% / 8 m / 433 m; 47 m | $9,333 + $1,980/yr | $15,555 + $3,300/yr | $2,565 (390) | $24,153 (42) | 86% |
+| Fulton County Jail (dense towers) | 20 dB | bladeRF 2.0 micro xA4 | not possible | best 13% / 20% (16 sensors) |  |  |  |  |  |
+| Fulton County Jail (dense towers) | 20 dB | Custom multichannel receiver | not possible | best 33% / 36% (16 sensors) |  |  |  |  |  |
+| Fulton County Jail (dense towers) | 30 dB | bladeRF 2.0 micro xA4 | not possible | best 80% / 75% (16 sensors) |  |  |  |  |  |
+| Fulton County Jail (dense towers) | 30 dB | Custom multichannel receiver | 12 | 93% / 82% / 99% / 12 m / 1154 m; 502 m | $28,332 + $4,321/yr | $47,220 + $7,201/yr | $6,658 (151) | $18,013 (56) | 64% |
+| Fulton County Jail (dense towers) | 40 dB | bladeRF 2.0 micro xA4 | 6 | 100% / 97% / 100% / 8 m / 395 m; 194 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
+| Fulton County Jail (dense towers) | 40 dB | Custom multichannel receiver | 4 | 100% / 96% / 99% / 5 m / 382 m; 206 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
 
 20 dB of interference removal is today's assumption; 30 and 40 dB are unproven (section 11). The custom receiver is a Series A product.
 
@@ -170,6 +170,7 @@ Recommended setup = the radio and number of sensors with the lowest cost to us t
 - **Whole-signal processing gain:** +11.9 dB at 30% network load over the reference-only method (ideal gain, ASSUMPTION; STANDARD resource counts, TS 36.211).
 - **Background stability (hover hold):** -30 dB default (ASSUMPTION); needs about -30 to -40 dB; listening up to 4.8 s on a stopped track. Microphone range 100 m (ASSUMPTION).
 - **Fast estimate:** chain loss 5 dB (FIT to 7 full-simulation runs); 20 scored flights per design point.
+- **Detection range:** distance outside the fence when the track that guards see begins (held for 3 updates), only before the drone crosses the fence; drones never tracked count as 0 m. The requirement uses the typical drone (median over 20 flights x 16 draws, DECISION Nov 12); the 8-in-10 figure is reported alongside. Flights start 1,800 m from the drop point from random directions. At Hays drones arriving from the south-southwest (bearings ~180-230 deg, along the line between the southern towers and the sensors) are picked up only ~50-300 m out even with 16 sensors, so the 8-in-10 range is much shorter than the typical one; sensor placement is the likely fix.
 - **Processing:** listening time per update 0.8 s, one update every 1.5 s, 12-bit radios, network 30% busy (ASSUMPTION), false-alarm rate 1e-06 per cell (ASSUMPTION).
 - **Sensors:** 6 m mast (ASSUMPTION; see section 12 for 15 and 25 m), evenly spaced on the fence.
 - **Towers:** positions and heights MEASURED (FCC); sector directions, power and channels ASSUMPTION (EIRP 60 dBm, 4 deg downtilt).
