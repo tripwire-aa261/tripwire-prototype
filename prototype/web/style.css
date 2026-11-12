@@ -312,3 +312,8 @@ svg#chNodes text, svg#chCost text { font-size: 13px; }
 .compare .bar .val { top: 3px; text-shadow: 0 0 3px #000; }
 .compare .note { margin-top: 6px; line-height: 1.5; }
 @media (max-width: 1000px) { .compare .bar { grid-template-columns: 1fr; } }
+
+/* Overview: each section below the recommendation in its own bordered box */
+.ov-sec { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); padding: 4px 18px 16px; margin: 18px 0; }
+.ov-sec > h2:first-child { margin-top: 14px; }
+@media (max-width: 560px) { .ov-sec { padding: 2px 12px 12px; } }

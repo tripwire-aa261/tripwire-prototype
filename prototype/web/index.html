@@ -58,39 +58,49 @@
         </div>
       </div>
 
-      <h2>What it takes at this facility <span data-help="levels"></span></h2>
-      <p class="note">Neighboring cell towers on the same frequency drown out the drone echo; the processing removes part of that interference. Today we can only count on about 20 dB. More (30 or 40 dB) is plausible but must be proven on the Seed recordings. Each cell is the cheapest number of sensors that meets the targets above. Click a cell to show it on the map.</p>
-      <div class="scrollx"><table class="cmp big" id="ovLevels"></table></div>
-
-      <h2>Which setup suits which site</h2>
-      <p class="note" id="ovSitesNote"></p>
-      <div class="scrollx"><table class="cmp big" id="ovSitesTable"></table></div>
-
-      <h2>How it works</h2>
-      <div class="steps">
-        <div class="step"><b>1 · Listen</b><span>Each sensor hears a cell tower twice: once directly, and once bounced off the drone, a moment later and slightly shifted in pitch.</span></div>
-        <div class="step"><b>2 · Measure</b><span>The delay gives the drone's distance along an ellipse; the pitch shift (Doppler) separates moving drones from buildings and trees. Each sensor has several antennas, combined in software to hear fainter echoes.</span></div>
-        <div class="step"><b>3 · Locate</b><span>Several sensors and towers give crossing ellipses: the drone's position, tracked over time and sent to the control room.</span></div>
+      <div class="ov-sec">
+        <h2>What it takes at this facility <span data-help="levels"></span></h2>
+        <p class="note">Neighboring cell towers on the same frequency drown out the drone echo; the processing removes part of that interference. Today we can only count on about 20 dB. More (30 or 40 dB) is plausible but must be proven on the Seed recordings. Each cell is the cheapest number of sensors that meets the targets above. Click a cell to show it on the map.</p>
+        <div class="scrollx"><table class="cmp big" id="ovLevels"></table></div>
       </div>
 
-      <h2>What we know, and what we still assume</h2>
-      <div class="kn3">
-        <div class="kn ok"><b>Shown</b><ul>
-          <li>A published field trial (Fraunhofer, LTE450) detected a 5 kg drone this way; our model reproduces it.</li>
-          <li>Real terrain, buildings and registered towers for all three facilities.</li></ul></div>
-        <div class="kn mid"><b>Simulated only</b><ul>
-          <li>Coverage, tracking and accuracy at each facility.</li>
-          <li>Hardware and installation cost with off-the-shelf parts.</li></ul></div>
-        <div class="kn bad"><b>Still to prove</b><ul>
-          <li>Whole-signal processing gain and interference removal: they decide the sparse-tower and dense-tower sites (see "What it takes" above).</li>
-          <li>How steady the quiet background is: it decides whether software can hold a hovering drone without a microphone.</li>
-          <li>Tower details (direction, power, channel) at each site, and network busyness by hour.</li>
-          <li>Next step: record real LTE signals at two or more sites (the Seed milestone).</li></ul></div>
+      <div class="ov-sec">
+        <h2>Which setup suits which site</h2>
+        <p class="note" id="ovSitesNote"></p>
+        <div class="scrollx"><table class="cmp big" id="ovSitesTable"></table></div>
       </div>
 
-      <h2>Compared with today's options</h2>
-      <div class="compare" id="ovBench"></div>
-      <p class="note small">Tripwire figures use the editable assumptions in the Financials tab. [3], [4]: Seed data package references (Axon price list on OMNIA Partners, March 2026; AirSight bid with the NC Sheriffs' Association, August 2024 prices).</p>
+      <div class="ov-sec">
+        <h2>How it works</h2>
+        <div class="steps">
+          <div class="step"><b>1 · Listen</b><span>Each sensor hears a cell tower twice: once directly, and once bounced off the drone, a moment later and slightly shifted in pitch.</span></div>
+          <div class="step"><b>2 · Measure</b><span>The delay gives the drone's distance along an ellipse; the pitch shift (Doppler) separates moving drones from buildings and trees. Each sensor has several antennas, combined in software to hear fainter echoes.</span></div>
+          <div class="step"><b>3 · Locate</b><span>Several sensors and towers give crossing ellipses: the drone's position, tracked over time and sent to the control room.</span></div>
+        </div>
+      </div>
+
+      <div class="ov-sec">
+        <h2>What we know, and what we still assume</h2>
+        <div class="kn3">
+          <div class="kn ok"><b>Shown</b><ul>
+            <li>A published field trial (Fraunhofer, LTE450) detected a 5 kg drone this way; our model reproduces it.</li>
+            <li>Real terrain, buildings and registered towers for all three facilities.</li></ul></div>
+          <div class="kn mid"><b>Simulated only</b><ul>
+            <li>Coverage, tracking and accuracy at each facility.</li>
+            <li>Hardware and installation cost with off-the-shelf parts.</li></ul></div>
+          <div class="kn bad"><b>Still to prove</b><ul>
+            <li>Whole-signal processing gain and interference removal: they decide the sparse-tower and dense-tower sites (see "What it takes" above).</li>
+            <li>How steady the quiet background is: it decides whether software can hold a hovering drone without a microphone.</li>
+            <li>Tower details (direction, power, channel) at each site, and network busyness by hour.</li>
+            <li>Next step: record real LTE signals at two or more sites (the Seed milestone).</li></ul></div>
+        </div>
+      </div>
+
+      <div class="ov-sec">
+        <h2>Compared with today's options</h2>
+        <div class="compare" id="ovBench"></div>
+        <p class="note small">Tripwire figures use the editable assumptions in the Financials tab. [3], [4]: Seed data package references (Axon price list on OMNIA Partners, March 2026; AirSight bid with the NC Sheriffs' Association, August 2024 prices).</p>
+      </div>
     </div>
   </section>
 
