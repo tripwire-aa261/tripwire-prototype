@@ -16,7 +16,7 @@
 </head>
 <body class="app">
   <header>
-    <div class="brand"><span class="logo">◎</span> Tripwire <span class="tag">digital twin v0.4</span></div>
+    <div class="brand"><span class="logo">◎</span> Tripwire <span class="tag">digital twin v0.4.2</span></div>
     <nav class="tabbar" role="tablist">
       <button role="tab" data-tab="overview" class="on">Overview</button>
       <button role="tab" data-tab="sim">Simulation</button>
@@ -37,9 +37,10 @@
       </div>
 
       <div class="chips" id="ovSites"></div>
-      <div class="row wrap ctl">
-        <label>Drone <select id="ovDrone"></select></label>
-        <label title="How much interference from neighboring cell towers the processing removes. Not yet measured.">Interference removal <select id="ovInterf"></select></label>
+      <div class="row wrap ctl targets">
+        <label>Drone <span data-help="drone"></span> <select id="ovDrone"></select></label>
+        <label>Area covered the customer wants <span data-help="target_area"></span> <output id="ovAreaOut"></output><input type="range" id="ovArea" min="50" max="100" step="5" /></label>
+        <label>Time tracked the customer wants <span data-help="target_tracked"></span> <output id="ovTrkOut"></output><input type="range" id="ovTrk" min="50" max="100" step="5" /></label>
       </div>
 
       <div class="ov-grid">
@@ -52,20 +53,26 @@
           </div>
         </div>
         <div class="panel-card">
-          <h3>What the customer gets <span class="hint" id="ovReqHint"></span></h3>
+          <h3>Recommended setup <span data-help="recommended"></span> <span class="hint" id="ovReqHint"></span></h3>
+          <div id="ovStatus"></div>
           <div class="kpis" id="ovKpis"></div>
-          <div class="note small" id="ovDesign"></div>
+          <div class="note small" id="ovAlt"></div>
+          <div class="price-box" id="ovPrice"></div>
         </div>
       </div>
 
-      <h2>Which design suits which site</h2>
-      <p class="note">Cheapest sensor design that meets the default requirements (drones 60 m up, 150 m around the fence, 90% of the area covered, tracked 80% of the time, within 25 m), under today's interference assumption and under the optimistic one that the Seed recordings will test. Change the requirements in the Simulation tab.</p>
-      <table class="cmp big" id="ovSitesTable"></table>
+      <h2>What it takes at this facility <span data-help="levels"></span></h2>
+      <p class="note">Neighboring cell towers on the same frequency drown out the drone echo; the processing removes part of that interference. Today we can only count on about 20 dB. More (30 or 40 dB) is plausible but must be proven on the Seed recordings. Each cell is the cheapest number of sensors that meets the targets above. Click a cell to show it on the map.</p>
+      <div class="scrollx"><table class="cmp big" id="ovLevels"></table></div>
+
+      <h2>Which setup suits which site</h2>
+      <p class="note" id="ovSitesNote"></p>
+      <div class="scrollx"><table class="cmp big" id="ovSitesTable"></table></div>
 
       <h2>How it works</h2>
       <div class="steps">
         <div class="step"><b>1 · Listen</b><span>Each sensor hears a cell tower twice: once directly, and once bounced off the drone, a moment later and slightly shifted in pitch.</span></div>
-        <div class="step"><b>2 · Measure</b><span>The delay gives the drone's distance along an ellipse; the pitch shift (Doppler) separates moving drones from buildings and trees.</span></div>
+        <div class="step"><b>2 · Measure</b><span>The delay gives the drone's distance along an ellipse; the pitch shift (Doppler) separates moving drones from buildings and trees. Each sensor has several antennas, combined in software to hear fainter echoes.</span></div>
         <div class="step"><b>3 · Locate</b><span>Several sensors and towers give crossing ellipses: the drone's position, tracked over time and sent to the control room.</span></div>
       </div>
 
@@ -78,7 +85,7 @@
           <li>Coverage, tracking and accuracy at each facility.</li>
           <li>Hardware and installation cost with off-the-shelf parts.</li></ul></div>
         <div class="kn bad"><b>Still to prove</b><ul>
-          <li>Enhanced processing gain and interference removal: they decide the remote and city sites.</li>
+          <li>Whole-signal processing gain and interference removal: they decide the remote and city sites (see "What it takes" above).</li>
           <li>Tower details (direction, power, channel) at each site, and network busyness by hour.</li>
           <li>Next step: record real LTE signals at two or more sites (the Seed milestone).</li></ul></div>
       </div>
@@ -93,46 +100,66 @@
   <section class="tab" id="tab-sim">
     <div class="sim-layout">
       <aside class="panel" id="reqPanel">
-        <h2>Customer requirements</h2>
-        <label>Facility <select id="rqSite"></select></label>
-        <label>Drone <select id="rqDrone"></select></label>
-        <label>Protected distance around the fence <output></output><input type="range" id="rqRadius" min="0" max="4" step="1" /></label>
-        <label>Drone height <select id="rqHeight"></select></label>
-        <label>Area covered, at least <select id="rqCov"><option value="80">80%</option><option value="90">90%</option><option value="95">95%</option></select></label>
-        <label>Time tracked, at least <output></output><input type="range" id="rqTrk" min="50" max="95" step="5" /></label>
-        <label>Position accuracy, within <output></output><input type="range" id="rqAcc" min="5" max="50" step="5" /></label>
-        <label>Position update, at least every <output></output><input type="range" id="rqUpd" min="1" max="5" step="0.5" /></label>
+        <h2>What to protect</h2>
+        <label>Facility <span data-help="facility"></span> <select id="rqSite"></select></label>
+        <label>Drone <span data-help="drone"></span> <select id="rqDrone"></select></label>
+        <label>Protected distance around the fence <span data-help="radius"></span> <output></output><input type="range" id="rqRadius" min="0" max="4" step="1" /></label>
+        <label>Drone height <span data-help="height"></span> <select id="rqHeight"></select></label>
         <h2>Scenario</h2>
-        <label title="Interference from neighboring cell towers on the same carrier that the processing removes. 20 dB is today's assumption; 40 dB needs rebuilding and subtracting neighbor cells (unproven).">Interference removal <select id="rqInterf"></select></label>
+        <label>Interference removal <span data-help="interference"></span> <select id="rqInterf"></select></label>
         <button class="ghost small" id="rqReset">Reset to defaults</button>
-        <p class="note small" id="rqNote"></p>
+        <p class="note small">Sensors are spaced evenly along the fence. The targets the recommendation uses (area covered, time tracked) are set on the Overview.</p>
       </aside>
 
       <div class="sim-main">
-        <h2>Designs that meet these requirements</h2>
-        <p class="note">For each sensor design: the fewest sensors that meet every requirement, and what that costs. Click a row to explore it below and in Financials.</p>
-        <table class="cmp big" id="dsTable"></table>
+        <h2>Pick a setup</h2>
+        <div class="panel-card picker">
+          <div class="pick-row">
+            <span class="pick-lab">Radio <span data-help="radio"></span></span>
+            <div class="seg" id="spRadio" role="radiogroup" aria-label="Radio"></div>
+          </div>
+          <div class="pick-row">
+            <span class="pick-lab">Number of sensors <span data-help="sensors"></span></span>
+            <input type="range" id="spN" min="0" max="5" step="1" aria-label="Number of sensors" /><output id="spNOut"></output>
+          </div>
+          <div class="pick-row">
+            <span class="pick-lab">Antenna setup <span data-help="build"></span></span>
+            <select id="spBuild"></select>
+          </div>
+          <div class="kpis five" id="spKpis"></div>
+          <div class="note" id="spRec"></div>
+        </div>
 
         <div class="two">
           <div class="panel-card">
-            <h3>More sensors, diminishing returns</h3>
-            <div class="row wrap ctl"><label>Show <select id="chMetric"><option value="cov">Area covered</option><option value="trk">Time tracked</option><option value="acc">Position accuracy</option></select></label></div>
-            <svg id="chNodes" viewBox="0 0 640 330" role="img" aria-label="Outcome versus number of sensors"></svg>
-            <div class="note small" id="chTip">Hover a point for details.</div>
+            <h3>Protection vs number of sensors <span data-help="bynodes"></span></h3>
+            <div class="row wrap ctl"><label>Show <select id="chMetric"><option value="cov">Area covered</option><option value="trk">Time tracked</option><option value="caught">Drones caught</option></select></label></div>
+            <div class="legend inline" id="chLegend"></div>
+            <svg id="chNodes" class="chart" viewBox="0 0 480 300" role="img" aria-label="Protection against the number of sensors, one line per radio"></svg>
+            <div class="note small" id="chTip">Click a point to pick that setup.</div>
           </div>
           <div class="panel-card">
-            <h3>What moves the result <span class="hint" id="tzBase"></span></h3>
-            <div class="row wrap ctl"><label>Outcome <select id="tzMetric"><option value="cov">Area covered</option><option value="trk">Time tracked</option><option value="acc">Position accuracy</option><option value="cost">Upfront cost</option></select></label></div>
-            <svg id="tornado" viewBox="0 0 640 330" role="img" aria-label="Sensitivity of the outcome to each input"></svg>
-            <div class="note small">Each bar: the range of the outcome when one input changes and the rest stay as in the selected design. The line marks the selected design.</div>
+            <h3>Customer's cost vs number of sensors <span data-help="total"></span></h3>
+            <div class="legend inline" id="chCostLegend"></div>
+            <svg id="chCost" class="chart" viewBox="0 0 480 300" role="img" aria-label="Customer's total over the contract against the number of sensors, one line per radio"></svg>
+            <div class="note small">Installation price plus the subscription over the contract (cost plus margin, from Financials).</div>
           </div>
+        </div>
+
+        <div class="panel-card">
+          <h3>What moves the result <span class="hint" id="tzBase"></span></h3>
+          <div class="row wrap ctl"><label>Outcome <select id="tzMetric"><option value="cov">Area covered</option><option value="trk">Time tracked</option><option value="caught">Drones caught</option><option value="acc">Position accuracy</option><option value="cost">Customer total</option></select></label></div>
+          <svg id="tornado" class="chart" viewBox="0 0 640 330" role="img" aria-label="Sensitivity of the outcome to each input"></svg>
+          <div class="note small">Each bar: the range of the outcome when one input changes and the rest stay as in the picked setup. The yellow line marks the picked setup.</div>
         </div>
 
         <details id="v3d" class="panel-card">
           <summary><h3>Watch a simulated intrusion (3D, full signal simulation)</h3></summary>
           <div class="v3d-layout">
             <div class="v3d-left">
-              <label>Simulation run <select id="runSelect"></select></label>
+              <label>Facility <select id="rpSite"></select></label>
+              <label>Drone <select id="rpDrone"></select></label>
+              <label>Radio <span data-help="radio"></span> <select id="rpRadio"></select></label>
               <div id="runSummary" class="note small"></div>
               <div class="row">
                 <button id="play">Pause</button>
@@ -148,20 +175,21 @@
                 <span><i class="sw gap"></i>Gap in the protected zone</span><span><i class="dot fix"></i>Position fix</span><span><i class="dot trk2"></i>Track</span>
               </div>
               <details class="newsim">
-                <summary>Run a new full simulation</summary>
+                <summary>Saved runs and new simulations</summary>
+                <label>Open a saved run <select id="runSelect"></select></label>
                 <form id="runForm">
                   <label>Facility <select name="site" id="f_site"></select></label>
                   <label>Drone <select name="drone" id="f_drone"></select></label>
-                  <label>Sensor design <select name="design" id="f_design"></select></label>
-                  <label>Sensors <output></output><input type="range" name="n_listeners" min="3" max="16" step="1" /></label>
+                  <label>Sensor type <span data-help="sensortype"></span> <select name="design" id="f_design"></select></label>
+                  <label>Number of sensors <span data-help="sensors"></span> <output></output><input type="range" name="n_listeners" min="3" max="16" step="1" /></label>
                   <label>Drone height <output></output><input type="range" name="altitude_agl_m" min="30" max="120" step="10" /></label>
                   <details><summary>More settings</summary>
-                    <label>Interference removal <output></output><input type="range" name="cochannel_suppression_db" min="10" max="45" step="5" /></label>
-                    <label>Network busyness <output></output><input type="range" name="network_load" min="0" max="1" step="0.1" /></label>
-                    <label>Integration time <output></output><input type="range" name="cit_s" min="0.2" max="1.0" step="0.1" /></label>
-                    <label>Receiver bits <select name="adc_bits"><option>8</option><option selected>12</option><option>14</option></select></label>
-                    <label>Cell towers used per sensor <output></output><input type="range" name="max_illuminators" min="1" max="14" step="1" /></label>
-                    <label>Antenna pointing <select name="pointing"><option value="inward">Face the facility</option><option value="auto">Auto</option></select></label>
+                    <label>Interference removal <span data-help="interference"></span> <output></output><input type="range" name="cochannel_suppression_db" min="10" max="45" step="5" /></label>
+                    <label>Network busyness <span data-help="load"></span> <output></output><input type="range" name="network_load" min="0" max="1" step="0.1" /></label>
+                    <label>Listening time per update <span data-help="cit"></span> <output></output><input type="range" name="cit_s" min="0.2" max="1.0" step="0.1" /></label>
+                    <label>Receiver bits <span data-help="bits"></span> <select name="adc_bits"><option>8</option><option selected>12</option><option>14</option></select></label>
+                    <label>Cell towers used per sensor <span data-help="towers"></span> <output></output><input type="range" name="max_illuminators" min="1" max="14" step="1" /></label>
+                    <label>Antenna pointing <span data-help="pointing"></span> <select name="pointing"><option value="inward">Face the facility</option><option value="auto">Auto</option></select></label>
                     <label class="check"><input type="checkbox" name="bird" checked /> Add a bird</label>
                   </details>
                   <label>Run name <input type="text" name="id" placeholder="optional" /></label>
@@ -195,11 +223,9 @@
     <div class="page">
       <h2>Facility economics</h2>
       <div class="row wrap ctl">
-        <label>Facility <select id="fnSite"></select></label>
-        <label>Sensor design <select id="fnDesign"></select></label>
-        <label>Sensors <input type="number" id="fnN" min="1" max="40" step="1" /></label>
-        <label>Radio <select id="fnRadio"></select></label>
-        <label>Coverage tier sold <select id="fnTier"><option value="80">80%</option><option value="90">90%</option><option value="95">95%</option></select></label>
+        <label>Facility <span data-help="facility"></span> <select id="fnSite"></select></label>
+        <label>Radio <span data-help="radio"></span> <select id="fnRadio"></select></label>
+        <label>Number of sensors <span data-help="sensors"></span> <input type="number" id="fnN" min="1" max="40" step="1" /></label>
       </div>
       <p class="note small" id="fnFrom"></p>
       <div class="kpis wide" id="fnKpis"></div>
@@ -216,11 +242,14 @@
       </div>
 
       <h2>Across the three facilities</h2>
-      <p class="note">Each facility with its cheapest design that meets the current requirements (Simulation tab).</p>
-      <table class="cmp big" id="fnSites"></table>
+      <p class="note" id="fnSitesNote"></p>
+      <div class="scrollx"><table class="cmp big" id="fnSites"></table></div>
 
       <h2>Inputs <span class="hint">assumptions; edit any value</span> <button class="ghost small" id="fnReset">Reset to assumptions</button></h2>
       <div class="inputs" id="fnInputs"></div>
+
+      <h2>Custom 8-channel receiver: parts list <span class="hint">Series A; sets the default above</span></h2>
+      <div class="panel-card" id="fnBom"></div>
     </div>
   </section>
 

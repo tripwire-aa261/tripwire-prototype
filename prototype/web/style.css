@@ -162,10 +162,6 @@ table.cmp tr.dim td { opacity: .6; }
 #reqPanel { border-right: 1px solid var(--line); position: sticky; top: 48px; height: calc(100vh - 48px); }
 .sim-main { padding: 12px 20px 40px; min-width: 0; }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin: 14px 0; }
-#chNodes, #tornado { width: 100%; height: auto; background: #111a23; border-radius: 8px; margin-top: 6px; }
-#chNodes text, #tornado text { fill: #8396a8; font: 11px system-ui, sans-serif; }
-#chNodes .grid, #tornado .grid { stroke: #223040; }
-#chNodes .tier { stroke-width: 1.2; stroke-dasharray: 5 4; }
 details > summary { cursor: pointer; }
 #v3d { margin-top: 6px; }
 #v3d[open] > summary { margin-bottom: 10px; }
@@ -203,3 +199,77 @@ table.cmp th.grp { text-align: left; padding-left: 14px; border-left: 1px solid 
 #tornado text.inbar { fill: #04121c; font-size: 10px; font-weight: 600; }
 #tornado text.lab { font-size: 10px; }
 td.hintrow { color: var(--warn); text-align: left !important; padding: 8px 0; }
+
+/* Custom receiver parts list (Financials) */
+.scrollx { overflow-x: auto; }
+table.bom td, table.bom th { padding: 5px 8px 5px 0; vertical-align: top; }
+table.bom td:first-child, table.bom td:nth-child(2) { text-align: left; }
+table.bom th:nth-child(2) { text-align: left; }
+label select { max-width: 100%; }
+
+/* v0.4.1: plain-language help (?) buttons and their popup */
+button.info { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; padding: 0; margin-left: 3px;
+  border-radius: 50%; border: 1px solid var(--muted); background: transparent; color: var(--muted); font-size: 11px; font-weight: 700;
+  line-height: 1; vertical-align: 1px; cursor: help; text-transform: none; letter-spacing: 0; }
+button.info:hover, button.info:focus-visible, button.info[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); outline: none; }
+button.info::after { content: ''; position: absolute; inset: -10px; } /* bigger tap target on phones */
+#helpTip { position: fixed; z-index: 1000; background: #0f1821; border: 1px solid var(--accent); border-radius: 8px; padding: 10px 12px;
+  font-size: 12.5px; line-height: 1.45; color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, .45); text-transform: none; letter-spacing: 0; font-weight: 400; }
+#helpTip[hidden] { display: none; }
+#helpTip b { font-size: 13px; }
+#helpTip p { margin: 6px 0 0; }
+#helpTip .tl { color: var(--accent); font-weight: 600; }
+#helpTip .src { color: var(--muted); font-size: 11.5px; }
+.badge.alt { background: var(--panel2); color: var(--text); border: 1px solid var(--line); }
+.sq { display: inline-block; width: 9px; height: 9px; border: 1.5px solid var(--muted); margin-right: 6px; vertical-align: -1px; }
+table.cmp th { vertical-align: bottom; }
+.row.ctl > label { max-width: 100%; min-width: 0; }
+.row.ctl select { max-width: 100%; text-overflow: ellipsis; }
+
+/* v0.4.2: Overview targets, recommended setup, setup picker, charts against the number of sensors */
+svg.chart { width: 100%; height: auto; background: #111a23; border-radius: 8px; margin-top: 6px; }
+svg.chart text { fill: #c3d0dc; font: 12px system-ui, sans-serif; }
+svg.chart text.axis { fill: #dbe5ee; font-weight: 600; }
+svg.chart text.target { fill: #fbbf24; }
+svg.chart .grid { stroke: #2a3a4b; stroke-width: 1; }
+svg.chart .tier { stroke-width: 1.4; stroke-dasharray: 5 4; }
+#tornado text.inbar { fill: #04121c; }
+.targets label { min-width: 220px; }
+.targets output { color: var(--text); font-weight: 600; font-size: 14px; }
+.targets input[type=range] { min-width: 200px; }
+.status { border-radius: 8px; padding: 8px 10px; margin: 0 0 10px; font-size: 13px; line-height: 1.45; border-left: 3px solid; background: var(--panel2); }
+.status.ok { border-left-color: var(--ok); } .status.warn { border-left-color: var(--warn); } .status.bad { border-left-color: var(--bad); color: var(--text); }
+.setup-line { grid-column: 1 / -1; font-size: 16px; }
+.price-box { background: var(--panel2); border-radius: 10px; padding: 10px 12px; border-left: 3px solid var(--accent); }
+.price-box small { display: block; color: var(--muted); font-size: 12px; }
+.price-box b { display: block; font-size: 19px; margin: 3px 0 5px; }
+.price-box span { color: #b8c6d4; font-size: 12.5px; line-height: 1.45; }
+button.link { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; font: inherit; cursor: pointer; }
+td.pick { cursor: pointer; border-radius: 6px; }
+td.pick:hover { background: var(--panel2); }
+td.pick.on { background: var(--panel2); box-shadow: 0 0 0 1px var(--accent) inset; }
+#ovLevels td.pick { padding-left: 8px; }
+.picker { display: grid; gap: 10px; }
+.pick-row { display: grid; grid-template-columns: 170px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.pick-lab { color: var(--muted); font-size: 12px; }
+.pick-row select { grid-column: 2 / 4; margin: 0; }
+.pick-row output { font-weight: 600; min-width: 80px; text-align: right; }
+.seg { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { flex: 1 1 120px; background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; text-align: left; font-weight: 500; }
+.seg button b { display: block; font-size: 14px; }
+.seg button small { color: var(--muted); font-size: 11px; }
+.seg button[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.kpis.five { grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 4px 0 0; }
+#spRec { font-size: 13px; line-height: 1.5; }
+@media (max-width: 1000px) {
+  .kpis.five { grid-template-columns: 1fr 1fr; }
+  .pick-row { grid-template-columns: 1fr auto; }
+  .pick-row .pick-lab { grid-column: 1 / -1; }
+  .seg, .pick-row select { grid-column: 1 / -1; }
+  .targets label { min-width: 0; width: 100%; }
+}
+svg#chNodes text, svg#chCost text { font-size: 13px; }
+#ovAlt { margin: -2px 0 10px; line-height: 1.45; }
+#ovAlt:empty { display: none; }
+#ovLevels td, #ovLevels th, #ovSitesTable td, #ovSitesTable th { text-align: left; }
+#ovLevels td.pick { min-width: 96px; }

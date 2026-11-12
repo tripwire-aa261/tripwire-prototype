@@ -112,6 +112,10 @@ def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = 
         idx = np.nonzero(srow)[0]
         firsts.append(float(dist[max(idx[0] - SUSTAIN + 1, 0)]) if len(idx) else np.nan)
     avail = 100 * tracked[:, zone].mean() if zone.any() else float("nan")
+    # Caught: a held track exists before the drone first crosses the fence (guards get a warning).
+    inside = np.nonzero(np.asarray(site.in_zone(pos[:, 0], pos[:, 1], 0.0)))[0]
+    cross = int(inside[0]) if len(inside) else len(ts)
+    caught = 100 * tracked[:, :cross].any(axis=1).mean() if cross > 0 else 0.0
     by_r = {}
     for r in radii or []:
         zr = np.asarray(site.in_zone(pos[:, 0], pos[:, 1], r))
@@ -122,7 +126,7 @@ def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = 
     for srow in tracked:
         idx = np.nonzero(srow)[0]
         warn.append(float(fence_d[max(idx[0] - SUSTAIN + 1, 0)]) if len(idx) else np.nan)
-    return {"availability_pct": float(avail), "by_radius": by_r,
+    return {"availability_pct": float(avail), "by_radius": by_r, "caught_pct": float(caught),
             "warning_m": None if np.all(np.isnan(warn)) else float(np.nanmedian(warn)),
             "first_track_m": None if np.all(np.isnan(firsts)) else float(np.nanmedian(firsts)),
             "frames_in_zone": int(zone.sum()),
@@ -140,6 +144,7 @@ def scored_flights(scene, n: int = 40, seed: int = 1, agl: float | None = None, 
             "hover_share_pct": round(float(np.mean([r["hover_share_pct"] for r in res])), 1),
             "share_flights_90_pct": round(float(100 * np.mean(av >= 90)), 1),
             "share_reach_150m_pct": round(float(100 * reach.mean()), 1),
+            "caught_pct": round(float(np.mean([r["caught_pct"] for r in res])), 1),
             "by_radius": {r: round(float(np.nanmean([x["by_radius"][r] for x in res])), 1) for r in (radii or [])},
             "warning_m": (None if all(x["warning_m"] is None for x in res) else
                           round(float(np.nanmedian([np.nan if x["warning_m"] is None else x["warning_m"] for x in res])), 0))}

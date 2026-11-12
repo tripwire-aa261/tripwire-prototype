@@ -27,3 +27,7 @@ web/runs/sweeps/custom-*
 # Run lists are rebuilt from the files present when serve.py starts.
 web/runs/index.json
 web/runs/sweeps/index.json
+.vercel
+# v0.4.2: the 12 precomputed 3D replays (tools/make_replays.py) and their manifest
+!web/runs/replay-*
+!web/runs/replays.json

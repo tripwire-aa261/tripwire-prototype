@@ -1,0 +1,27 @@
+# Vercel serves the viewer as static files only: the viewer (web/), site data (data/sites/) and v0.1.
+# Everything else stays off the server. Never upload keys.
+.env
+.env.*
+.venv/
+__pycache__/
+.pytest_cache/
+twin/
+tests/
+tools/
+data/raw/
+serve.py
+requirements.txt
+README.md
+*.sigmf-data
+*.iq
+# Runs that stay on your own machine (git-ignored) are not deployed either; the deploy matches the repo.
+# The 12 replays (replay-*, replays.json) and the committed demo runs are deployed.
+web/runs/hays-2026*
+web/runs/hays-baseline-mavic.*
+web/runs/hays-upgraded-mavic.*
+web/runs/seed-m210-crs-only.*
+web/runs/seriesA-mavic.*
+web/runs/sweeps/custom-*
+# Vercel Hobby caps a CLI upload at 100 MB. The range-Doppler files (.bin, ~200 MB) only feed the raw radar
+# view under "Technical details"; without them every replay still plays (the viewer says so in that panel).
+web/runs/*.bin

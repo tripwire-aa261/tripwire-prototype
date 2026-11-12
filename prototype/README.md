@@ -1,4 +1,4 @@
-# Tripwire Twin: prototype v0.4
+# Tripwire Twin: prototype v0.4.2
 
 A signal-level digital twin of a passive LTE radar at **three real Georgia facilities**: Hays State Prison
 (rural), Hancock State Prison (remote) and Fulton County Jail (dense urban).
@@ -7,15 +7,39 @@ buildings, adds drone, bird and clutter echoes, and runs the processing chain th
 direct-signal cancellation, range-Doppler maps, CFAR detection, multistatic location and tracking.
 The model is calibrated against the only published LTE450 drone-detection field trials (Fraunhofer FKIE).
 
+**v0.4.2 (Nov 12):** the customer chooses by **radio**: bladeRF or B210 (off-the-shelf, Seed) or our custom
+receiver (Series A). Each radio has one fixed sensor build (`BUILDS` in `twin/explore.py`): bladeRF/B210 = 2 boards,
+4 all-round antennas, whole-signal processing, microphone; custom = 1 board, 8 antennas, microphone. bladeRF and B210
+perform the same in the model (12-bit, 2 channels per board) and differ only in price. The **Overview** has two
+sliders (area covered, time tracked) and recommends the cheapest radio and sensor count, with our cost and a
+suggested price (cost + margin); interference removal is no longer a setting there. Instead the page states whether
+today's processing (20 dB) is enough and, if not, which unproven level (30 or 40 dB) the answer needs, in a
+today / 30 / 40 dB table. The **Simulation** tab replaces the option table with a radio + number-of-sensors picker
+(other antenna setups can still be explored), plots protection and the customer's cost against the number of
+sensors per radio, and picks the 3D replay by facility, drone and radio (12 precomputed full simulations at the
+recommended sensor count, `tools/make_replays.py`). **Financials** chooses the radio only.
+
+**v0.4.1 (Nov 11):** plain language throughout (a *sensor* is one box on a pole; a *sensor type* is what is inside
+it), a (?) explanation on every setting and result (hover, tap or keyboard; text in `web/src/help.js`), and a
+**protection menu**: the customer says what to protect and picks an option by price instead of typing targets.
+Each option shows *drones caught* (share of simulated contraband flights tracked before the drone crosses the
+fence, new in `twin/flights.py`) and *area covered*. Options that cost more and protect less than another are
+hidden. Price = our cost + margin (40 % / 72 %, ASSUMPTION reproducing the data package's planning prices).
+"Recommended" = cheapest option catching 90 % and covering 90 % (ASSUMPTION thresholds, `twin/explore.py`).
+Sensors are still spaced evenly on the fence; choosing the best spots is the next step.
+
 The viewer has three tabs:
-- **Overview** (for people outside the technical work): what a facility gets, which design suits which site
-  (under today's interference assumption and the optimistic one, side by side), cost against today's options,
-  and what is shown vs still assumed.
-- **Simulation**: set the customer's requirements (protected distance around the fence, drone height, area
-  covered, time tracked, position accuracy, update rate); see which sensor designs meet them and the cheapest;
-  how results change with more sensors; what moves the result (sensitivity); and a 3D replay of full simulations.
-- **Financials**: hardware, installation, labour and maintenance per facility, with every assumption editable
-  (saved in your browser) and a reset button; pricing per facility by coverage tier.
+- **Overview** (for people outside the technical work): set how much area must be covered and how much of the
+  time a drone must be tracked; see the recommended radio and sensor count, its coverage map, our cost and the
+  suggested price, what it takes at today's vs higher interference removal, which setup suits which site, and
+  cost against today's options.
+- **Simulation**: say what to protect (facility, drone, protected distance, drone height) and the interference
+  scenario; pick a radio and a number of sensors (and, to explore, another antenna setup); protection and cost
+  against the number of sensors per radio; what moves the result (sensitivity); and a 3D replay chosen by
+  facility, drone and radio.
+- **Financials**: hardware, installation, labor and maintenance per facility for the chosen radio and sensor count,
+  with every assumption editable (saved in your browser) and a reset button; price = cost + editable margins; the
+  sourced custom-receiver parts list.
 
 Earlier versions stay reachable from the page footer: v0.3 (archived in `web/archive/v0.3/`, which also plays the
 v0.2 runs) and v0.1 (`v0.1/`).
@@ -37,14 +61,22 @@ On Windows, use `.venv\Scripts\python` instead of `.venv/bin/python`.
 | Command | What it does |
 |---|---|
 | `.venv/bin/python -m twin.explore` | precompute the requirements explorer for all three sites (~40 min, 4 cores) |
+| `.venv/bin/python -m twin.explore --maps` | recompute only the recommendations and the Overview's coverage maps (~6 min) |
+| `.venv/bin/python tools/make_replays.py` | the 12 precomputed 3D replays (facility x drone x radio; ~45 min) |
 | `.venv/bin/python -m twin.run hays --set drone=m210 --set n_listeners=8 --id my-run` | full simulation at a site (`hays`, `hancock`, `fulton`) |
 | `.venv/bin/python -m twin.sweep --drone m210 --id m210` | coverage + scored flights + cost vs node count for the standard designs (~1.5 min) |
 | `.venv/bin/python -m twin.cost` | print the cost model and write `web/runs/cost_model.json` |
 | `.venv/bin/python -m twin.calibrate` | re-fit the calibration to the Fraunhofer trials (~1 min) |
 | `.venv/bin/python -m twin.run --relocate` | re-run location/tracking/metrics on saved runs (seconds) |
-| `.venv/bin/python -m pytest -q` | 26 physics, antenna, cost and processing tests |
+| `.venv/bin/python -m pytest -q` | 37 physics, antenna, cost, flight, pricing and recommendation tests |
 | `.venv/bin/python tools/fetch_site.py --osm-way <id> --id <name> --name "<Facility>"` | fetch another facility (OSM + USGS) |
 | `.venv/bin/python tools/fetch_towers.py --site <name>` | real towers near it (FCC; OpenCelliD if a key is set) |
+
+**Web deploy (Vercel):** from `prototype/`, run `vercel` (preview link) and then `vercel --prod`. It serves the viewer
+as static files (`vercel.json` redirects `/` to `/web/`); what is left out is in `.vercelignore`. The Hobby plan
+caps a CLI upload at 100 MB, so the range-Doppler files (`web/runs/*.bin`, ~250 MB) stay local: every replay still
+plays on the web, and only the raw radar view under "Technical details" needs `serve.py`. Running new simulations
+also needs `serve.py` (the form disables itself on the web).
 
 API key (optional): put `OPENCELLID_API_KEY=...` in `prototype/.env` or `aa261/.env.local`. Never commit it.
 
@@ -67,6 +99,14 @@ network load, co-channel suppression, building heights (7 m), trial geometry det
 paper's figures, antenna datasheet values and prices, the ideal gain of arrays and of full-signal processing,
 microphone range, and the custom-receiver parts list. Radio prices: USRP B210 $2,387 (data package ref [1]),
 bladeRF 2.0 micro xA4 $540 (Nuand shop listing, Nov 2026).
+
+**Custom 8-channel receiver (Series A):** costed from a parts list in `twin/cost.py` (`CUSTOM_BOM`), shown with a
+link per line in the Financials tab. Four 2-channel LMS7002M transceivers, an Artix-7 FPGA streaming over PCIe to the
+edge computer, GNSS-disciplined 40 MHz reference, LNA + filter + balun + calibration switch per input. 11 of 16 part
+lines are distributor prices (DigiKey, Mini-Circuits, Nov 2026), covering ~$540 of the ~$610 of parts at 1,000 boards;
+assembly uses JLCPCB's published rates. Board fabrication, regulators, passives, shields, the PCIe cable, test and the
+$400k design cost are ASSUMPTIONS. Result: ~$1,040 per board at 1,000 (~$4,800 at 100, ~$570 at 10,000). Known gaps:
+the cheap balun stops at 698 MHz (T-Mobile B71 needs a wideband one), and the FPGA has a 52-week lead time.
 
 ## How the physics works (`twin/`)
 
@@ -100,16 +140,47 @@ bladeRF 2.0 micro xA4 $540 (Nuand shop listing, Nov 2026).
 
 ## Findings so far (calibrated model; numbers from `web/runs/sweeps/` and the demo runs)
 
+**v0.4.2, recommendation by radio** (5 kg drone, 60 m up, 150 m around the fence; targets 90 % of the area
+covered and 80 % of the time tracked, the slider defaults; fixed build per radio):
+
+- **Hays works today (20 dB).** Cheapest: 4 custom-receiver sensors, $39,600 + $24,200/yr (our cost $23,700 +
+  $6,800/yr). With off-the-shelf radios (what Seed can build): 6 bladeRF sensors, $55,100 + $35,800/yr. Four
+  custom sensors beat six bladeRF ones because one 8-channel board ($1,042 at 1,000) replaces two bladeRF boards
+  plus clock sharing and covers more ground.
+- **Hancock is not possible today:** at 20 dB the best is 36 % of the area and 62 % tracked. It needs 40 dB of
+  removal (unproven): then 6 bladeRF sensors meet both targets.
+- **Fulton is not possible today:** at 20 dB the best is 55 % / 78 %. With 30 dB, 12 custom sensors meet the targets
+  ($110,400 + $72,500/yr; off-the-shelf radios cannot); with 40 dB, 4 bladeRF sensors do.
+- **B210 never wins:** same performance as the bladeRF, $3,694 more per sensor (2 boards at $2,387 instead of $540).
+- **Full simulations (the 12 replays) check the fast estimate.** 5 kg drone: Hays 87 % tracked in both replays (fast
+  estimate 84-88 %), Hancock at 40 dB 82-89 % (82-91 %), Fulton 81 % with 12 custom sensors at 30 dB (87 %) but only
+  62.5 % with 4 bladeRF sensors at 40 dB (87 %). Mavic: 76-79 % at Hays, but 36-47 % at Hancock and 44-78 % at Fulton
+  against 74-88 % estimated. The fast estimate is optimistic at the remote and city sites, more so with few sensors
+  or a small drone; treat those recommendations as lower bounds on the sensor count.
+
+**v0.4.1, protection menu** (5 kg drone, 60 m up, 150 m around the fence; recommended = cheapest catching 90 % and
+covering 90 %):
+
+- **Hays:** 6 Standard sensors without microphones catch 92 % of drones (99 % of the area) for $54,000 + $35,600/yr;
+  cheaper options exist down to 3 sensors at 35-65 % caught. With 40 dB interference removal, 4 Panel-pair sensors suffice.
+- **The microphone does not change "drones caught"**: it holds the track during the hover inside the fence, which
+  raises time tracked, not the chance of catching the drone before it crosses. The menu therefore often picks the
+  version without one; whether guards need the hover track is a question for design partners.
+- **Hancock and Fulton at 20 dB:** 16 sensors catch 84 % and 97 % of drones but cover only 36 % and 55 % of the area:
+  drones are usually seen somewhere on their approach, but there are large blind areas near the fence. Showing both
+  numbers matters. At 40 dB, 3 Long-range sensors (Hancock) and 4 Standard sensors (Fulton) reach the recommended level.
+- "Drones caught" comes from 20 scored flights per point, so it moves in steps of about 5 %.
+
 **v0.4, three facilities** (default requirements: drones 60 m up, 150 m around the fence, 90 % of the area
 covered, tracked 80 % of the time, within 25 m; 5 kg drone):
 
 - **The type of site decides the architecture, through one assumption: how much interference from neighboring
   cells on the same carrier the processing removes.** At today's assumption (20 dB) only Hays can be covered
-  (4 sensors, 8-antenna rings with enhanced processing and microphones, ~$25,900 upfront). At Hancock (remote,
+  (4 sensors, 8-antenna rings with enhanced processing and microphones, ~$23,700 upfront with the sourced custom-receiver price). At Hancock (remote,
   towers 4+ km away) and Fulton County Jail (city, 52 towers within 5 km), neighboring cells swamp the echoes and
   no design meets the requirements even with 16 sensors.
 - **If the processing removes 40 dB** (rebuilding and subtracting each neighbor cell's signal; plausible, unmeasured),
-  all three work: Hays 3 sensors (~$20,000 upfront), Hancock 6 sensors (~$33,000), Fulton 4 sensors (~$22,900).
+  all three work: Hays 3 sensors (~$18,400 upfront), Hancock 6 sensors (~$33,000), Fulton 4 sensors (~$22,900).
 - So interference removal is now the first thing the Seed recordings must measure, ahead of the enhanced-processing
   gain. Hays may also look better than it is: the crowd-sourced cell data puts Verizon on only one nearby tower.
 
@@ -125,9 +196,11 @@ covered, tracked 80 % of the time, within 25 m; 5 kg drone):
   with 4. With microphones holding tracks through the hover, scored-flight track availability averages 93 % with
   8 nodes (89 % with 6; Series A gate: 90 %). The full simulation of the demo flight gives 86.8 % radar-only (its
   tracker does not use microphones yet). This rests on an ideal-gain ASSUMPTION that recorded captures must test.
-- **Off-the-shelf hardware can meet the cost gate.** A 4-omni node with a bladeRF xA4 ($540) costs ~$3,000 in parts:
-  ~$9,300 per 3-node zone against the $24,000 target, ~70 % installation margin against 40 %. With B210s the same
-  node is ~$6,800 (~$20,400 per zone). A custom receiver is not needed for cost at Seed; it matters for 8+
+- **Off-the-shelf hardware is affordable at Seed.** Costs are estimated by the twin from the sensors a site needs,
+  not set as a target in advance. A 4-omni node with a bladeRF xA4 ($540) costs ~$3,000 in parts: ~$9,300 per
+  3 sensors, leaving ~70 % of the $50,000 installation price after hardware and deployment. (The data package's
+  $24,000 per 3 sensors was a planning figure from before the twin.) With B210s the same node is ~$6,800
+  (~$20,400 per 3 sensors). A custom receiver is not needed for cost at Seed; it matters for 8+
   coherent channels (Series A).
 - **Per-zone pricing breaks when a facility needs more than 3 nodes.** The data package bills $50k + $18k/yr per
   3-node zone. Hays at 8 nodes is billed as 3 zones: ~$420k over 5 years, ~4× the memo's ~$104k incumbent package,

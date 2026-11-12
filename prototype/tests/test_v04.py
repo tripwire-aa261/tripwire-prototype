@@ -54,3 +54,48 @@ def test_locator_velocity_fallback_tolerates_pairs_without_doppler_rows():
     from twin import locate
     src = inspect.getsource(locate.Locator._refine)
     assert "if pi in rows" in src
+
+
+def test_drones_caught_and_cost_plus_pricing():
+    from twin.cost import customer_price
+    p = Params(drone="m210", antenna="omni", rx_elements=4, processing="full", n_listeners=8, bird=False)
+    sc = site_scene("hays", p)
+    fl = random_flights(sc.site, p, 2, agl=60)
+    r = score_flight(sc, fl[0], radii=[150])
+    assert 0 <= r["caught_pct"] <= 100  # share of draws tracked before the drone crosses the fence
+    # Default margins reproduce the data package: $30,000 cost -> $50,000; $5,000/yr -> ~$18,000/yr.
+    c = customer_price(30000, 5000)
+    assert c["price"] == pytest.approx(50000) and c["sub"] == pytest.approx(17857, rel=0.01)
+    assert c["customer_total"] == pytest.approx(c["price"] + FINANCE["pricing"]["years"] * c["sub"])
+
+
+def test_recommend_picks_cheapest_radio_meeting_area_and_tracking_targets():
+    from twin.explore import BUILDS, DEFAULT_REQ, RADII, node_costs, recommend
+    ri, h = RADII.index(DEFAULT_REQ["radius_m"]), DEFAULT_REQ["height_m"]
+
+    def point(design, n, cov, trk):
+        c, t = [0.0] * len(RADII), [0.0] * len(RADII)
+        c[ri], t[ri] = cov, trk
+        return {"k": ["hays", "m210", design, h, 20, n], "cov": c, "trk": t, "caught": 90.0}
+    ots, custom = BUILDS["bladerf"], BUILDS["custom"]
+    res = [point(ots, 4, 95, 70),      # misses the tracking target
+           point(ots, 8, 99, 90),      # meets
+           point(custom, 4, 99, 85),   # meets with fewer sensors
+           point("ring4", 3, 99, 99)]  # not a fixed build: never recommended
+    de, radio, n, ok = recommend(res, node_costs(), "hays", "m210", 20)
+    assert ok and n in (4, 8) and de in BUILDS.values() and radio in BUILDS
+    # No point meets the targets -> best area, flagged as not meeting.
+    de, radio, n, ok = recommend([point(ots, 4, 60, 50), point(ots, 8, 80, 70)], node_costs(), "hays", "m210", 20)
+    assert not ok and n == 8 and radio == "bladerf"
+    # bladeRF and B210 share a build; the B210 is never the cheaper of the two.
+    assert BUILDS["bladerf"] == BUILDS["b210"]
+
+
+def test_explore_has_a_map_for_every_fixed_build_and_count():
+    import json
+    from pathlib import Path
+    from twin.explore import BUILDS, map_jobs
+    doc = json.loads((Path(__file__).resolve().parent.parent / "web" / "data" / "explore.json").read_text())
+    have = {tuple(m["k"]) for m in doc["maps"]}
+    assert all(tuple(j) in have for j in map_jobs())
+    assert doc.get("builds") == BUILDS

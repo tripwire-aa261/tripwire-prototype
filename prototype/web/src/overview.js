@@ -1,16 +1,31 @@
-// Overview tab: outcome-first story for investors and graders, using the default customer requirements.
-import { $, esc, usd, pct, meters, X, state, outcome, meets, facility, defaultRadio, defaultReq, fillSelect, INTERF_LABEL, onChange, emit } from './data.js';
+// Overview tab: the customer says how much area they want covered and how much of the time a drone must be
+// tracked (two sliders); the twin recommends the radio and number of sensors, what it costs us and what we
+// would charge. Interference removal is not a setting here: the page says which level each answer needs.
+import { $, esc, usd, pct, X, state, defaultReq, defaultTargets, fillSelect, INTERF_SHORT, onChange, emit,
+  RADIO, RADIO_KEYS, recommendOverall, radioOption } from './data.js';
+import { info } from './help.js';
 import { distToPolygon } from './viewer3d.js';
 
-const REQ = () => defaultReq(); // the Overview always uses the default requirements
+const REQ = () => defaultReq(); // the Overview always uses the default protected distance and height
+const usdk = (v) => (v >= 1e6 ? usd(v) : `$${Math.round(v / 1000)}k`);
+let pick = null; // a cell clicked in the "what it takes" table: { interf, radio }
 
-function rec(site, drone, interf) {
-  return X.recommended[`${site}|${drone}|${interf}`];
+// What the Overview shows: the clicked cell, else today's answer, else the first level that works, else the best tried.
+function headline() {
+  const R = recommendOverall(state.site, state.drone, state.targets, REQ());
+  if (pick) {
+    const lv = R.levels.find((l) => l.interf === pick.interf), pr = lv.per[pick.radio];
+    return { R, lv, x: pr.ok ?? pr.best, meets: !!pr.ok, picked: true };
+  }
+  if (R.first) return { R, lv: R.first, x: R.first.rec, meets: true };
+  const lv = R.levels.at(-1), best = RADIO_KEYS.map((r) => lv.per[r].best).filter(Boolean)
+    .reduce((b, x) => (!b || x.o.cov > b.o.cov || (x.o.cov === b.o.cov && x.total < b.total) ? x : b), null);
+  return { R, lv, x: best, meets: false };
 }
 
-function drawMap() {
-  const site = X.sites[state.site], r = rec(state.site, state.drone, state.interf);
-  const m = X.maps.find((x) => x.k[0] === state.site && x.k[1] === state.drone && x.k[2] === r.design && x.k[4] === state.interf && x.k[5] === r.n);
+function drawMap(hd) {
+  const site = X.sites[state.site], r = hd.x;
+  const m = r && X.maps.find((x) => x.k[0] === state.site && x.k[1] === state.drone && x.k[2] === r.design && x.k[4] === hd.lv.interf && x.k[5] === r.n);
   const cv = $('ovMap'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
   ctx.fillStyle = '#111a23'; ctx.fillRect(0, 0, W, H);
   if (!m) return;
@@ -51,41 +66,80 @@ function drawMap() {
   $('ovMapTitle').textContent = `${site.name}, ${site.place} · ${site.type}`;
 }
 
-function kpis() {
-  const req = REQ(), r = rec(state.site, state.drone, state.interf), d = X.designs[r.design];
-  const o = outcome(state.site, state.drone, r.design, req.height_m, state.interf, r.n, req.radius_m);
-  const ok = meets(o, req).ok, f = facility(r.design, r.n, defaultRadio(r.design), String(req.coverage_pct));
-  $('ovReqHint').textContent = `${X.drones[state.drone].name}, ${req.height_m} m up`;
-  const card = (k, v, s, cls = '') => `<div class="kpi ${cls}"><small>${k}</small><b>${v}</b><span>${s}</span></div>`;
-  $('ovKpis').innerHTML = [
-    card('Area covered', pct(o.cov), `within ${req.radius_m} m of the fence`, o.cov >= req.coverage_pct ? 'ok' : 'bad'),
-    card('Time tracked', pct(o.trk), 'of a drone\'s time inside the zone', o.trk >= req.tracked_pct ? 'ok' : 'bad'),
-    card('Position accuracy', o.acc == null ? '—' : `~${Math.round(o.acc)} m`, `updated every ${X.update_interval_s} s`, o.acc != null && o.acc <= req.accuracy_m ? 'ok' : 'bad'),
-    card('Early warning', o.warn == null ? '—' : meters(o.warn), 'outside the fence when first tracked'),
-    card('Customer price', `${usd(f.price)} + ${usd(f.sub)}/yr`, `${req.coverage_pct}% coverage tier`),
-    card('Our upfront cost', usd(f.upfront), `${r.n} sensors installed`),
+function status(H) {
+  const { R, lv, x } = H, t = state.targets, today = R.today;
+  const bestToday = RADIO_KEYS.map((r) => today.per[r].best).filter(Boolean).reduce((b, y) => (!b || y.o.cov > b.o.cov ? y : b), null);
+  let html;
+  if (H.picked) html = `<div class="status ${H.meets ? (lv.interf === today.interf ? 'ok' : 'warn') : 'bad'}">Showing the cell you picked: ${esc(INTERF_SHORT[lv.interf])}, ${esc(RADIO[x.radio].name)}. <button class="link" id="ovUnpick">Back to the recommendation</button></div>`;
+  else if (today.rec) html = `<div class="status ok"><b>Works with today's processing.</b> Meets ${t.area}% area and ${t.tracked}% time tracked with 20 dB of interference removal, which is today's assumption.</div>`;
+  else if (R.first) html = `<div class="status warn"><b>Not possible with today's technology.</b> At 20 dB of interference removal the best is ${pct(bestToday?.o.cov)} area covered and ${pct(bestToday?.o.trk)} time tracked. It needs <b>${R.first.interf} dB</b> of removal, which the Seed recordings must prove. Shown: the setup at ${R.first.interf} dB.</div>`;
+  else html = `<div class="status bad"><b>Not possible, even with 40 dB of interference removal.</b> The best tried covers ${pct(x?.o.cov)} of the area and tracks ${pct(x?.o.trk)} of the time. Lower the targets, or see the Simulation tab for other antenna setups.</div>`;
+  let alt = '';
+  if (x && x.radio === 'custom' && H.meets) {
+    const ots = lv.per.bladerf.ok;
+    alt = `The custom receiver is a Series A product. With off-the-shelf radios (Seed) at this level: ${ots ? `<b>${radioOption('bladerf', ots.n)}</b>, ${usd(ots.fin.price)} + ${usd(ots.fin.sub)}/yr` : 'the targets are not reachable'}.`;
+  }
+  $('ovAlt').innerHTML = alt;
+  return html;
+}
+
+function kpis(H) {
+  const req = REQ(), x = H.x;
+  $('ovReqHint').textContent = `${X.drones[state.drone].name}, ${req.height_m} m up, ${req.radius_m} m around the fence`;
+  $('ovStatus').innerHTML = status(H);
+  if ($('ovUnpick')) $('ovUnpick').onclick = () => { pick = null; render(); };
+  if (!x) { $('ovKpis').innerHTML = ''; $('ovPrice').innerHTML = ''; return; }
+  const o = x.o, f = x.fin, t = state.targets;
+  const card = (k, h, v, s, cls = '') => `<div class="kpi ${cls}"><small>${k} ${info(h)}</small><b>${v}</b><span>${s}</span></div>`;
+  $('ovKpis').innerHTML = `<div class="setup-line"><b>${esc(radioOption(x.radio, x.n))}</b> <span class="badge ${RADIO[x.radio].stage === 'Seed' ? '' : 'alt'}">${RADIO[x.radio].stage}</span><br><span class="note small">Each sensor: ${esc(RADIO[x.radio].build)}. Spaced evenly along the fence.</span></div>` + [
+    card('Area covered', 'area', pct(o.cov), `target ${t.area}%`, o.cov >= t.area ? 'ok' : 'bad'),
+    card('Time tracked', 'tracked', pct(o.trk), `target ${t.tracked}%`, o.trk >= t.tracked ? 'ok' : 'bad'),
+    card('Drones caught', 'caught', pct(o.caught), 'tracked before they reach the fence'),
+    card('Position accuracy', 'accuracy', o.acc == null ? '—' : `~${Math.round(o.acc)} m`, `updated every ${X.update_interval_s} s`),
   ].join('');
-  $('ovDesign').innerHTML = ok
-    ? `<b>Design:</b> ${r.n} sensors (${esc(d.label.toLowerCase())}). The cheapest design that meets the default requirements here.`
-    : `<b>No design meets the default requirements here</b> under this interference assumption. Shown: the best one tried (${r.n} sensors, ${esc(d.label.toLowerCase())}). Try the optimistic interference setting to see what measuring it could unlock.`;
+  const b = X.finance.benchmarks, Y = state.fin.years, lo = Y * b.airsight_subscription_low_usd, hi = Y * b.airsight_subscription_high_usd;
+  const vsAir = f.customer5 < lo ? 'below' : f.customer5 > hi ? 'above' : 'within';
+  $('ovPrice').innerHTML = `<small>Suggested price ${info('price')}</small>
+    <b>${usd(f.price)} installation + ${usd(f.sub)}/yr</b>
+    <span>Our cost ${usd(f.upfront)} upfront ${info('upfront')} + ${usd(f.yearly)}/yr ${info('running')}, plus ${state.fin.margin_upfront}% and ${state.fin.margin_yearly}% margin (editable in Financials).
+    The customer pays ${usd(f.customer5)} over ${Y} years, ${vsAir} the range of AirSight's subscriptions over the same time (${usdk(lo)} to ${usdk(hi)}) [4]. Axon's hardware and installation alone is ${usdk(b.axon_hardware_install_usd)} [3].</span>`;
+}
+
+function cellHtml(lv, r, on) {
+  const pr = lv.per[r];
+  if (pr.ok) {
+    const x = pr.ok;
+    return `<td class="pick${on ? ' on' : ''}" data-i="${lv.interf}" data-r="${r}"><b>${x.n} sensors</b><br><span class="note">${pct(x.o.cov)} area · ${pct(x.o.trk)} tracked</span><br>${usdk(x.fin.price)} + ${usdk(x.fin.sub)}/yr</td>`;
+  }
+  const y = pr.best;
+  return `<td class="pick no${on ? ' on' : ''}" data-i="${lv.interf}" data-r="${r}"><span class="bad">Not possible</span><br><span class="note">best ${pct(y?.o.cov)} area · ${pct(y?.o.trk)} tracked (${y?.n} sensors)</span></td>`;
+}
+
+function levelsTable(H) {
+  const rows = H.R.levels.map((lv) => {
+    const cheapest = lv.rec;
+    const cells = RADIO_KEYS.map((r) => cellHtml(lv, r, H.lv.interf === lv.interf && H.x?.radio === r)).join('');
+    return `<tr><td><b>${esc(INTERF_SHORT[lv.interf])}</b><br><span class="note">${lv.interf === X.axes.interference[0] ? "today's assumption" : 'not yet proven'}</span></td>${cells}
+      <td>${cheapest ? `<b>${esc(radioOption(cheapest.radio, cheapest.n))}</b>` : '<span class="bad">none</span>'}</td></tr>`;
+  }).join('');
+  $('ovLevels').innerHTML = `<tr><th>Interference removal ${info('interference')}</th>${RADIO_KEYS.map((r) => `<th>${esc(RADIO[r].name)} ${info(`radio_${r}`)}<br><span class="note">${RADIO[r].kind}, ${RADIO[r].stage}</span></th>`).join('')}<th>Cheapest</th></tr>${rows}`;
+  $('ovLevels').querySelectorAll('td.pick').forEach((td) => (td.onclick = () => { pick = { interf: +td.dataset.i, radio: td.dataset.r }; render(); }));
 }
 
 function sitesTable() {
-  // Side by side: today's interference assumption vs the optimistic (unproven) one.
-  const req = REQ(), tier = String(req.coverage_pct), levels = [X.axes.interference[0], X.axes.interference.at(-1)];
-  const cell = (k, lv) => {
-    const r = rec(k, state.drone, lv), d = X.designs[r.design];
-    const o = outcome(k, state.drone, r.design, req.height_m, lv, r.n, req.radius_m), f = facility(r.design, r.n, defaultRadio(r.design), tier);
-    if (!r.meets) return `<td class="split"><span class="bad">No design meets the requirements</span><br><span class="note">best: ${pct(o.cov)} covered with ${r.n} sensors</span></td><td>—</td>`;
-    return `<td class="split"><b>${r.n} sensors</b> · ${esc(d.short)}<br><span class="note">${pct(o.cov)} covered · ${pct(o.trk)} tracked · ~${Math.round(o.acc)} m</span></td><td>${usd(f.upfront)}</td>`;
-  };
+  const t = state.targets, req = REQ();
+  $('ovSitesNote').textContent = `The cheapest setup at each facility that covers ${t.area}% of the area within ${req.radius_m} m of the fence and tracks a drone ${t.tracked}% of the time (drones ${req.height_m} m up), at each level of interference removal.`;
   const rows = Object.keys(X.sites).map((k) => {
-    const s = X.sites[k];
-    return `<tr class="${k === state.site ? 'on' : ''}" data-k="${k}"><td><b>${esc(s.name)}</b><br><span class="note">${esc(s.type)} · ${s.towers_5km} towers within 5 km, nearest ${s.nearest_tower_km} km</span></td>${cell(k, levels[0])}${cell(k, levels[1])}</tr>`;
+    const s = X.sites[k], R = recommendOverall(k, state.drone, t, req);
+    const cells = R.levels.map((lv) => {
+      if (lv.rec) return `<td><b>${esc(radioOption(lv.rec.radio, lv.rec.n))}</b><br><span class="note">${usd(lv.rec.fin.price)} + ${usd(lv.rec.fin.sub)}/yr</span></td>`;
+      const best = RADIO_KEYS.map((r) => lv.per[r].best).filter(Boolean).reduce((b, y) => (!b || y.o.cov > b.o.cov ? y : b), null);
+      return `<td><span class="bad">Not possible</span><br><span class="note">best ${pct(best?.o.cov)} area · ${pct(best?.o.trk)} tracked</span></td>`;
+    }).join('');
+    return `<tr class="${k === state.site ? 'on' : ''}" data-k="${k}"><td><b>${esc(s.name)}</b><br><span class="note">${esc(s.type)} · ${s.towers_5km} towers within 5 km, nearest ${s.nearest_tower_km} km</span></td>${cells}</tr>`;
   }).join('');
-  $('ovSitesTable').innerHTML = `<tr><th rowspan="2">Facility</th><th colspan="2" class="grp">Today's assumption: ${levels[0]} dB interference removal</th><th colspan="2" class="grp">If enhanced processing removes ${levels[1]} dB (unproven)</th></tr>
-    <tr><th class="split">Cheapest design that works</th><th>Our upfront cost</th><th class="split">Cheapest design that works</th><th>Our upfront cost</th></tr>${rows}`;
-  $('ovSitesTable').querySelectorAll('tr[data-k]').forEach((tr) => (tr.onclick = () => { state.site = tr.dataset.k; emit('overview'); }));
+  $('ovSitesTable').innerHTML = `<tr><th>Facility ${info('facility')}</th>${X.axes.interference.map((i) => `<th>${esc(INTERF_SHORT[i])}${i === X.axes.interference[0] ? '' : '<br><span class="note">unproven</span>'}</th>`).join('')}</tr>${rows}`;
+  $('ovSitesTable').querySelectorAll('tr[data-k]').forEach((tr) => (tr.onclick = () => { state.site = tr.dataset.k; pick = null; emit('overview'); }));
 }
 
 export function benchBars(el, customer5, years) {
@@ -103,20 +157,20 @@ export function benchBars(el, customer5, years) {
 function render() {
   $('ovSites').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.k === state.site));
   $('ovDrone').value = state.drone;
-  $('ovInterf').value = String(state.interf);
-  drawMap(); kpis(); sitesTable();
-  const req = REQ(), r = rec(state.site, state.drone, state.interf);
-  const f = facility(r.design, r.n, defaultRadio(r.design), String(req.coverage_pct));
-  benchBars($('ovBench'), f.customer5, state.fin.years);
+  $('ovArea').value = state.targets.area; $('ovAreaOut').textContent = `${state.targets.area}%`;
+  $('ovTrk').value = state.targets.tracked; $('ovTrkOut').textContent = `${state.targets.tracked}%`;
+  const H = headline();
+  drawMap(H); kpis(H); levelsTable(H); sitesTable();
+  if (H.x) benchBars($('ovBench'), H.x.fin.customer5, state.fin.years);
 }
 
 export function initOverview() {
   $('ovSites').innerHTML = Object.keys(X.sites).map((k) => `<button data-k="${k}"><b>${esc(X.sites[k].name)}</b><span>${esc(X.sites[k].type)}</span></button>`).join('');
-  $('ovSites').querySelectorAll('button').forEach((b) => (b.onclick = () => { state.site = b.dataset.k; emit('overview'); }));
+  $('ovSites').querySelectorAll('button').forEach((b) => (b.onclick = () => { state.site = b.dataset.k; pick = null; emit('overview'); }));
   fillSelect($('ovDrone'), Object.entries(X.drones).map(([k, d]) => [k, d.name]), state.drone);
-  fillSelect($('ovInterf'), X.axes.interference.map((i) => [i, INTERF_LABEL[i]]), state.interf);
-  $('ovDrone').onchange = () => { state.drone = $('ovDrone').value; emit('overview'); };
-  $('ovInterf').onchange = () => { state.interf = +$('ovInterf').value; emit('overview'); };
+  $('ovDrone').onchange = () => { state.drone = $('ovDrone').value; pick = null; emit('overview'); };
+  $('ovArea').oninput = () => { state.targets.area = +$('ovArea').value; pick = null; emit('targets'); };
+  $('ovTrk').oninput = () => { state.targets.tracked = +$('ovTrk').value; pick = null; emit('targets'); };
   onChange(render);
   render();
 }

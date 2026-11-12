@@ -2,13 +2,13 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import { $, esc, X, fillSelect, state } from './data.js';
+import { $, esc, X, fillSelect, state, designName, designFor, RADIO, RADIO_KEYS } from './data.js';
 
 const RUN_DIR = 'runs/';
 const fmtM = (x) => (x == null ? '—' : x >= 1000 ? `${(x / 1000).toFixed(2)} km` : `${Math.round(x)} m`);
 
 let site = null, towersDoc = null, siteKey = null, elev0 = 0, gridC, gridF;
-let run = null, rdBlob = null, runsIndex = [], apiMeta = null;
+let run = null, rdBlob = null, runsIndex = [], apiMeta = null, replays = null, replayNote = '';
 let tNow = 0, playing = true, rdListener = 0, active = false, pinned = false;
 
 // ------------------------------------------------------------------ terrain helpers
@@ -188,18 +188,27 @@ function beams(l) {
   return out;
 }
 
-const PROC = { crs_p0: 'standard processing', crs_all: 'all reference signals', full: 'enhanced processing' };
+const PROC = { crs_p0: 'beacon-only processing', crs_all: 'all reference signals', full: 'whole-signal processing' };
 function designText(p, l) {
   const a = l?.antenna;
   if (!a || a.kind === 'iso') return `${p.rx_elements} antenna(s), v0.2 antenna model`;
-  const name = { omni: 'omni', patch: 'patch', lpda: 'log-periodic', yagi: 'Yagi' }[a.kind];
-  return a.kind === 'omni' ? `${a.elements}-antenna ring` : `${a.elements} ${name} antenna(s)${a.faces.length > 1 ? ` in ${a.faces.length} directions` : ''}`;
+  const name = { omni: 'all-round', patch: 'panel', lpda: 'log-periodic', yagi: 'Yagi' }[a.kind];
+  return `${a.elements} ${name} antenna${a.elements > 1 ? 's' : ''}${a.faces.length > 1 ? ` facing ${a.faces.length} ways` : ''}`;
 }
 
+let loadSeq = 0; // a newer pick cancels a load still in flight
 async function loadRun(id) {
-  run = await (await fetch(`${RUN_DIR}${id}.json`, { cache: 'no-store' })).json();
-  rdBlob = new Uint8Array(await (await fetch(`${RUN_DIR}${id}.bin`, { cache: 'no-store' })).arrayBuffer());
+  const my = ++loadSeq;
+  let doc = null;
+  try { const r = await fetch(`${RUN_DIR}${id}.json`, { cache: 'no-store' }); if (r.ok) doc = await r.json(); } catch { doc = null; }
+  if (!doc) { if (my === loadSeq) $('runSummary').innerHTML = `<span class="bad">Run "${esc(id)}" is not on this server</span> (runs you make yourself stay on your own computer).`; return; }
+  // The .bin holds the raw radar view only; the web deploy leaves it out (size limit), the replay still plays.
+  let blob = null;
+  try { const r = await fetch(`${RUN_DIR}${id}.bin`, { cache: 'no-store' }); if (r.ok) blob = new Uint8Array(await r.arrayBuffer()); } catch { blob = null; }
+  if (my !== loadSeq) return;
+  run = doc; rdBlob = blob;
   await ensureSite(run.site?.key || run.scenario || 'hays');
+  if (my !== loadSeq) return;
   runGroup.clear();
   beamGroup.clear();
   buildTowers();
@@ -231,7 +240,7 @@ async function loadRun(id) {
   $('rdTabs').innerHTML = run.listeners.map((l, i) => `<button data-i="${i}" class="${i === rdListener ? 'on' : ''}">${l.id.replace('L', 'S')}</button>`).join('');
   $('rdTabs').querySelectorAll('button').forEach((b) => (b.onclick = () => { rdListener = +b.dataset.i; $('rdTabs').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); drawFrame(true); }));
   const p = run.params, dm = run.drone_model;
-  $('runSummary').innerHTML = `${esc(X.sites[siteKey].name)} · ${esc(dm.name)} at ${p.altitude_agl_m} m · ${p.n_listeners} sensors, each a ${esc(designText(p, run.listeners[0]))}, ${esc(PROC[p.processing || 'crs_p0'])}${p.mic_range_m ? ' + microphone' : ''} · interference removal ${p.cochannel_suppression_db} dB · ${run.illuminators.length} cell towers used`;
+  $('runSummary').innerHTML = `${replayNote}${esc(X.sites[siteKey].name)} · ${esc(dm.name)} at ${p.altitude_agl_m} m · ${p.n_listeners} sensors, each with ${esc(designText(p, run.listeners[0]))}, ${esc(PROC[p.processing || 'crs_p0'])}${p.mic_range_m ? ' + microphone' : ''} · interference removal ${p.cochannel_suppression_db} dB · ${run.illuminators.length} cell towers used`;
   runCards();
   fillParamTable();
   lastFrameIdx = -1;
@@ -339,6 +348,10 @@ const LUT = (() => {
 const rdOff = document.createElement('canvas');
 function drawRD(fi) {
   if (!$('rd').offsetParent) return; // hidden
+  if (!rdBlob || !rdBlob.length) {
+    const c = $('rd').getContext('2d'); c.fillStyle = '#111a23'; c.fillRect(0, 0, 300, 300);
+    c.fillStyle = '#8396a8'; c.font = '12px system-ui'; c.fillText('Raw radar view: run serve.py locally', 20, 150); return;
+  }
   const ax = run.rd.axes, rows = ax.range[2], cols = ax.doppler[2], off = (fi * run.rd.per_frame + rdListener) * rows * cols;
   rdOff.width = cols; rdOff.height = rows;
   const octx = rdOff.getContext('2d'), img = octx.createImageData(cols, rows);
@@ -425,7 +438,7 @@ function initForm() {
   const f = $('runForm');
   fillSelect($('f_site'), Object.keys(X.sites).map((k) => [k, `${X.sites[k].name} (${X.sites[k].type})`]), state.site);
   fillSelect($('f_drone'), Object.entries(apiMeta.drones).map(([k, d]) => [k, d.name]), state.drone);
-  fillSelect($('f_design'), Object.entries(X.designs).map(([k, d]) => [k, d.label]), state.design || 'ring4_enh_mic');
+  fillSelect($('f_design'), Object.keys(X.designs).map((k) => [k, designName(k)]), designFor(state.radio));
   const d = apiMeta.defaults;
   setForm({ n_listeners: state.n || 8, altitude_agl_m: state.req.height_m, cochannel_suppression_db: state.interf, network_load: d.network_load, cit_s: 0.8, max_illuminators: d.max_illuminators, adc_bits: 12, pointing: 'inward', bird: true });
   f.querySelectorAll('input[type=range]').forEach((el) => el.addEventListener('input', () => setForm({ [el.name]: el.value })));
@@ -449,16 +462,28 @@ function initForm() {
       $('runStatus').textContent = j.status === 'running' ? `simulating ${j.done}/${j.total || '…'} frames` : j.status;
       if (j.status !== 'running') {
         clearInterval(poll); $('runBtn').disabled = false; bar.hidden = true;
-        if (j.status === 'finished') { await refreshRuns(); $('runSelect').value = j.run_id; await loadRun(j.run_id); $('runStatus').textContent = `finished: ${j.run_id}`; }
+        if (j.status === 'finished') { await refreshRuns(); $('runSelect').value = j.run_id; replayNote = ''; await loadRun(j.run_id); $('runStatus').textContent = `finished: ${j.run_id}`; }
         else $('runStatus').textContent = `failed: ${j.error}`;
       }
     }, 1500);
   };
 }
 
+// Precomputed replays (tools/make_replays.py): one per facility x drone x radio, at the recommended sensor count.
+// bladeRF and B210 share one: the same radio in the model.
+const replayId = (siteK, drone, radio) => `replay-${siteK}-${drone}-${radio === 'custom' ? 'custom' : 'ots'}`;
+async function loadReplay() {
+  const r = replays?.replays.find((x) => x.id === replayId($('rpSite').value, $('rpDrone').value, $('rpRadio').value));
+  if (!r || !r.metrics) { loadSeq++; $('runSummary').innerHTML = '<span class="bad">This replay has not been computed yet</span> (run tools/make_replays.py).'; return; }
+  const radio = $('rpRadio').value, t = replays.targets;
+  replayNote = `<b>${r.n} × ${esc(RADIO[radio].name)} sensors</b>: ${r.meets ? `the fewest that meet ${t.area_pct}% area and ${t.tracked_pct}% tracked` : `the best tried; nothing meets ${t.area_pct}% area and ${t.tracked_pct}% tracked`}, with ${r.interference_db} dB of interference removal${r.interference_db > X.axes.interference[0] ? ' (unproven)' : " (today's assumption)"}.${radio === 'b210' ? ' The B210 behaves like the bladeRF in the model, so it shares this replay.' : ''}<br>`;
+  await loadRun(r.id);
+}
 async function refreshRuns() {
-  const idx = await (await fetch(`${RUN_DIR}index.json`, { cache: 'no-store' })).json();
-  runsIndex = idx.runs.filter((r) => r.params?.antenna && r.params.antenna !== 'iso'); // v0.2 runs live in the archive
+  let idx = { runs: [] };
+  try { idx = await (await fetch(`${RUN_DIR}index.json`, { cache: 'no-store' })).json(); } catch { /* static deploy without a run list */ }
+  try { replays = await (await fetch(`${RUN_DIR}replays.json`, { cache: 'no-store' })).json(); } catch { replays = null; }
+  runsIndex = idx.runs.filter((r) => r.params?.antenna && r.params.antenna !== 'iso' && !r.id.startsWith('replay-')); // v0.2 runs live in the archive
   const name = (r) => `${r.id} · ${X.sites[r.scenario]?.name || r.scenario} · ${r.drone}`;
   $('runSelect').innerHTML = runsIndex.map((r) => `<option value="${esc(r.id)}">${esc(name(r))}</option>`).join('');
 }
@@ -488,7 +513,11 @@ export function setActive(on) { active = on; if (on) resize(); }
 export async function initViewer(meta) {
   apiMeta = meta;
   await refreshRuns();
-  $('runSelect').onchange = () => loadRun($('runSelect').value);
+  fillSelect($('rpSite'), Object.keys(X.sites).map((k) => [k, `${X.sites[k].name} (${X.sites[k].type})`]), state.site);
+  fillSelect($('rpDrone'), Object.entries(X.drones).map(([k, d]) => [k, d.name]), state.drone);
+  fillSelect($('rpRadio'), RADIO_KEYS.map((r) => [r, `${RADIO[r].name} (${RADIO[r].kind})`]), state.radio);
+  for (const id of ['rpSite', 'rpDrone', 'rpRadio']) $(id).onchange = loadReplay;
+  $('runSelect').onchange = () => { replayNote = '<b>Saved run</b> (not one of the replays above).<br>'; loadRun($('runSelect').value); };
   $('play').onclick = () => { playing = !playing; $('play').textContent = playing ? 'Pause' : 'Play'; };
   $('timeline').oninput = (e) => { tNow = +e.target.value; };
   $('showCoverage').onchange = (e) => { if (coverageMesh) coverageMesh.visible = e.target.checked; };
@@ -497,16 +526,19 @@ export async function initViewer(meta) {
   if (apiMeta) initForm();
   else { $('runForm').querySelectorAll('input,select,button').forEach((e) => (e.disabled = true)); $('runStatus').textContent = 'Start serve.py to run new simulations.'; }
   const q = new URLSearchParams(location.search);
-  const want = q.get('run') || 'seed-m210';
   pinned = !!runsIndex.find((r) => r.id === q.get('run')); // a run named in the link wins on first open
-  if (runsIndex.length) { await loadRun(runsIndex.find((r) => r.id === want)?.id || runsIndex[0].id); $('runSelect').value = run.id; }
+  if (pinned) { $('runSelect').value = q.get('run'); await loadRun(q.get('run')); }
+  else if (replays) await loadReplay();
+  else if (runsIndex.length) { await loadRun(runsIndex.find((r) => r.id === 'seed-m210')?.id || runsIndex[0].id); $('runSelect').value = run.id; }
   if (q.get('t')) { tNow = +q.get('t'); playing = false; $('play').textContent = 'Play'; }
   requestAnimationFrame(loop);
 }
 export function showRunFor(siteKeyWanted) {
   if (pinned) { pinned = false; return; }
-  // Prefer the committed demo runs for the facility, then any run there.
-  const demo = ['seed-m210', 'hancock-seed-m210', 'fulton-seed-m210'];
-  const r = runsIndex.find((x) => x.scenario === siteKeyWanted && demo.includes(x.id)) || runsIndex.find((x) => x.scenario === siteKeyWanted);
-  if (r && run?.scenario !== siteKeyWanted) { $('runSelect').value = r.id; loadRun(r.id); }
+  // Follow the facility, drone and radio picked in the Simulation tab.
+  if (!replays) return;
+  const want = [siteKeyWanted, state.drone, state.radio];
+  if (['rpSite', 'rpDrone', 'rpRadio'].every((id, i) => $(id).value === want[i]) && run?.id?.startsWith('replay-')) return;
+  $('rpSite').value = want[0]; $('rpDrone').value = want[1]; $('rpRadio').value = want[2];
+  loadReplay();
 }

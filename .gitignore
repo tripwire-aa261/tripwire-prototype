@@ -44,3 +44,6 @@ papers/
 
 # Old downloaded copy of this repository
 tripwire-prototype-main/
+
+# Vercel project link (created by `vercel` in prototype/)
+.vercel/

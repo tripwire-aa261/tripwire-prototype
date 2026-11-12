@@ -1,9 +1,10 @@
-// Tripwire digital twin v0.4: tabs (Overview, Simulation, Financials) over shared state.
-import { $, esc, X, state, loadData, defaultRadio } from './data.js';
+// Tripwire digital twin v0.4.2: tabs (Overview, Simulation, Financials) over shared state.
+import { $, esc, X, state, loadData } from './data.js';
 import { initOverview } from './overview.js';
 import { initSimulate } from './simulate.js';
 import { initFinance } from './finance.js';
 import { initViewer, setActive, drawCalibration, showRunFor } from './viewer3d.js';
+import { initHelp } from './help.js';
 
 let calibration = null;
 
@@ -15,12 +16,12 @@ function showTab(name) {
 }
 
 async function boot() {
+  initHelp();
   await loadData();
   let meta = null;
   try { meta = await (await fetch('/api/meta')).json(); } catch { meta = null; }
   try { calibration = meta?.calibration || (await (await fetch('runs/calibration.json')).json()); } catch { calibration = null; }
-  initSimulate(); // picks the cheapest design first; Financials follows it
-  state.radio = defaultRadio(state.design);
+  initSimulate(); // picks the recommended setup first; Financials follows it
   initOverview();
   initFinance();
   await initViewer(meta);

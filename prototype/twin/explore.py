@@ -1,7 +1,8 @@
 """Precompute everything the viewer's Overview, Simulation and Financials tabs need to answer
 "which sensor design meets the customer's requirements at each site, and what does it cost".
 
-    .venv/bin/python -m twin.explore            (~30 min on 4 cores; writes web/data/explore.json)
+    .venv/bin/python -m twin.explore            (~40 min on 4 cores; writes web/data/explore.json)
+    .venv/bin/python -m twin.explore --maps     (~5 min: recommendations and coverage maps only)
 
 Grid: 3 real sites x 2 drones x 6 sensor designs x 3 drone heights x 3 interference-removal levels x
 node counts. For each point, at several zone radii (distance protected around the fence):
@@ -89,7 +90,7 @@ def _point(args):
         acc.append(round(float(np.median(e)), 1) if len(e) else None)
     fl = scored_flights(sc, FLIGHTS, agl=height, radii=RADII)
     return {"k": [site, drone, design, height, interf, n], "cov": cov, "acc": acc,
-            "trk": [fl["by_radius"][r] for r in RADII], "warn": fl["warning_m"]}
+            "trk": [fl["by_radius"][r] for r in RADII], "warn": fl["warning_m"], "caught": fl["caught_pct"]}
 
 
 def _map(args):
@@ -132,24 +133,46 @@ def node_costs() -> dict:
     return out
 
 
-def recommend(results, costs, site, drone, interf, req=DEFAULT_REQ):
-    """Cheapest (upfront) design + node count meeting the requirements; else the best-covering option."""
+# Each radio comes with one fixed sensor build on the Overview and in Financials (the Simulation tab can
+# explore the other builds). bladeRF and B210 are the same radio in the model (12-bit, 2 channels per board);
+# the B210 only costs more.
+BUILDS = {"bladerf": "ring4_enh_mic", "b210": "ring4_enh_mic", "custom": "ring8_enh_mic"}
+
+# The option the Overview recommends by default: the cheapest (customer's total over the contract) radio and
+# sensor count that covers at least 90 % of the protected area and holds a track 80 % of the time (ASSUMPTION
+# default targets; the Overview has sliders for both). If none does: the one covering the most area.
+RECOMMEND = {"area_pct": float(DEFAULT_REQ["coverage_pct"]), "tracked_pct": float(DEFAULT_REQ["tracked_pct"])}
+
+
+def recommend(results, costs, site, drone, interf, req=DEFAULT_REQ, target=RECOMMEND):
+    """(design, radio, sensors, meets targets) at the default protected distance and height."""
+    from .cost import customer_price
     ri = RADII.index(req["radius_m"])
+    by_design = {}
+    for radio, de in BUILDS.items():
+        by_design.setdefault(de, []).append(radio)
     best, fallback = None, None
     for r in results:
         s, dr, de, h, i, n = r["k"]
-        if (s, dr, h, i) != (site, drone, req["height_m"], interf):
+        if (s, dr, h, i) != (site, drone, req["height_m"], interf) or de not in by_design:
             continue
-        node_usd = costs[de][DESIGNS[de]["radio"]]["total"]
-        cost = facility_costs(n, node_usd)["upfront"]
-        ok = (r["cov"][ri] >= req["coverage_pct"] and (r["trk"][ri] or 0) >= req["tracked_pct"]
-              and r["acc"][ri] is not None and r["acc"][ri] <= req["accuracy_m"])
-        if ok and (best is None or cost < best[0]):
-            best = (cost, de, n)
-        score = (r["cov"][ri], -cost)
-        if fallback is None or score > fallback[0]:
-            fallback = (score, de, n)
-    return (best[1], best[2], True) if best else (fallback[1], fallback[2], False)
+        for radio in by_design[de]:
+            fc = facility_costs(n, costs[de][radio]["total"])
+            total = customer_price(fc["upfront"], fc["yearly"])["customer_total"]
+            ok = r["cov"][ri] >= target["area_pct"] and r["trk"][ri] >= target["tracked_pct"]
+            if ok and (best is None or total < best[0]):
+                best = (total, de, radio, n)
+            score = (r["cov"][ri], r["trk"][ri], -total)
+            if fallback is None or score > fallback[0]:
+                fallback = (score, de, radio, n)
+    pick = best or fallback
+    return pick[1], pick[2], pick[3], best is not None
+
+
+def map_jobs():
+    """Coverage maps for every fixed build x sensor count at the default height (the Overview draws any of them)."""
+    return [(s, d, de, DEFAULT_REQ["height_m"], i, n) for s in SITES for d in DRONE_KEYS
+            for de in sorted(set(BUILDS.values())) for i in INTERFERENCE for n in NODES]
 
 
 def site_info(key):
@@ -166,21 +189,40 @@ def site_info(key):
                        for t in cell if t["distance_m"] <= 6000]}
 
 
+def recommendations(results, costs):
+    recs = {}
+    for s in SITES:
+        for d in DRONE_KEYS:
+            for i in INTERFERENCE:
+                de, radio, n, ok = recommend(results, costs, s, d, i)
+                recs[f"{s}|{d}|{i}"] = {"design": de, "radio": radio, "n": n, "meets": ok}
+    return recs
+
+
+def refresh_maps():
+    """Recompute the recommendations and coverage maps only, keeping the design-point results (~5 min)."""
+    t0 = time.time()
+    doc = json.loads(OUT.read_text())
+    costs = node_costs()
+    doc["recommend"], doc["builds"] = RECOMMEND, BUILDS
+    doc["recommended"] = recommendations(doc["results"], costs)
+    doc["maps"] = _pool(_map, map_jobs(), "maps")
+    OUT.write_text(json.dumps(doc, separators=(",", ":")))
+    print(f"wrote {OUT} ({OUT.stat().st_size / 1e6:.1f} MB) in {(time.time() - t0) / 60:.1f} min")
+
+
 def main():
+    import sys
+    if "--maps" in sys.argv:
+        return refresh_maps()
     t0 = time.time()
     jobs = [(s, d, de, h, i, n) for s in SITES for d in DRONE_KEYS for de in DESIGNS for h in HEIGHTS
             for i in INTERFERENCE for n in NODES]
     print(f"{len(jobs)} design points")
     results = _pool(_point, jobs, "points")
     costs = node_costs()
-    recs, map_jobs = {}, []
-    for s in SITES:
-        for d in DRONE_KEYS:
-            for i in INTERFERENCE:
-                de, n, ok = recommend(results, costs, s, d, i)
-                recs[f"{s}|{d}|{i}"] = {"design": de, "n": n, "meets": ok}
-                map_jobs.append((s, d, de, DEFAULT_REQ["height_m"], i, n))
-    maps = _pool(_map, map_jobs, "maps")
+    recs = recommendations(results, costs)
+    maps = _pool(_map, map_jobs(), "maps")
     doc = {
         "created": dt.datetime.now().isoformat(timespec="seconds"), "runtime_min": round((time.time() - t0) / 60, 1),
         "sites": {k: site_info(k) for k in SITES},
@@ -190,12 +232,13 @@ def main():
         "antennas": {k: {"name": a.name, "gain_dbi": a.gain_dbi, "price_usd": a.price_usd} for k, a in ANTENNAS.items()},
         "radios": {k: {"name": r["name"], "usd": r["usd"], "stage": r["stage"], "source": r["source"]} for k, r in RADIOS.items()},
         "axes": {"heights": HEIGHTS, "interference": INTERFERENCE, "nodes": NODES, "radii": RADII},
-        "default_req": DEFAULT_REQ, "update_interval_s": BASE["cit_s"] and 1.5,
+        "default_req": DEFAULT_REQ, "recommend": RECOMMEND, "builds": BUILDS, "update_interval_s": BASE["cit_s"] and 1.5,
         "finance": FINANCE, "results": results, "recommended": recs, "maps": maps,
         "notes": {
             "area_covered": "Share of the zone (fence + radius) where 3+ tower-sensor pairs detect the drone, or 2+ microphones hear it.",
             "accuracy": "Median expected position error over the covered area; rough (within ~2x of the full simulation).",
             "time_tracked": f"Scored-flight estimate: {FLIGHTS} random contraband flights at the chosen height, share of in-zone time with a held track.",
+            "drones_caught": f"Scored-flight estimate: share of {FLIGHTS} random contraband flights at the chosen height that are tracked before the drone crosses the fence.",
             "interference": "dB of interference from neighboring cells on the same carrier that the processing removes: 20 = current assumption; 40 = rebuilding and subtracting neighbor cells (unproven).",
             "update": "One position update per processed frame: every 1.5 s (0.8 s integration).",
         },
