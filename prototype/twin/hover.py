@@ -47,12 +47,8 @@ def _background_points(site):
     X, Y = (a.ravel() for a in np.meshgrid(xs, xs))
     pts = np.stack([X, Y, site.ground(X, Y) + 1.0], axis=1)
     rcs = np.full(len(pts), SIGMA0 * GRID_M ** 2)
-    bp, br = [], []
-    for b in site.buildings:
-        poly = np.array(b["poly"])
-        cx, cy = poly[:-1].mean(axis=0)
-        bp.append([cx, cy, float(site.ground(cx, cy)) + b["height_m"] * 0.7])
-        br.append(np.clip(0.1 * b.get("area_m2", 100), 5, 300))
+    from .scene import building_reflectors
+    bp, br = building_reflectors(site)
     if bp:
         pts, rcs = np.vstack([pts, np.array(bp)]), np.concatenate([rcs, np.array(br)])
     _MEM[key] = (pts, rcs)

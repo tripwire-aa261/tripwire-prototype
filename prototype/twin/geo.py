@@ -156,6 +156,8 @@ class Site:
                 continue
             X, Y = np.meshgrid(g.x0 + g.step * np.arange(j0, j1), g.y0 + g.step * np.arange(i0, i1))
             m = points_in_polygon(X, Y, poly)
+            for hole in b.get("holes", []):  # e.g. the open field inside a stadium grandstand
+                m &= ~points_in_polygon(X, Y, np.array(hole))
             h[i0:i1, j0:j1] = np.where(m, np.maximum(h[i0:i1, j0:j1], b["height_m"]), h[i0:i1, j0:j1])
         return Grid(h, g.x0, g.y0, g.step)
 

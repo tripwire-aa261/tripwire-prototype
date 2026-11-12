@@ -2,6 +2,26 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Nimalan · Twin v0.5–v0.5.1: stadium site, sensors on the structure, bird display option
+
+**Asked for:** "Clemson Memorial Stadium in South Carolina to know how it is like for stadium based customers ... We should place the nodes on top the stadium infrastructure itself. What do you think?" (then "commit and push first, then build the stadium"); version numbering (v0.5, then v0.5.1 for the bird change); "make the bird optional checkbox in the sim for now" after noticing the bird gets a track estimate; finally, update the handoff, the figures/financials md and the other docs with everything that changed, "and highlight it ... so that he can easily integrate it into his work".
+**Done:**
+- Site: `prototype/data/sites/clemson-memorial-stadium/` (OSM relation 4131933, stands with the field as a hole, USGS terrain; FCC + OpenCelliD towers: 9 likely cell towers within 5 km, nearest 2.1 km). `tools/fetch_site.py` reads multipolygon relations (`--osm-rel`, `--height`) and retries busy Overpass servers; `twin/geo.py` and the 3D view handle building holes; `scene.building_reflectors` spreads stadium-sized rings.
+- Mounting: `Params.mount` (pole / structure / mixed), `setback_m`, `structure_inset_m`, `roof_mast_m`; per-site settings `scenarios.SITE_PARAMS` (stadium: mixed, 20 m setback, microphones off). `tools/placement_study.py` → `web/runs/placement_study.json`.
+- Explorer: `python -m twin.explore --site clemson` merges one site (~17-25 min); stadium points, maps and 4 replays (`web/runs/replay-clemson-*`, ~88 MB; full simulation tracks 83-86 %). `make_replays.py` keeps earlier replays' metrics.
+- Viewer v0.5.1: stadium chip and wording (`edgeWord`, `mountText` in `web/src/data.js`), help text, version badge; 3D **Bird** checkbox (hides the bird and its tracks; display only).
+- Docs: highlighted **WHAT'S NEW** block and **NEW** markers in `Tripwire_Assumptions_and_Figures.md` (stadium rows, stadium study, tracker settings, pole assumptions, FAA source [16]); NEW block in `BUSINESS_PLAN_UPDATE_BRIEF.md`; README v0.5 / v0.5.1; `Iterations.docx` entries 10-11. 43 tests pass; all tabs checked headless at 1280 and 390 px (only the expected `/api/meta` 404 with a static server).
+**Decided:**
+- Stadium sensors alternate between the top of the stands and 6 m poles outside. Poles alone never see into the bowl (at most ~50-65 % of the inside covered); on the stands alone they see every tower and lose the area around the stadium below 40 dB. Rejected: stands only (the user's first idea) and poles only.
+- Microphones off at the stadium (game-day crowd noise, ASSUMPTION). Stands 30 m tall (ASSUMPTION; no reliable published height).
+- Stadium positioning: the bowl layer next to an RF detector (FAA 3 NM restriction and pilot location are RF-detector strengths).
+- Bird checkbox is display only and on by default; the classifier fix was proposed, not built ("for now").
+- Version numbers: v0.5 for the stadium, v0.5.1 for the bird option.
+**Left open:**
+- Drone-vs-bird classification does not work: rotor score above 6 dB on 37 % of drone, 33 % of bird and 65 % of false detections. Proposed fix: rotor evidence accumulated over a track + flight behavior, alerts only on drone-classified tracks, re-scoring the saved replays.
+- Stadium: no bowl-specific area target (16 poles "meet" 90 % while a third of the bowl is blind); DAS, game-day load and crowd clutter not modeled; real stand height and mounting points unknown; stadium pricing untested.
+- Still open from before: stale receiver figures in the `Iterations.docx` lessons; new lessons 4-16 not added.
+
 ## 2026-11-12 · Nimalan · Twin v0.4.5: detection range as a customer requirement
 
 **Asked for:** "when the drone is first detected. Essentially the range. For example, 600m. Customer can also choose what is the drone detection range in the overview page." Also in this session (discussion only, nothing built): a check of the numbers in Nimalan's "What we learnt from the prototype" text, more lessons from the prototype, how to demo the idea with ESP32 WiFi boards (then with only 3 ESP32s and RFID tags), whether the tracking estimate uses filters, the sensor pole height, and adding Clemson Memorial Stadium (SC) as a stadium-customer site with sensors on the stadium structure (approved; next session's work).

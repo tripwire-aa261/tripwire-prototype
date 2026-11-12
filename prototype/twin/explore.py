@@ -1,8 +1,9 @@
 """Precompute everything the viewer's Overview, Simulation and Financials tabs need to answer
 "which sensor design meets the customer's requirements at each site, and what does it cost".
 
-    .venv/bin/python -m twin.explore            (~40 min on 4 cores; writes web/data/explore.json)
-    .venv/bin/python -m twin.explore --maps     (~5 min: recommendations and coverage maps only)
+    .venv/bin/python -m twin.explore            (~100 min on 4 cores, 4 sites; writes web/data/explore.json)
+    .venv/bin/python -m twin.explore --maps     (~8 min: recommendations and coverage maps only)
+    .venv/bin/python -m twin.explore --site clemson   (one site only, merged into the existing file)
 
 Grid: 3 real sites x 2 drones x 8 sensor designs x 3 drone heights x 3 interference-removal levels x
 node counts. For each point, at several zone radii (distance protected around the fence):
@@ -30,12 +31,13 @@ from .config import DRONES, Params
 from .cost import FINANCE, RADIOS, facility_costs, node_cost
 from .coverage import acoustic_count, albersheim_db, coverage_grid, pair_snr_db, position_error_m
 from .flights import scored_flights
+from .scenarios import SITE_PARAMS
 from .geo import distance_to_polygon
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "web" / "data" / "explore.json"
 
-SITES = ["hays", "hancock", "fulton"]
+SITES = ["hays", "hancock", "fulton", "clemson"]
 DRONE_KEYS = ["m210", "mavic"]
 HEIGHTS = [30, 60, 120]
 INTERFERENCE = [20, 30, 40]  # dB of neighbor-cell interference removed (cochannel_suppression_db)
@@ -70,17 +72,21 @@ DESIGNS = {
 }
 
 
-def _params(site, drone, design, height, interf, n) -> Params:
+def _params(site, drone, design, height, interf, n, extra=None) -> Params:
+    """Design-point parameters: base + design + per-site settings (SITE_PARAMS) + any extra overrides."""
     d = DESIGNS[design]
     return Params.from_dict({**BASE, **d["p"], "drone": drone, "altitude_agl_m": height,
-                             "cochannel_suppression_db": interf, "n_listeners": n, "zone_buffer_m": 150})
+                             "cochannel_suppression_db": interf, "n_listeners": n, "zone_buffer_m": 150,
+                             **SITE_PARAMS.get(site, {}), **(extra or {})})
 
 
 def _point(args):
+    """One design point. args = (site, drone, design, height, interference, sensors[, extra Params overrides])."""
     from .scenarios import site_scene
-    site, drone, design, height, interf, n = args
-    p = _params(site, drone, design, height, interf, n)
-    sc = site_scene(site, p)
+    site, drone, design, height, interf, n = args[:6]
+    extra = args[6] if len(args) > 6 else None
+    p = _params(site, drone, design, height, interf, n, extra)
+    sc = site_scene(site, p, site_params=False)
     zs = zone_samples(sc.site, max(RADII), height, 40.0)
     dist = np.asarray(distance_to_polygon(zs[:, 0], zs[:, 1], sc.site.fence))
     thr = albersheim_db(0.9, p.pfa)
@@ -96,7 +102,7 @@ def _point(args):
         e = err[m & np.isfinite(err)]
         acc.append(round(float(np.median(e)), 1) if len(e) else None)
     fl = scored_flights(sc, FLIGHTS, agl=height, radii=RADII)
-    return {"k": [site, drone, design, height, interf, n], "cov": cov, "acc": acc,
+    return {"k": [site, drone, design, height, interf, n], **({"extra": extra} if extra else {}), "cov": cov, "acc": acc,
             "trk": [fl["by_radius"][r] for r in RADII], "warn": fl["warning_m"], "caught": fl["caught_pct"],
             "det80": fl["detect80_m"], "det50": fl["detect50_m"], "dirs": fl["detect_dirs"]}
 
@@ -106,7 +112,7 @@ def _map(args):
     from .scenarios import site_scene
     site, drone, design, height, interf, n = args
     p = _params(site, drone, design, height, interf, n)
-    sc = site_scene(site, p)
+    sc = site_scene(site, p, site_params=False)
     c = np.asarray(sc.site.fence)[:-1].mean(axis=0)
     ext = float(np.max(np.abs(np.asarray(sc.site.fence) - c))) + 450
     half = float(np.ceil(ext / 25) * 25)
@@ -182,9 +188,9 @@ def recommend(results, costs, site, drone, interf, req=DEFAULT_REQ, target=RECOM
     return pick[1], pick[2], pick[3], best is not None
 
 
-def map_jobs():
+def map_jobs(sites=None):
     """Coverage maps for every fixed build x sensor count at the default height (the Overview draws any of them)."""
-    return [(s, d, de, DEFAULT_REQ["height_m"], i, n) for s in SITES for d in DRONE_KEYS
+    return [(s, d, de, DEFAULT_REQ["height_m"], i, n) for s in (sites or SITES) for d in DRONE_KEYS
             for de in sorted(set(BUILDS.values())) for i in INTERFERENCE for n in NODES]
 
 
@@ -224,10 +230,29 @@ def refresh_maps():
     print(f"wrote {OUT} ({OUT.stat().st_size / 1e6:.1f} MB) in {(time.time() - t0) / 60:.1f} min")
 
 
+def add_site(key):
+    """Compute one site's design points and maps and merge them into the existing explore.json, keeping the other
+    sites' results (the model is deterministic, so this equals a full run for that site)."""
+    t0 = time.time()
+    doc = json.loads(OUT.read_text())
+    jobs = [(key, d, de, h, i, n) for d in DRONE_KEYS for de in DESIGNS for h in HEIGHTS for i in INTERFERENCE for n in NODES]
+    print(f"{key}: {len(jobs)} design points")
+    new = _pool(_point, jobs, "points")
+    doc["results"] = [r for r in doc["results"] if r["k"][0] != key] + new
+    doc["sites"] = {k: (site_info(k) if k == key else doc["sites"][k]) for k in SITES if k == key or k in doc["sites"]}
+    doc["recommended"] = recommendations(doc["results"], node_costs())
+    doc["maps"] = [m for m in doc["maps"] if m["k"][0] != key] + _pool(_map, map_jobs([key]), "maps")
+    doc["site_params"] = SITE_PARAMS
+    OUT.write_text(json.dumps(doc, separators=(",", ":")))
+    print(f"wrote {OUT} ({OUT.stat().st_size / 1e6:.1f} MB) in {(time.time() - t0) / 60:.1f} min")
+
+
 def main():
     import sys
     if "--maps" in sys.argv:
         return refresh_maps()
+    if "--site" in sys.argv:
+        return add_site(sys.argv[sys.argv.index("--site") + 1])
     t0 = time.time()
     jobs = [(s, d, de, h, i, n) for s in SITES for d in DRONE_KEYS for de in DESIGNS for h in HEIGHTS
             for i in INTERFERENCE for n in NODES]
@@ -245,7 +270,7 @@ def main():
         "antennas": {k: {"name": a.name, "gain_dbi": a.gain_dbi, "price_usd": a.price_usd} for k, a in ANTENNAS.items()},
         "radios": {k: {"name": r["name"], "usd": r["usd"], "stage": r["stage"], "source": r["source"]} for k, r in RADIOS.items()},
         "axes": {"heights": HEIGHTS, "interference": INTERFERENCE, "nodes": NODES, "radii": RADII},
-        "default_req": DEFAULT_REQ, "recommend": RECOMMEND, "builds": BUILDS, "update_interval_s": BASE["cit_s"] and 1.5,
+        "site_params": SITE_PARAMS, "default_req": DEFAULT_REQ, "recommend": RECOMMEND, "builds": BUILDS, "update_interval_s": BASE["cit_s"] and 1.5,
         "finance": FINANCE, "results": results, "recommended": recs, "maps": maps,
         "notes": {
             "area_covered": "Share of the zone (fence + radius) where 3+ tower-sensor pairs detect the drone, or 2+ microphones hear it.",

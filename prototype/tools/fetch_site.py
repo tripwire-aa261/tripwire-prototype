@@ -3,6 +3,8 @@
 Usage (from prototype/):
     .venv/bin/python tools/fetch_site.py --osm-way 380309198 --id hays-state-prison \
         --name "Hays State Prison" --place "Trion, Chattooga County, GA"
+    .venv/bin/python tools/fetch_site.py --osm-rel 4131933 --height 4131933=30 --id clemson-memorial-stadium \
+        --name "Clemson Memorial Stadium" --place "Clemson, Pickens County, SC"
 
 Writes data/sites/<id>/site.json, terrain_coarse.bin and terrain_fine.bin. No API key needed.
 Data: (c) OpenStreetMap contributors (ODbL); USGS 3D Elevation Program (public domain).
@@ -35,14 +37,14 @@ DEFAULT_BUILDING_H = 7.0  # ASSUMPTION: 1-2 storey prison buildings when OSM has
 
 def http_get(url: str, data: bytes | None = None, timeout: int = 120) -> bytes:
     req = urllib.request.Request(url, data=data, headers={"User-Agent": UA})
-    for attempt in range(3):
+    for attempt in range(5):
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return r.read()
-        except Exception:  # noqa: BLE001 - retry any network error
-            if attempt == 2:
+        except Exception:  # noqa: BLE001 - retry any network error (Overpass returns 429/502/504 when busy)
+            if attempt == 4:
                 raise
-            time.sleep(3 * (attempt + 1))
+            time.sleep(10 * 2 ** attempt)
     raise RuntimeError("unreachable")
 
 
@@ -117,6 +119,45 @@ def write_grid(path: Path, z: np.ndarray):
     np.round(z * 10).astype("<i2").tofile(path)
 
 
+def join_rings(ways):
+    """Join open member ways (lists of (lat, lon)) end to end into closed rings (OSM multipolygon rule)."""
+    ways = [list(w) for w in ways if len(w) >= 2]
+    rings = []
+    while ways:
+        ring = ways.pop(0)
+        changed = True
+        while ring[0] != ring[-1] and changed:
+            changed = False
+            for k, w in enumerate(ways):
+                if w[0] == ring[-1]:
+                    ring += w[1:]
+                elif w[-1] == ring[-1]:
+                    ring += w[::-1][1:]
+                elif w[-1] == ring[0]:
+                    ring = w[:-1] + ring
+                elif w[0] == ring[0]:
+                    ring = w[::-1][:-1] + ring
+                else:
+                    continue
+                ways.pop(k)
+                changed = True
+                break
+        if ring[0] == ring[-1] and len(ring) >= 4:
+            rings.append(ring)
+    return rings
+
+
+def relation_rings(rel_id: int | None = None, rel: dict | None = None):
+    """(outer rings, inner rings) of a multipolygon relation, as lists of (lat, lon); and its tags."""
+    if rel is None:
+        rel = overpass(f"[out:json][timeout:60];relation({rel_id});out geom;")["elements"][0]
+    geo = {"outer": [], "inner": []}
+    for m in rel.get("members", []):
+        if m["type"] == "way" and m.get("geometry"):
+            geo["inner" if m.get("role") == "inner" else "outer"].append([(g["lat"], g["lon"]) for g in m["geometry"]])
+    return join_rings(geo["outer"]), join_rings(geo["inner"]), rel.get("tags", {})
+
+
 def poly_area(p):
     x, y = p[:, 0], p[:, 1]
     return 0.5 * abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
@@ -139,7 +180,10 @@ def building_height(tags):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--osm-way", type=int, required=True)
+    ap.add_argument("--osm-way", type=int, help="facility outline as an OSM way")
+    ap.add_argument("--osm-rel", type=int, help="facility outline as an OSM multipolygon relation (largest outer ring)")
+    ap.add_argument("--height", action="append", default=[],
+                    help="building height override OSM_ID=METRES (e.g. a stadium with no OSM height; ASSUMPTION)")
     ap.add_argument("--id", required=True)
     ap.add_argument("--name", required=True)
     ap.add_argument("--place", default="")
@@ -151,10 +195,16 @@ def main():
     out = ROOT / "data" / "sites" / args.id
     out.mkdir(parents=True, exist_ok=True)
 
+    if (args.osm_way is None) == (args.osm_rel is None):
+        ap.error("give exactly one of --osm-way or --osm-rel")
+    overrides = {int(k): float(v) for k, v in (h.split("=", 1) for h in args.height)}
     print("OSM: facility outline ...")
-    d = overpass(f"[out:json][timeout:60];way({args.osm_way});out geom tags;")
-    way = d["elements"][0]
-    ring = [(g["lat"], g["lon"]) for g in way["geometry"]]
+    if args.osm_way is not None:
+        d = overpass(f"[out:json][timeout:60];way({args.osm_way});out geom tags;")
+        ring = [(g["lat"], g["lon"]) for g in d["elements"][0]["geometry"]]
+    else:
+        outers, _, _ = relation_rings(args.osm_rel)
+        ring = max(outers, key=lambda r: poly_area(np.array([(lo, la) for la, lo in r])))
     lat0 = float(np.mean([p[0] for p in ring[:-1]]))
     lon0 = float(np.mean([p[1] for p in ring[:-1]]))
     frame = LocalFrame(lat0, lon0)
@@ -166,16 +216,30 @@ def main():
     la2, lo2 = frame.to_latlon(fence[:, 0].max() + pad, fence[:, 1].max() + pad)
     d = overpass(f'[out:json][timeout:60];way["building"]({la1},{lo1},{la2},{lo2});out geom tags;')
     buildings = []
-    for e in d["elements"]:
-        pts = np.array([frame.to_xy(g["lat"], g["lon"]) for g in e.get("geometry", [])])
+
+    def add(osm_id, tags, outer, holes=()):
+        pts = np.array([frame.to_xy(la, lo) for la, lo in outer])
         if len(pts) < 4:
-            continue
-        h, src = building_height(e.get("tags", {}))
-        buildings.append({
-            "osm_id": e["id"], "poly": np.round(pts, 1).tolist(), "height_m": round(h, 1),
-            "height_source": src, "kind": e.get("tags", {}).get("building", "yes"),
-            "area_m2": round(float(poly_area(pts)), 1),
-        })
+            return
+        h, src = building_height(tags)
+        if osm_id in overrides:
+            h, src = overrides[osm_id], "override (assumption)"
+        holes = [np.round(np.array([frame.to_xy(la, lo) for la, lo in r]), 1).tolist() for r in holes]
+        area = float(poly_area(pts)) - sum(float(poly_area(np.array(r))) for r in holes)
+        b = {"osm_id": osm_id, "poly": np.round(pts, 1).tolist(), "height_m": round(h, 1),
+             "height_source": src, "kind": tags.get("building", "yes"), "area_m2": round(area, 1)}
+        if holes:
+            b["holes"] = holes
+        buildings.append(b)
+
+    for e in d["elements"]:
+        add(e["id"], e.get("tags", {}), [(g["lat"], g["lon"]) for g in e.get("geometry", [])])
+    # Multipolygon buildings (e.g. a stadium grandstand around an open field): outer rings with holes.
+    d = overpass(f'[out:json][timeout:90];relation["building"]({la1},{lo1},{la2},{lo2});out geom;')
+    for e in d["elements"]:
+        outers, inners, tags = relation_rings(rel=e)
+        for o in outers:
+            add(e["id"], tags, o, inners)
     print(f"  {len(buildings)} buildings")
 
     print("USGS 3DEP: coarse terrain ...")
@@ -188,7 +252,7 @@ def main():
 
     site = {
         "id": args.id, "name": args.name, "place": args.place,
-        "osm_way": args.osm_way,
+        "osm_way": args.osm_way, "osm_rel": args.osm_rel,
         "origin": {"lat": lat0, "lon": lon0, "elev_m": round(elev0, 1)},
         "fence": np.round(fence, 1).tolist(),
         "fence_area_m2": round(float(poly_area(fence)), 0),

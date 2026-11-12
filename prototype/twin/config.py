@@ -88,6 +88,10 @@ class Params:
     adc_bits: int = 12
     adc_backoff_db: float = 12.0
     mast_m: float = 6.0
+    mount: str = "pole"  # pole: on a mast at the perimeter | structure: on the building at the perimeter | mixed: alternate
+    setback_m: float = 0.0  # pole sensors this far outside the perimeter line (e.g. a plaza around a stadium)
+    structure_inset_m: float = 12.0  # structure sensors this far inside the outline (on the top of the stands)
+    roof_mast_m: float = 3.0  # short mast above the structure's top
     # --- processing ---
     cit_s: float = 0.5
     pfa: float = 1e-6
@@ -165,6 +169,10 @@ PARAM_SOURCES = {
     "adc_bits": ("ADC resolution", "CITED: USRP B210 = 12 bit (Ettus); KrakenSDR/RTL = 8 bit"),
     "adc_backoff_db": ("ADC headroom for OFDM peaks", "ASSUMPTION"),
     "mast_m": ("Listener mast height", "ASSUMPTION"),
+    "mount": ("Where sensors go: poles at the perimeter, on the structure itself (stadium stands), or alternating", "design choice; tools/placement_study.py"),
+    "setback_m": ("Pole sensors stand this far outside the perimeter line", "ASSUMPTION"),
+    "structure_inset_m": ("Structure sensors sit this far inside the building outline (the top of the stands)", "ASSUMPTION"),
+    "roof_mast_m": ("Mast above the structure's top for structure-mounted sensors", "ASSUMPTION"),
     "cit_s": ("Coherent integration time", "CITED: 0.8 s in Demissie & Steffes 2025; default 0.5 s (ASSUMPTION, manoeuvring drone)"),
     "pfa": ("False-alarm probability per range-Doppler cell (CFAR)", "ASSUMPTION"),
     "dpc_rank": ("Singular components removed (direct path + static clutter)", "CITED: SVD method, Demissie & Steffes 2025 eq. 13"),

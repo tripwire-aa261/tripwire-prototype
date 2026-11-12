@@ -105,7 +105,9 @@ async function ensureSite(key) {
   const mat = new THREE.MeshLambertMaterial({ color: 0x9aa5b4 });
   for (const b of site.buildings) {
     const pts = b.poly.slice(0, -1).map(([x, y]) => new THREE.Vector2(x, y));
-    const m = new THREE.Mesh(new THREE.ExtrudeGeometry(new THREE.Shape(pts), { depth: b.height_m, bevelEnabled: false }), mat);
+    const shape = new THREE.Shape(pts);
+    for (const h of b.holes || []) shape.holes.push(new THREE.Path(h.slice(0, -1).map(([x, y]) => new THREE.Vector2(x, y))));  // stadium field
+    const m = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: b.height_m, bevelEnabled: false }), mat);
     m.rotation.x = -Math.PI / 2;
     m.position.y = ground(b.poly[0][0], b.poly[0][1]) - elev0;
     siteGroup.add(m);
@@ -226,11 +228,13 @@ async function loadRun(id) {
   }
   beamGroup.visible = $('showBeams').checked;
   runGroup.add(beamGroup);
+  birdPath = null;
   for (const kind of ['drone', 'bird']) {
     if (!run.frames[0].truth[kind]) continue;
     const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(run.frames.map((f) => w(...f.truth[kind].pos))),
       new THREE.LineDashedMaterial({ color: kind === 'drone' ? 0xcbd5e1 : 0x64748b, dashSize: 10, gapSize: 8 }));
     line.computeLineDistances();
+    if (kind === 'bird') { birdPath = line; line.visible = $('showBird').checked; }
     runGroup.add(line);
   }
   buildCoverage();
@@ -244,8 +248,25 @@ async function loadRun(id) {
   runCards();
   errorChart();
   fillParamTable();
+  birdTrackIds = birdTracks(run);
   lastFrameIdx = -1;
 }
+
+// Tracks the bird caused: within 100 m of the bird and never within 100 m of the drone (the rule twin/run.py uses to
+// count bird tracks). The Bird checkbox hides them with the bird; the run itself was simulated with the bird.
+let birdPath = null, birdTrackIds = new Set();
+function birdTracks(r) {
+  const nearDrone = new Set(), nearBird = new Set();
+  for (const f of r.frames) {
+    const d = f.truth.drone.pos, b = f.truth.bird?.pos;
+    for (const tr of f.tracks) {
+      if (Math.hypot(tr.pos[0] - d[0], tr.pos[1] - d[1]) < 100) nearDrone.add(tr.id);
+      else if (b && Math.hypot(tr.pos[0] - b[0], tr.pos[1] - b[1]) < 100) nearBird.add(tr.id);
+    }
+  }
+  return new Set([...nearBird].filter((id) => !nearDrone.has(id)));
+}
+const nearBirdNow = (f, p) => !!f.truth.bird && Math.hypot(p[0] - f.truth.bird.pos[0], p[1] - f.truth.bird.pos[1]) < 100;
 
 function buildCoverage() {
   if (coverageMesh) runGroup.remove(coverageMesh);
@@ -282,7 +303,7 @@ function runCards() {
     ['Tracking accuracy', m.median_error_m == null ? '—' : fmtM(m.median_error_m), 'median track error'],
     ['First tracked', m.first_track_distance_m == null ? 'never' : fmtM(m.first_track_distance_m), 'from the nearest sensor'],
     ['Updates', `every ${p.frame_dt_s} s`, `${p.cit_s} s integration`],
-    ['False alerts', `${m.false_tracks}`, `bird tracked ${m.bird_tracks}×`],
+    ['False alerts', `${m.false_tracks}`, $('showBird').checked ? `bird tracked ${m.bird_tracks}×` : `bird hidden (tracked ${m.bird_tracks}× in this run)`],
   ];
   $('runCards').innerHTML = cards.map(([k, v, s]) => `<div class="card"><small>${k}</small><b>${v}</b><span class="note small">${s}</span></div>`).join('');
 }
@@ -357,7 +378,8 @@ function drawFrame(force = false) {
   drone.children.forEach((c, k) => { if (k) c.rotation.y += 0.8; });
   droneLabel.position.copy(pos).add(new THREE.Vector3(0, 22, 0));
   dropLine.geometry.setFromPoints([pos, w(dp[0], dp[1], ground(dp[0], dp[1]))]);
-  if (a.truth.bird) {
+  const showBird = $('showBird').checked;
+  if (a.truth.bird && showBird) {
     const bp = lerp3(a.truth.bird.pos, b.truth.bird.pos, u);
     bird.position.copy(w(...bp)); birdLabel.position.copy(w(...bp)).add(new THREE.Vector3(0, 16, 0));
     bird.visible = birdLabel.visible = true;
@@ -370,9 +392,10 @@ function drawFrame(force = false) {
   const seg = [], heard = new Set(a.drone_hits.map((h, pi) => (h ? run.pairs[pi].rx : -1)).filter((x) => x >= 0));
   for (const li of heard) seg.push(w(...run.listeners[li].pos).add(new THREE.Vector3(0, 9, 0)), w(...a.truth.drone.pos));
   pairLines.geometry.setFromPoints(seg);
-  fixPts.geometry.setFromPoints(a.fixes.map((f) => w(...f.pos)));
+  fixPts.geometry.setFromPoints(a.fixes.filter((f) => showBird || !nearBirdNow(a, f.pos)).map((f) => w(...f.pos)));
   trkGroup.clear();
   for (const tr of a.tracks) {
+    if (!showBird && birdTrackIds.has(tr.id)) continue;
     const hist = run.frames.slice(0, i + 1).flatMap((f) => f.tracks.filter((x) => x.id === tr.id).map((x) => w(...x.pos)));
     if (hist.length > 1) trkGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(hist), new THREE.LineBasicMaterial({ color: 0xfb7185 })));
     const s = new THREE.Mesh(new THREE.SphereGeometry(9, 12, 8), new THREE.MeshBasicMaterial({ color: 0xfb7185 }));
@@ -535,7 +558,7 @@ async function loadReplay() {
   const r = replays?.replays.find((x) => x.id === replayId($('rpSite').value, $('rpDrone').value, $('rpRadio').value));
   if (!r || !r.metrics) { loadSeq++; $('runSummary').innerHTML = '<span class="bad">This replay has not been computed yet</span> (run tools/make_replays.py).'; return; }
   const radio = $('rpRadio').value, t = replays.targets;
-  replayNote = `<b>${r.n} × ${esc(RADIO[radio].name)} sensors</b>: ${r.meets ? `the fewest that meet ${t.area_pct}% area and ${t.tracked_pct}% tracked` : `the best tried; nothing meets ${t.area_pct}% area and ${t.tracked_pct}% tracked`}, with ${r.interference_db} dB of interference removal${r.interference_db > X.axes.interference[0] ? ' (unproven)' : " (today's assumption)"}.${radio === 'b210' ? ' The B210 behaves like the bladeRF in the model, so it shares this replay.' : ''} These full simulations use the microphone version of the sensor: background history is not in the full simulation yet.<br>`;
+  replayNote = `<b>${r.n} × ${esc(RADIO[radio].name)} sensors</b>: ${r.meets ? `the fewest that meet ${t.area_pct}% area and ${t.tracked_pct}% tracked` : `the best tried; nothing meets ${t.area_pct}% area and ${t.tracked_pct}% tracked`}, with ${r.interference_db} dB of interference removal${r.interference_db > X.axes.interference[0] ? ' (unproven)' : " (today's assumption)"}.${radio === 'b210' ? ' The B210 behaves like the bladeRF in the model, so it shares this replay.' : ''} These full simulations use the microphone version of the sensor: background history is not in the full simulation yet${X.site_params?.[r.site]?.mic_range_m === 0 ? ' (microphones are off at the stadium: the crowd drowns a drone out, so this replay is radar only)' : ''}.<br>`;
   await loadRun(r.id);
 }
 async function refreshRuns() {
@@ -582,6 +605,7 @@ export async function initViewer(meta) {
   $('showCoverage').onchange = (e) => { if (coverageMesh) coverageMesh.visible = e.target.checked; };
   $('showAllTowers').onchange = buildTowers;
   $('showBeams').onchange = (e) => { beamGroup.visible = e.target.checked; };
+  $('showBird').onchange = (e) => { if (birdPath) birdPath.visible = e.target.checked; if (run) { runCards(); drawFrame(true); } };
   if (apiMeta) initForm();
   else { $('runForm').querySelectorAll('input,select,button').forEach((e) => (e.disabled = true)); $('runStatus').textContent = 'Start serve.py to run new simulations.'; }
   const q = new URLSearchParams(location.search);

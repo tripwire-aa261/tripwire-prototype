@@ -67,6 +67,13 @@ def main():
     items = plan()
     for it in items:
         print(f"{it['id']:34} {it['n']:2} sensors at {it['interference_db']} dB  meets={it['meets']}  expected {it['expected']}")
+    prev = {}
+    if (RUNS / "replays.json").exists():  # keep the metrics of replays not re-run this time (same plan)
+        prev = {r["id"]: r for r in json.loads((RUNS / "replays.json").read_text())["replays"]}
+    for it in items:
+        old = prev.get(it["id"])
+        if old and "metrics" in old and (old["n"], old["interference_db"]) == (it["n"], it["interference_db"]):
+            it["metrics"] = old["metrics"]
     manifest = {"targets": TARGET, "radius_m": DEFAULT_REQ["radius_m"], "height_m": DEFAULT_REQ["height_m"], "replays": items}
     if a.plan:
         return

@@ -4,7 +4,7 @@
 import { $, esc, usd, pct, X, state, defaultReq, defaultTargets, fillSelect, INTERF_SHORT, onChange, emit, targetsText, competitors,
   RADIO, RADIO_KEYS, recommendOverall, radioOption } from './data.js';
 import { info } from './help.js';
-import { weakDirections } from './data.js';
+import { weakDirections, edgeWord, mountText } from './data.js';
 
 // Detection range card: the typical drone (the requirement), with the 8-in-10 figure and weak directions.
 function detCard(o, t, card) {
@@ -96,16 +96,16 @@ function status(H) {
 
 function kpis(H) {
   const req = REQ(), x = H.x;
-  $('ovReqHint').textContent = `${X.drones[state.drone].name}, ${req.height_m} m up, ${req.radius_m} m around the fence`;
+  $('ovReqHint').textContent = `${X.drones[state.drone].name}, ${req.height_m} m up, ${req.radius_m} m around the ${edgeWord()}`;
   $('ovStatus').innerHTML = status(H);
   if ($('ovUnpick')) $('ovUnpick').onclick = () => { pick = null; render(); };
   if (!x) { $('ovKpis').innerHTML = ''; $('ovPrice').innerHTML = ''; return; }
   const o = x.o, f = x.fin, t = state.targets;
   const card = (k, h, v, s, cls = '') => `<div class="kpi ${cls}"><small>${k} ${info(h)}</small><b>${v}</b><span>${s}</span></div>`;
-  $('ovKpis').innerHTML = `<div class="setup-line"><b>${esc(radioOption(x.radio, x.n))}</b> <span class="badge ${RADIO[x.radio].stage === 'Seed' ? '' : 'alt'}">${RADIO[x.radio].stage}</span><br><span class="note small">Each sensor: ${esc(RADIO[x.radio].build)} ${info('history')}. Spaced evenly along the fence.</span></div>` + [
+  $('ovKpis').innerHTML = `<div class="setup-line"><b>${esc(radioOption(x.radio, x.n))}</b> <span class="badge ${RADIO[x.radio].stage === 'Seed' ? '' : 'alt'}">${RADIO[x.radio].stage}</span><br><span class="note small">Each sensor: ${esc(RADIO[x.radio].build)} ${info('history')}. ${esc(mountText())}</span></div>` + [
     card('Area covered', 'area', pct(o.cov), `target ${t.area}%`, o.cov >= t.area ? 'ok' : 'bad'),
     card('Time tracked', 'tracked', pct(o.trk), `target ${t.tracked}%`, o.trk >= t.tracked ? 'ok' : 'bad'),
-    card('Drones caught', 'caught', pct(o.caught), 'tracked before they reach the fence'),
+    card('Drones caught', 'caught', pct(o.caught), `tracked before they reach the ${edgeWord()}`),
     card('Tracking accuracy', 'accuracy', o.acc == null ? '—' : `~${Math.round(o.acc)} m`, `target within ${t.accuracy} m`, o.acc != null && o.acc <= t.accuracy ? 'ok' : 'bad'),
     detCard(o, t, card),
   ].join('');
@@ -140,7 +140,7 @@ function levelsTable(H) {
 
 function sitesTable() {
   const t = state.targets, req = REQ();
-  $('ovSitesNote').textContent = `The cheapest setup at each facility that covers ${t.area}% of the area within ${req.radius_m} m of the fence, tracks a drone ${t.tracked}% of the time and places it within ${t.accuracy} m (drones ${req.height_m} m up), at each level of interference removal.`;
+  $('ovSitesNote').textContent = `The cheapest setup at each facility that covers ${t.area}% of the area within ${req.radius_m} m of the fence (stadium: its outer wall), tracks a drone ${t.tracked}% of the time and places it within ${t.accuracy} m (drones ${req.height_m} m up), at each level of interference removal.`;
   const rows = Object.keys(X.sites).map((k) => {
     const s = X.sites[k], R = recommendOverall(k, state.drone, t, req);
     const cells = R.levels.map((lv) => {

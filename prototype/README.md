@@ -1,11 +1,31 @@
-# Tripwire Twin: prototype v0.4.5
+# Tripwire Twin: prototype v0.5.1
 
 A signal-level digital twin of a passive LTE radar at **three real Georgia facilities**: Hancock State Prison
-(sparse towers), Hays State Prison (moderate towers) and Fulton County Jail (dense towers, Atlanta).
+(sparse towers), Hays State Prison (moderate towers) and Fulton County Jail (dense towers, Atlanta), plus one stadium
+(Clemson Memorial Stadium, South Carolina) as a different kind of customer.
 It generates the LTE reference signals defined in the standard, propagates them over real terrain and
 buildings, adds drone, bird and clutter echoes, and runs the processing chain the product would run:
 direct-signal cancellation, range-Doppler maps, CFAR detection, multistatic location and tracking.
 The model is calibrated against the only published LTE450 drone-detection field trials (Fraunhofer FKIE).
+
+**v0.5.1 (Nov 12): bird display option.** The 3D tab has a **Bird** checkbox: unticked, it hides the bird and the tracks it causes (display only; every replay
+was simulated with the bird). Telling birds from drones does not work yet: the rotor score separates them poorly
+(above 6 dB on 37 % of drone and 33 % of bird detections, and 65 % of false detections), so the bird usually gets a
+"drone" track. Fix proposed: better rotor evidence accumulated over a track, plus flight behavior, with alerts only on
+tracks classified as drones.
+
+**v0.5 (Nov 12): a stadium customer, sensors on the structure.** A fourth site, **Clemson Memorial Stadium** (SC), shows a
+different kind of customer. `tools/fetch_site.py --osm-rel` reads an OpenStreetMap multipolygon (the stands around an open
+field, kept as a hole; `geo.py`, the 3D view and the building echoes in `scene.building_reflectors` respect it); the stands
+are 30 m tall (ASSUMPTION: no published height found). Sensors can be mounted on poles (`Params.mount = "pole"`, with
+`setback_m`), on top of the structure (`"structure"`, `structure_inset_m`, `roof_mast_m`) or alternating (`"mixed"`).
+`tools/placement_study.py` compares them (`web/runs/placement_study.json`): poles alone never see into the bowl (at most
+~50-65 % of the inside covered); on the stands alone the sensors see every tower around and lose the area outside the
+stadium below 40 dB of interference removal; alternating covers both and is the stadium default (`scenarios.SITE_PARAMS`,
+with microphones off: the game-day crowd drowns a drone, ASSUMPTION). Result (5 kg drone, default targets): not possible
+at 20 dB (16 custom sensors: 91 % area, 78 % tracked); 30 dB: 8 custom or 12 bladeRF; 40 dB: 6 of either; typical drone
+first tracked ~1.1-1.2 km out. Not modeled: the stadium's own cell antennas (DAS), game-day network load, the crowd as
+clutter. `python -m twin.explore --site clemson` computes one site and merges it into `explore.json` (~17 min).
 
 **v0.4.5 (Nov 12): detection range as a customer requirement.** A fifth slider in "What the customer wants": how
 far outside the fence an incoming drone is when guards get a confirmed track (held 3 updates), counting only tracks
@@ -130,9 +150,11 @@ On Windows, use `.venv\Scripts\python` instead of `.venv/bin/python`.
 
 | Command | What it does |
 |---|---|
-| `.venv/bin/python -m twin.explore` | precompute the requirements explorer for all three sites (~80 min, 4 cores) |
+| `.venv/bin/python -m twin.explore` | precompute the requirements explorer for all four sites (~100 min, 4 cores) |
 | `.venv/bin/python -m twin.explore --maps` | recompute only the recommendations and the Overview's coverage maps (~6 min) |
 | `.venv/bin/python tools/make_replays.py` | the 12 precomputed 3D replays (facility x drone x radio; ~45 min) |
+| `.venv/bin/python -m twin.explore --site clemson` | one site only, merged into the existing `explore.json` (~17 min) |
+| `.venv/bin/python tools/placement_study.py` | stadium sensor mounting: poles vs on the stands vs alternating (~7 min) |
 | `.venv/bin/python tools/hover_feasibility.py` | hover-by-background-history and pole-height study (~3 min) |
 | `.venv/bin/python tools/build_assumptions_doc.py` | write `Tripwire_Assumptions_and_Figures.md` (all assumptions and figures, for the business plan) |
 | `.venv/bin/python -m twin.run hays --set drone=m210 --set n_listeners=8 --id my-run` | full simulation at a site (`hays`, `hancock`, `fulton`) |
@@ -140,8 +162,8 @@ On Windows, use `.venv\Scripts\python` instead of `.venv/bin/python`.
 | `.venv/bin/python -m twin.cost` | print the cost model and write `web/runs/cost_model.json` |
 | `.venv/bin/python -m twin.calibrate` | re-fit the calibration to the Fraunhofer trials (~1 min) |
 | `.venv/bin/python -m twin.run --relocate` | re-run location/tracking/metrics on saved runs (seconds) |
-| `.venv/bin/python -m pytest -q` | 38 physics, antenna, cost, flight, pricing, hover and recommendation tests |
-| `.venv/bin/python tools/fetch_site.py --osm-way <id> --id <name> --name "<Facility>"` | fetch another facility (OSM + USGS) |
+| `.venv/bin/python -m pytest -q` | 43 physics, antenna, cost, flight, pricing, hover, recommendation and stadium tests |
+| `.venv/bin/python tools/fetch_site.py --osm-way <id> (or --osm-rel <id> [--height <id>=<m>]) --id <name> --name "<Facility>"` | fetch another facility (OSM + USGS); then `tools/fetch_towers.py --site <name>` |
 | `.venv/bin/python tools/fetch_towers.py --site <name>` | real towers near it (FCC; OpenCelliD if a key is set) |
 
 **Web deploy (Vercel):** from `prototype/`, run `vercel` (preview link) and then `vercel --prod`. It serves the viewer

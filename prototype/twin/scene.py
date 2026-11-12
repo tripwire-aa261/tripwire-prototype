@@ -65,13 +65,23 @@ def candidate_illuminators(site, p: Params) -> list[Illuminator]:
 
 
 def place_listeners(site, p: Params, cands: list | None = None) -> list[Listener]:
-    """Nodes spread evenly along the fence. Each faces the middle of the facility, or with
+    """Nodes spread evenly along the fence, on poles (p.mount = "pole") or on the structure ("structure", e.g.
+    stadium stands; "mixed" alternates). Each faces the middle of the facility, or with
     pointing = "auto" is turned (up to +/-90 deg) to maximise its own detections over the zone."""
     pts = polygon_perimeter_points(site.fence, p.n_listeners)
-    z = site.ground(pts[:, 0], pts[:, 1]) + p.mast_m
+    c = np.asarray(site.fence)[:-1].mean(axis=0)
     out = []
     zs = zone_samples(site, p.zone_buffer_m, p.altitude_agl_m) if p.pointing == "auto" and cands else None
-    for i, ((x, y), zz) in enumerate(zip(pts, z)):
+    for i, (x, y) in enumerate(pts):
+        u = np.array([x, y]) - c
+        u = u / max(float(np.hypot(*u)), 1e-9)  # outward, away from the middle
+        mode = p.mount if p.mount != "mixed" else ("structure" if i % 2 == 0 else "pole")
+        if mode == "structure":  # on top of the building at the perimeter (stadium stands)
+            x, y = np.array([x, y]) - u * p.structure_inset_m
+            zz = float(site.surface(x, y)) + p.roof_mast_m
+        else:
+            x, y = np.array([x, y]) + u * p.setback_m
+            zz = float(site.ground(x, y)) + p.mast_m
         pos = np.array([x, y, zz])
         az = inward_azimuth(site, pos)
         if zs is not None and p.antenna not in ("iso", "omni"):
@@ -214,13 +224,35 @@ class Scene:
         return int(round(self.params.cit_s / SLOT_S))
 
 
-def _clutter(site, p: Params, rng):
+RING_REFLECTORS = 12  # a ring-shaped building (stadium stands around a field) is spread over this many points
+RING_MIN_AREA_M2 = 20000.0  # only stadium-sized rings; courtyard buildings keep the one-point rule
+
+
+def building_reflectors(site):
+    """Static building echoes as point reflectors: (points (N, 3), rcs (N,)). One point per building at its
+    centre, 70 % up (RCS = 0.1 m2 per m2 of footprint, 5-300 m2, ASSUMPTION: walls/roofs). A stadium-sized building
+    with holes (stands around a field) gets RING_REFLECTORS points around the middle of the ring instead, each 300 m2
+    (ASSUMPTION), so its echo is not placed over the open field."""
     pts, rcs = [], []
     for b in site.buildings:
         poly = np.array(b["poly"])
+        if b.get("holes") and b.get("area_m2", 0) >= RING_MIN_AREA_M2:
+            inner = np.array(max(b["holes"], key=len))
+            for q in polygon_perimeter_points(poly, RING_REFLECTORS):
+                k = np.argmin(np.hypot(inner[:, 0] - q[0], inner[:, 1] - q[1]))
+                cx, cy = (q + inner[k]) / 2
+                pts.append([cx, cy, float(site.ground(cx, cy)) + b["height_m"] * 0.7])
+                rcs.append(300.0)
+            continue
         cx, cy = poly[:-1].mean(axis=0)
         pts.append([cx, cy, float(site.ground(cx, cy)) + b["height_m"] * 0.7])
         rcs.append(np.clip(0.1 * b.get("area_m2", 100), 5, 300))  # ASSUMPTION: walls/roofs
+    return pts, rcs
+
+
+def _clutter(site, p: Params, rng):
+    pts, rcs = building_reflectors(site)
+    nb = len(pts)
     n = 60
     r = 2500 * np.sqrt(rng.random(n))
     a = rng.random(n) * 2 * np.pi
@@ -230,7 +262,6 @@ def _clutter(site, p: Params, rng):
         rcs.append(0.01 * 2500)  # sigma0 = -20 dB over a 50 m x 50 m patch (ASSUMPTION)
     pts, rcs = np.array(pts), np.array(rcs)
     moving = np.zeros(len(pts), dtype=bool)
-    nb = len(site.buildings)
     moving[nb:] = rng.random(len(pts) - nb) < p.vegetation_fraction  # wind-blown trees
     return pts, rcs, moving
 

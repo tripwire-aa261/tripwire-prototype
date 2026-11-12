@@ -22,8 +22,17 @@ SITES = ROOT / "data" / "sites"
 # ---------------------------------------------------------------------------
 # Real facilities (real terrain, buildings and towers)
 # ---------------------------------------------------------------------------
-SITE_IDS = {"hays": "hays-state-prison", "hancock": "hancock-state-prison", "fulton": "fulton-county-jail"}
-SITE_LABELS = {"hays": "moderate towers", "hancock": "sparse towers", "fulton": "dense towers"}  # by tower density (Nov 12)
+SITE_IDS = {"hays": "hays-state-prison", "hancock": "hancock-state-prison", "fulton": "fulton-county-jail",
+            "clemson": "clemson-memorial-stadium"}
+SITE_LABELS = {"hays": "moderate towers", "hancock": "sparse towers", "fulton": "dense towers",  # by tower density (Nov 12)
+               "clemson": "stadium"}  # a different kind of customer (Nov 12)
+# Per-site settings applied on top of every scenario's Params. The stadium alternates sensors on top of the stands
+# with 6 m poles in the plaza 20 m outside (setback ASSUMPTION). Chosen by tools/placement_study.py (Nov 12): poles alone
+# never see into the bowl (stands block it, <= ~65 % covered inside); on the stands alone the sensors see too much
+# tower signal and fail around the stadium below 40 dB of interference removal; alternating covers both.
+# Microphones are off at the stadium: on game day the crowd drowns out a drone (ASSUMPTION), so the microphone
+# builds there rely on the radar alone.
+SITE_PARAMS = {"clemson": {"mount": "mixed", "setback_m": 20.0, "mic_range_m": 0.0}}
 _SITES: dict = {}
 
 
@@ -54,8 +63,11 @@ def site_bird(site, key: str = "hays") -> Trajectory:
     return Trajectory(c + 220 * np.stack([np.sin(ang), np.cos(ang)], axis=1), 10.0, 35.0, loop=True)
 
 
-def site_scene(key: str, p: Params):
+def site_scene(key: str, p: Params, site_params: bool = True):
+    """Scene for a real facility. SITE_PARAMS for the site are applied unless the caller set them itself."""
     site = load_site(key)
+    if site_params and key in SITE_PARAMS:
+        p = replace(p, **SITE_PARAMS[key])
     targets = [drone_target(p, site_flight(site, p, key))]
     if p.bird:
         targets.append(bird_target(site_bird(site, key)))

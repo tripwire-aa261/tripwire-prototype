@@ -83,6 +83,47 @@ def best_for(site, drone, interf, radio):
     return {"meets": True, "n": n, "r": r, "node": nc}
 
 
+def whats_new(w):
+    """A highlighted block for teammates: what changed in the latest builds and where it is in this file."""
+    st = []
+    if "clemson" in X["sites"]:
+        for interf in X["axes"]["interference"]:
+            for radio in ("custom", "bladerf"):
+                rb = best_for("clemson", "m210", interf, radio)
+                if rb["meets"]:
+                    a = priced(rb["n"], rb["node"], "install_sub")
+                    st.append(f"{interf} dB: {rb['n']} {'custom-receiver' if radio == 'custom' else 'bladeRF'} sensors, our cost "
+                              f"{usd(a['upfront'])} + {usd(a['yearly'])}/yr, price at cost + 40% {usd(a['price'])} + {usd(a['sub'])}/yr")
+    w("> **WHAT'S NEW in v0.5 and v0.5.1 (2026-11-12), since v0.4.5 (commit `7cb4715`). Read this first if you already "
+      "used an earlier version of this file.** Everything new below is marked **NEW**.\n>")
+    w("> - **NEW customer type: a stadium.** Clemson Memorial Stadium (Clemson, SC) is a fourth site, next to the three "
+      "Georgia prisons. Its figures are the rows marked **NEW** in section 8, and its own study is in section 12 "
+      "(*Stadium: where to put the sensors*).")
+    if st:
+        w("> - **NEW stadium figures (5 kg drone, default targets):** not possible at today's 20 dB of interference "
+          "removal; " + "; ".join(st) + ". Same cost model, margins and pricing models as the prisons (sections 2-6).")
+    w("> - **NEW decision: at a stadium, sensors alternate between the top of the stands and 6 m poles outside.** Poles "
+      "alone cannot see into the bowl; on the stands alone the sensors pick up too much tower interference. DECISION "
+      "(Nov 12), section 12.")
+    w("> - **NEW assumptions:** stands 30 m tall (no published height found); stadium poles stand 20 m outside the stands; "
+      "microphones off at the stadium (a game-day crowd drowns out a drone). Not modeled: the stadium's own cell "
+      "antennas, game-day network load, the crowd as clutter.")
+    w("> - **NEW positioning point for the business plan:** the FAA bans drones within 3 nautical miles of large stadiums "
+      "during major games [16], far beyond our range, and stadium security wants the pilot's location, which RF detectors "
+      "give and we do not. Pitch Tripwire as the bowl layer (it also sees drones that emit nothing), sold next to an RF "
+      "detector. Stadium pricing and buying process are untested (section 13).")
+    w("> - **NEW caveat:** a 90% area target can be met while a third of the bowl is blind (16 poles at 30-40 dB), "
+      "because the bowl is a small share of the protected area. For stadiums, state the area target for the bowl.")
+    w("> - **NEW in section 11:** the tracker settings (Kalman filter, gates, confirmation rules) and the pole "
+      "assumptions (customer provides poles, power and network; new poles are not priced; no setback from the fence) "
+      "are now listed.")
+    w("> - **NEW finding (v0.5.1):** telling birds from drones does not work in the twin yet (the rotor score is above "
+      "6 dB on 37% of drone and 33% of bird detections), so the 3D replays often track the bird; a Bird checkbox hides it. "
+      "Do not claim drone-vs-bird classification in the plan until it is fixed and measured (section 13).")
+    w("> - **Unchanged:** all part prices, installation, running costs, margins, pricing models, company costs and every "
+      "prison result. Business-plan figures taken from v0.4.5 for the prisons still hold.\n")
+
+
 def main():
     L = []
     w = L.append
@@ -97,6 +138,7 @@ def main():
       "5 Running costs · 6 Pricing · 7 Company-level costs · 8 What each facility needs and earns · 9 Seed kit · "
       "10 Changes from the Seed data package · 11 Technical assumptions behind the performance · 12 Results that "
       "check the model · 13 Open items · 14 Sources\n")
+    whats_new(w)
 
     # 1
     w("## 1. Product and architecture\n")
@@ -276,18 +318,19 @@ def main():
       f"slider defaults), drones {DEFAULT_REQ['height_m']} m up, 5 kg drone. Results from `web/data/explore.json` "
       f"(created {X['created']}). Sensors spaced evenly on the fence.\n")
     rows = []
-    for site in [k for k in ("hancock", "hays", "fulton") if k in X["sites"]]:  # sparse, moderate, dense towers
+    label = lambda k: ("**NEW** " if k == "clemson" else "") + f"{X['sites'][k]['name']} ({SITE_LABELS[k]})"  # noqa: E731
+    for site in [k for k in ("hancock", "hays", "fulton", "clemson") if k in X["sites"]]:  # sparse, moderate, dense towers; stadium
         for interf in X["axes"]["interference"]:
             for radio in ("bladerf", "custom"):
                 rb = best_for(site, "m210", interf, radio)
                 r = rb["r"]
                 if not rb["meets"]:
-                    rows.append([f"{X['sites'][site]['name']} ({SITE_LABELS[site]})", f"{interf} dB", C.RADIOS[radio]["name"], "not possible",
+                    rows.append([label(site), f"{interf} dB", C.RADIOS[radio]["name"], "not possible",
                                  f"best {r['cov'][RI]:.0f}% / {r['trk'][RI]:.0f}% ({rb['n']} sensors)", "", "", "", "", ""])
                     continue
                 n, ndu = rb["n"], rb["node"]
                 a, s = priced(n, ndu, "install_sub"), priced(n, ndu, "set")
-                rows.append([f"{X['sites'][site]['name']} ({SITE_LABELS[site]})", f"{interf} dB", C.RADIOS[radio]["name"], n,
+                rows.append([label(site), f"{interf} dB", C.RADIOS[radio]["name"], n,
                              f"{r['cov'][RI]:.0f}% / {r['trk'][RI]:.0f}% / {r['caught']:.0f}% / {r['acc'][RI]:.0f} m / "
                              f"{r.get('det50', 0):.0f} m; {r.get('det80', 0):.0f} m",
                              f"{usd(a['upfront'])} + {usd(a['yearly'])}/yr", f"{usd(a['price'])} + {usd(a['sub'])}/yr",
@@ -346,7 +389,16 @@ def main():
       "with 16 sensors, so the 8-in-10 range is much shorter than the typical one; sensor placement is the likely fix.")
     w(f"- **Processing:** listening time per update {BASE['cit_s']} s, one update every 1.5 s, 12-bit radios, network "
       f"{BASE['network_load']:.0%} busy (ASSUMPTION), false-alarm rate {p.pfa:g} per cell (ASSUMPTION).")
-    w(f"- **Sensors:** {p.mast_m:g} m mast (ASSUMPTION; see section 12 for 15 and 25 m), evenly spaced on the fence.")
+    w(f"- **Sensors:** {p.mast_m:g} m mast (ASSUMPTION; see section 12 for 15 and 25 m), evenly spaced on the fence, "
+      "exactly on the fence line (no setback). **NEW:** The customer provides the pole, power and network (data package); new "
+      "poles, foundations and trenching are not priced (ASSUMPTION; typically more than a sensor). At the stadium, see "
+      "the stadium section for poles vs on the stands.")
+    w("- **NEW. Tracker (full simulation only, `twin/locate.py`):** constant-velocity Kalman filter in 3D (position + velocity), "
+      "random acceleration 1.5 m/s2, measurement noise 15 m horizontal / 40 m vertical, 4-sigma association gate "
+      "(nearest fix), confirmed after hits in 2 of the last 3 updates, dropped at the 3rd miss in a row, tracks within "
+      "40 m merged; fixes need 3+ pairs from 2+ sensors, speed <= 40 m/s, Doppler agreement <= 4 Hz rms (all ASSUMPTION / "
+      "design choice). The fast estimate runs no filter: it applies the same start/drop rules, and its accuracy is the "
+      "ideal range error x 4.5 (FIT to full-simulation track error over 5 runs, spread 1.8-9x).")
     w("- **Towers:** positions and heights MEASURED (FCC); sector directions, power and channels ASSUMPTION "
       "(EIRP 60 dBm, 4 deg downtilt).")
     cal = json.loads((ROOT / 'twin' / 'calibration.json').read_text())
@@ -383,6 +435,39 @@ def main():
         w("\nTaller poles do not help: at the dense-tower site they see over the buildings into more interference, and they make it "
           "harder to tell a drone from a person beneath it. Keep sensors low (~6 m) unless a site survey says otherwise.\n")
 
+    sp = ROOT / "web" / "runs" / "placement_study.json"
+    if sp.exists() and "clemson" in X["sites"]:
+        S = json.loads(sp.read_text())
+        si = X["sites"]["clemson"]
+        w("**NEW. Stadium: where to put the sensors** (`tools/placement_study.py`, Clemson Memorial Stadium, SC; 5 kg drone at "
+          f"{S['requirements']['height_m']} m). Outline and stands from OpenStreetMap (the field kept open as a hole in the "
+          f"stands); stands {S['stands_height_m']:g} m tall (ASSUMPTION: no published height found); "
+          f"{si['towers_5km']} likely cell towers within 5 km, nearest {si['nearest_tower_km']} km (FCC + OpenCelliD). "
+          "Mountings: 6 m poles in the plaza "
+          f"{S['site_params'].get('setback_m', 0):g} m outside the stands (ASSUMPTION), on top of the stands (+3 m mast), or "
+          "alternating. *Inside* = the stadium outline (bowl and stands), *around* = the 150 m strip outside it.\n")
+        rows = []
+        for r in S["rows"]:
+            if r["sensors"] in (6, 8, 16) and r["design"] == BUILDS["custom"]:
+                rows.append([r["mount"], f"{r['interference_db']} dB", r["sensors"], f"{r['inside_pct']:.0f}%", f"{r['around_pct']:.0f}%",
+                             f"{r['tracked_pct']:.0f}%", f"{r['detect50_m']:.0f} m", "yes" if r["meets"] else "no"])
+        w(table(["Mounting", "Interference removal", "Custom sensors", "Area inside", "Area around", "Time tracked",
+                 "Detection range (typical)", "Meets all five targets"], rows))
+        fb = S["fewest_sensors"]
+        line = "; ".join(f"{m}: " + ", ".join(f"{i} dB {fb.get(f'{m}|{BUILDS[radio]}|{i}', 'none')}" for i in (20, 30, 40))
+                         for m in ("pole", "structure", "mixed") for radio in ("custom",))
+        w(f"\nFewest custom sensors meeting all five targets — {line}.")
+        w("\nPoles alone never see into the bowl (the stands block it: at most ~65% of the inside is covered at any count). "
+          "On top of the stands the sensors see the bowl, but also every tower around, so below 40 dB of interference removal "
+          "they lose the area around the stadium (the same effect as tall poles at the dense-tower site). Alternating the two "
+          "covers both: DECISION (Nov 12), the stadium default. Note that 16 poles meet the 90% area target at 30-40 dB while a third of the bowl stays blind, because the bowl is a small share of the protected area: for stadiums the area target should be stated for the bowl itself (not yet a separate requirement in the viewer). Not modeled: the stadium's own cell antennas (an in-venue "
+          "distributed antenna system, not in the FCC register; could be the strongest signal or the strongest interference), "
+          "game-day network load (the twin assumes 30% busy), and the crowd as moving clutter. A stadium customer's need also "
+          "differs: the FAA bars drones within 3 nautical miles and up to 3,000 ft of stadiums with 30,000+ seats during NCAA "
+          "Division I football and other major events [16], far beyond our range, and stadium security wants the pilot's "
+          "location, which RF detectors give and we do not. Position: a layer for the bowl that also sees drones emitting "
+          "nothing, alongside an RF detector.\n")
+
     # 13
     w("## 13. Open items (replace assumptions with quotes or measurements)\n")
     for t in ["Supplier quotes for the Seed kit: bladeRF, antennas, enclosure, power, arrestors, Jetson, hub.",
@@ -393,7 +478,12 @@ def main():
               "Field installation time and loaded labor rate from an installer quote.",
               "Company running cost per year for the business plan (team, office, sales, insurance).",
               "Pricing: test value-based subscription levels and the all-in fee with design partners; how prisons buy (capital vs service budgets).",
-              "Recalibrate the fast estimate at the sparse- and dense-tower sites against full simulations."]:
+              "Recalibrate the fast estimate at the sparse- and dense-tower sites against full simulations.",
+              "**NEW.** Drone vs bird: the rotor score does not separate them in the twin (above 6 dB on 37% of drone and 33% of "
+              "bird detections); fix the classifier (rotor evidence over a track + flight behavior) and measure it on "
+              "Seed recordings of drones and birds.",
+              "**NEW.** Stadium: real stand heights, mounting points and power on the stands; the in-venue cell antenna layout (DAS); "
+              "game-day network load; whether stadiums buy a layer next to an RF detector."]:
         w(f"- {t}")
     w("")
 
@@ -415,6 +505,7 @@ def main():
         ("[13]", "AirSight drone detection radar guide (single FMCW unit $30K-$80K, hardware only; undated, (c) 2026) — https://www.airsight.com/blog/drone-detection-radar-guide"),
         ("[14]", "AirSight drone detection system cost guide (installation, survey, calibration, training, software and maintenance add 30-60% to hardware; undated, (c) 2026) — https://www.airsight.com/blog/drone-detection-system-cost"),
         ("[15]", "OMNIA Partners, Axon/Dedrone price list AM9 (2025-02-04), Robin Iris radar $396,000 — https://www.omniapartners.com/suppliers-files/A-D/Axon/Contract_Documents/3544-21-4615/3544-21-4615_AM9_Axon_2025_02_04.pdf (now redirects to a login; figure from a search-result snippet)"),
+        ("[16]", "**NEW.** FAA, Stadiums and Sporting Events (UAS restrictions: 3 NM, 3,000 ft AGL, stadiums with 30,000+ seats) — https://www.faa.gov/uas/getting_started/where_can_i_fly/airspace_restrictions/sports_stadiums"),
     ]:
         w(f"- {k} {s}")
     OUT.write_text("\n".join(L) + "\n")

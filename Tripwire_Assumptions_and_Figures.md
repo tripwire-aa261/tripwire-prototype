@@ -4,6 +4,18 @@ Generated 2026-11-12 from the digital twin by `prototype/tools/build_assumptions
 
 Contents: 1 Product and architecture · 2 Hardware per sensor · 3 Custom receiver parts list · 4 Installation · 5 Running costs · 6 Pricing · 7 Company-level costs · 8 What each facility needs and earns · 9 Seed kit · 10 Changes from the Seed data package · 11 Technical assumptions behind the performance · 12 Results that check the model · 13 Open items · 14 Sources
 
+> **WHAT'S NEW in v0.5 and v0.5.1 (2026-11-12), since v0.4.5 (commit `7cb4715`). Read this first if you already used an earlier version of this file.** Everything new below is marked **NEW**.
+>
+> - **NEW customer type: a stadium.** Clemson Memorial Stadium (Clemson, SC) is a fourth site, next to the three Georgia prisons. Its figures are the rows marked **NEW** in section 8, and its own study is in section 12 (*Stadium: where to put the sensors*).
+> - **NEW stadium figures (5 kg drone, default targets):** not possible at today's 20 dB of interference removal; 30 dB: 8 custom-receiver sensors, our cost $19,888 + $3,280/yr, price at cost + 40% $33,147 + $5,467/yr; 30 dB: 12 bladeRF sensors, our cost $31,023 + $4,455/yr, price at cost + 40% $51,704 + $7,425/yr; 40 dB: 6 custom-receiver sensors, our cost $15,666 + $2,760/yr, price at cost + 40% $26,110 + $4,601/yr; 40 dB: 6 bladeRF sensors, our cost $17,011 + $2,828/yr, price at cost + 40% $28,352 + $4,713/yr. Same cost model, margins and pricing models as the prisons (sections 2-6).
+> - **NEW decision: at a stadium, sensors alternate between the top of the stands and 6 m poles outside.** Poles alone cannot see into the bowl; on the stands alone the sensors pick up too much tower interference. DECISION (Nov 12), section 12.
+> - **NEW assumptions:** stands 30 m tall (no published height found); stadium poles stand 20 m outside the stands; microphones off at the stadium (a game-day crowd drowns out a drone). Not modeled: the stadium's own cell antennas, game-day network load, the crowd as clutter.
+> - **NEW positioning point for the business plan:** the FAA bans drones within 3 nautical miles of large stadiums during major games [16], far beyond our range, and stadium security wants the pilot's location, which RF detectors give and we do not. Pitch Tripwire as the bowl layer (it also sees drones that emit nothing), sold next to an RF detector. Stadium pricing and buying process are untested (section 13).
+> - **NEW caveat:** a 90% area target can be met while a third of the bowl is blind (16 poles at 30-40 dB), because the bowl is a small share of the protected area. For stadiums, state the area target for the bowl.
+> - **NEW in section 11:** the tracker settings (Kalman filter, gates, confirmation rules) and the pole assumptions (customer provides poles, power and network; new poles are not priced; no setback from the fence) are now listed.
+> - **NEW finding (v0.5.1):** telling birds from drones does not work in the twin yet (the rotor score is above 6 dB on 37% of drone and 33% of bird detections), so the 3D replays often track the bird; a Bird checkbox hides it. Do not claim drone-vs-bird classification in the plan until it is fixed and measured (section 13).
+> - **Unchanged:** all part prices, installation, running costs, margins, pricing models, company costs and every prison result. Business-plan figures taken from v0.4.5 for the prisons still hold.
+
 ## 1. Product and architecture
 
 - **What is sold:** receive-only sensors on the facility fence that detect drone echoes of signals cell towers already transmit, plus one on-site hub, installation and a yearly service. Nothing is transmitted, so no license is needed.
@@ -142,6 +154,12 @@ Recommended setup = the radio and number of sensors with the lowest cost to us t
 | Fulton County Jail (dense towers) | 30 dB | Custom multichannel receiver | 12 | 93% / 82% / 99% / 12 m / 1154 m; 502 m | $28,332 + $4,321/yr | $47,220 + $7,201/yr | $6,658 (151) | $18,013 (56) | 64% |
 | Fulton County Jail (dense towers) | 40 dB | bladeRF 2.0 micro xA4 | 6 | 100% / 97% / 100% / 8 m / 395 m; 194 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
 | Fulton County Jail (dense towers) | 40 dB | Custom multichannel receiver | 4 | 100% / 96% / 99% / 5 m / 382 m; 206 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
+| **NEW** Clemson Memorial Stadium (stadium) | 20 dB | bladeRF 2.0 micro xA4 | not possible | best 78% / 61% (16 sensors) |  |  |  |  |  |
+| **NEW** Clemson Memorial Stadium (stadium) | 20 dB | Custom multichannel receiver | not possible | best 91% / 78% (16 sensors) |  |  |  |  |  |
+| **NEW** Clemson Memorial Stadium (stadium) | 30 dB | bladeRF 2.0 micro xA4 | 12 | 99% / 89% / 100% / 7 m / 1166 m; 803 m | $31,023 + $4,455/yr | $51,704 + $7,425/yr | $7,106 (141) | $17,340 (58) | 62% |
+| **NEW** Clemson Memorial Stadium (stadium) | 30 dB | Custom multichannel receiver | 8 | 99% / 90% / 100% / 5 m / 1162 m; 619 m | $19,888 + $3,280/yr | $33,147 + $5,467/yr | $4,839 (207) | $20,742 (49) | 74% |
+| **NEW** Clemson Memorial Stadium (stadium) | 40 dB | bladeRF 2.0 micro xA4 | 6 | 100% / 94% / 95% / 6 m / 974 m; 361 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
+| **NEW** Clemson Memorial Stadium (stadium) | 40 dB | Custom multichannel receiver | 6 | 100% / 96% / 96% / 4 m / 1088 m; 493 m | $15,666 + $2,760/yr | $26,110 + $4,601/yr | $3,929 (255) | $22,106 (46) | 79% |
 
 20 dB of interference removal is today's assumption; 30 and 40 dB are unproven (section 11). The custom receiver is a Series A product.
 
@@ -172,7 +190,8 @@ Recommended setup = the radio and number of sensors with the lowest cost to us t
 - **Fast estimate:** chain loss 5 dB (FIT to 7 full-simulation runs); 20 scored flights per design point.
 - **Detection range:** distance outside the fence when the track that guards see begins (held for 3 updates), only before the drone crosses the fence; drones never tracked count as 0 m. The requirement uses the typical drone (median over 20 flights x 16 draws, DECISION Nov 12); the 8-in-10 figure is reported alongside. Flights start 1,800 m from the drop point from random directions. At Hays drones arriving from the south-southwest (bearings ~180-230 deg, along the line between the southern towers and the sensors) are picked up only ~50-300 m out even with 16 sensors, so the 8-in-10 range is much shorter than the typical one; sensor placement is the likely fix.
 - **Processing:** listening time per update 0.8 s, one update every 1.5 s, 12-bit radios, network 30% busy (ASSUMPTION), false-alarm rate 1e-06 per cell (ASSUMPTION).
-- **Sensors:** 6 m mast (ASSUMPTION; see section 12 for 15 and 25 m), evenly spaced on the fence.
+- **Sensors:** 6 m mast (ASSUMPTION; see section 12 for 15 and 25 m), evenly spaced on the fence, exactly on the fence line (no setback). **NEW:** The customer provides the pole, power and network (data package); new poles, foundations and trenching are not priced (ASSUMPTION; typically more than a sensor). At the stadium, see the stadium section for poles vs on the stands.
+- **NEW. Tracker (full simulation only, `twin/locate.py`):** constant-velocity Kalman filter in 3D (position + velocity), random acceleration 1.5 m/s2, measurement noise 15 m horizontal / 40 m vertical, 4-sigma association gate (nearest fix), confirmed after hits in 2 of the last 3 updates, dropped at the 3rd miss in a row, tracks within 40 m merged; fixes need 3+ pairs from 2+ sensors, speed <= 40 m/s, Doppler agreement <= 4 Hz rms (all ASSUMPTION / design choice). The fast estimate runs no filter: it applies the same start/drop rules, and its accuracy is the ideal range error x 4.5 (FIT to full-simulation track error over 5 runs, spread 1.8-9x).
 - **Towers:** positions and heights MEASURED (FCC); sector directions, power and channels ASSUMPTION (EIRP 60 dBm, 4 deg downtilt).
 
 All model parameters with their tags. *Code default* is the generic default in `twin/config.py`; *used* is what the explorer runs for the standard bladeRF build at the default targets (sensor count and interference level vary per design point):
@@ -194,6 +213,10 @@ All model parameters with their tags. *Code default* is the generic default in `
 | adc_bits | 12 | 12 | ADC resolution | CITED: USRP B210 = 12 bit (Ettus); KrakenSDR/RTL = 8 bit |
 | adc_backoff_db | 12.0 | 12.0 | ADC headroom for OFDM peaks | ASSUMPTION |
 | mast_m | 6.0 | 6.0 | Listener mast height | ASSUMPTION |
+| mount | pole | pole | Where sensors go: poles at the perimeter, on the structure itself (stadium stands), or alternating | design choice; tools/placement_study.py |
+| setback_m | 0.0 | 0.0 | Pole sensors stand this far outside the perimeter line | ASSUMPTION |
+| structure_inset_m | 12.0 | 12.0 | Structure sensors sit this far inside the building outline (the top of the stands) | ASSUMPTION |
+| roof_mast_m | 3.0 | 3.0 | Mast above the structure's top for structure-mounted sensors | ASSUMPTION |
 | cit_s | 0.5 | 0.8 | Coherent integration time | CITED: 0.8 s in Demissie & Steffes 2025; default 0.5 s (ASSUMPTION, manoeuvring drone) |
 | pfa | 1e-06 | 1e-06 | False-alarm probability per range-Doppler cell (CFAR) | ASSUMPTION |
 | dpc_rank | 1 | 1 | Singular components removed (direct path + static clutter) | CITED: SVD method, Demissie & Steffes 2025 eq. 13 |
@@ -228,14 +251,18 @@ All model parameters with their tags. *Code default* is the generic default in `
 | hays-m210-custom | 4 | 20 dB | 84% | 87% |
 | hays-mavic-ots | 16 | 40 dB | 89% | 76% |
 | hays-mavic-custom | 12 | 20 dB | 90% | 79% |
-| hancock-m210-ots | 6 | 40 dB | 82% | 82% |
-| hancock-m210-custom | 6 | 40 dB | 91% | 89% |
+| hancock-m210-ots | 6 | 40 dB | 81% | 82% |
+| hancock-m210-custom | 6 | 40 dB | 92% | 89% |
 | hancock-mavic-ots | 16 | 40 dB | 74% | 36% |
 | hancock-mavic-custom | 16 | 40 dB | 84% | 47% |
-| fulton-m210-ots | 4 | 40 dB | 87% | 62% |
+| fulton-m210-ots | 4 | 40 dB | 86% | 62% |
 | fulton-m210-custom | 12 | 30 dB | 87% | 81% |
-| fulton-mavic-ots | 16 | 40 dB | 88% | 44% |
+| fulton-mavic-ots | 16 | 40 dB | 89% | 44% |
 | fulton-mavic-custom | 12 | 40 dB | 87% | 78% |
+| clemson-m210-ots | 16 | 30 dB | 89% | 83% |
+| clemson-m210-custom | 12 | 30 dB | 86% | 86% |
+| clemson-mavic-ots | 16 | 40 dB | 89% | 83% |
+| clemson-mavic-custom | 12 | 40 dB | 87% | 86% |
 
 The fast estimate (used for every recommendation) is optimistic at the sparse- and dense-tower sites, more so with few sensors or the small drone: treat those sensor counts as lower bounds.
 
@@ -258,6 +285,42 @@ The fast estimate (used for every recommendation) is optimistic at the sparse- a
 
 Taller poles do not help: at the dense-tower site they see over the buildings into more interference, and they make it harder to tell a drone from a person beneath it. Keep sensors low (~6 m) unless a site survey says otherwise.
 
+**NEW. Stadium: where to put the sensors** (`tools/placement_study.py`, Clemson Memorial Stadium, SC; 5 kg drone at 60 m). Outline and stands from OpenStreetMap (the field kept open as a hole in the stands); stands 30 m tall (ASSUMPTION: no published height found); 9 likely cell towers within 5 km, nearest 2.1 km (FCC + OpenCelliD). Mountings: 6 m poles in the plaza 20 m outside the stands (ASSUMPTION), on top of the stands (+3 m mast), or alternating. *Inside* = the stadium outline (bowl and stands), *around* = the 150 m strip outside it.
+
+| Mounting | Interference removal | Custom sensors | Area inside | Area around | Time tracked | Detection range (typical) | Meets all five targets |
+|---|---|---|---|---|---|---|---|
+| pole | 20 dB | 6 | 24% | 92% | 32% | 960 m | no |
+| pole | 20 dB | 8 | 42% | 92% | 44% | 1033 m | no |
+| pole | 20 dB | 16 | 49% | 100% | 77% | 1462 m | no |
+| pole | 30 dB | 6 | 37% | 98% | 46% | 1117 m | no |
+| pole | 30 dB | 8 | 49% | 100% | 63% | 1198 m | no |
+| pole | 30 dB | 16 | 62% | 100% | 84% | 1507 m | yes |
+| pole | 40 dB | 6 | 39% | 100% | 52% | 1198 m | no |
+| pole | 40 dB | 8 | 54% | 100% | 70% | 1308 m | no |
+| pole | 40 dB | 16 | 65% | 100% | 85% | 1563 m | yes |
+| structure | 20 dB | 6 | 15% | 2% | 1% | 0 m | no |
+| structure | 20 dB | 8 | 28% | 3% | 4% | 0 m | no |
+| structure | 20 dB | 16 | 56% | 11% | 39% | 1439 m | no |
+| structure | 30 dB | 6 | 94% | 52% | 52% | 0 m | no |
+| structure | 30 dB | 8 | 99% | 71% | 66% | 90 m | no |
+| structure | 30 dB | 16 | 100% | 94% | 91% | 1443 m | yes |
+| structure | 40 dB | 6 | 100% | 100% | 96% | 308 m | yes |
+| structure | 40 dB | 8 | 100% | 100% | 98% | 481 m | yes |
+| structure | 40 dB | 16 | 100% | 100% | 100% | 1487 m | yes |
+| mixed | 20 dB | 6 | 22% | 91% | 26% | 953 m | no |
+| mixed | 20 dB | 8 | 36% | 90% | 37% | 1004 m | no |
+| mixed | 20 dB | 16 | 49% | 95% | 78% | 1437 m | no |
+| mixed | 30 dB | 6 | 94% | 96% | 69% | 1005 m | no |
+| mixed | 30 dB | 8 | 91% | 100% | 90% | 1162 m | yes |
+| mixed | 30 dB | 16 | 100% | 100% | 100% | 1445 m | yes |
+| mixed | 40 dB | 6 | 100% | 100% | 96% | 1088 m | yes |
+| mixed | 40 dB | 8 | 100% | 100% | 99% | 1174 m | yes |
+| mixed | 40 dB | 16 | 100% | 100% | 100% | 1507 m | yes |
+
+Fewest custom sensors meeting all five targets — pole: 20 dB none, 30 dB 16, 40 dB 16; structure: 20 dB none, 30 dB 16, 40 dB 6; mixed: 20 dB none, 30 dB 8, 40 dB 6.
+
+Poles alone never see into the bowl (the stands block it: at most ~65% of the inside is covered at any count). On top of the stands the sensors see the bowl, but also every tower around, so below 40 dB of interference removal they lose the area around the stadium (the same effect as tall poles at the dense-tower site). Alternating the two covers both: DECISION (Nov 12), the stadium default. Note that 16 poles meet the 90% area target at 30-40 dB while a third of the bowl stays blind, because the bowl is a small share of the protected area: for stadiums the area target should be stated for the bowl itself (not yet a separate requirement in the viewer). Not modeled: the stadium's own cell antennas (an in-venue distributed antenna system, not in the FCC register; could be the strongest signal or the strongest interference), game-day network load (the twin assumes 30% busy), and the crowd as moving clutter. A stadium customer's need also differs: the FAA bars drones within 3 nautical miles and up to 3,000 ft of stadiums with 30,000+ seats during NCAA Division I football and other major events [16], far beyond our range, and stadium security wants the pilot's location, which RF detectors give and we do not. Position: a layer for the bowl that also sees drones emitting nothing, alongside an RF detector.
+
 ## 13. Open items (replace assumptions with quotes or measurements)
 
 - Supplier quotes for the Seed kit: bladeRF, antennas, enclosure, power, arrestors, Jetson, hub.
@@ -269,6 +332,8 @@ Taller poles do not help: at the dense-tower site they see over the buildings in
 - Company running cost per year for the business plan (team, office, sales, insurance).
 - Pricing: test value-based subscription levels and the all-in fee with design partners; how prisons buy (capital vs service budgets).
 - Recalibrate the fast estimate at the sparse- and dense-tower sites against full simulations.
+- **NEW.** Drone vs bird: the rotor score does not separate them in the twin (above 6 dB on 37% of drone and 33% of bird detections); fix the classifier (rotor evidence over a track + flight behavior) and measure it on Seed recordings of drones and birds.
+- **NEW.** Stadium: real stand heights, mounting points and power on the stands; the in-venue cell antenna layout (DAS); game-day network load; whether stadiums buy a layer next to an RF detector.
 
 ## 14. Sources
 
@@ -287,3 +352,4 @@ Taller poles do not help: at the dense-tower site they see over the buildings in
 - [13] AirSight drone detection radar guide (single FMCW unit $30K-$80K, hardware only; undated, (c) 2026) — https://www.airsight.com/blog/drone-detection-radar-guide
 - [14] AirSight drone detection system cost guide (installation, survey, calibration, training, software and maintenance add 30-60% to hardware; undated, (c) 2026) — https://www.airsight.com/blog/drone-detection-system-cost
 - [15] OMNIA Partners, Axon/Dedrone price list AM9 (2025-02-04), Robin Iris radar $396,000 — https://www.omniapartners.com/suppliers-files/A-D/Axon/Contract_Documents/3544-21-4615/3544-21-4615_AM9_Axon_2025_02_04.pdf (now redirects to a login; figure from a search-result snippet)
+- [16] **NEW.** FAA, Stadiums and Sporting Events (UAS restrictions: 3 NM, 3,000 ft AGL, stadiums with 30,000+ seats) — https://www.faa.gov/uas/getting_started/where_can_i_fly/airspace_restrictions/sports_stadiums
