@@ -105,6 +105,6 @@ def test_custom_bom_sources_and_total():
         if line["source"].startswith("CITED"):
             assert line["url"].startswith("https://"), line["part"]
     b = custom_board_breakdown(8, 1000)
-    assert b["total_usd"] == pytest.approx(b["parts_usd"] + b["assembly_usd"] + b["test_usd"] + b["nre_per_board_usd"], abs=0.05)
+    assert b["total_usd"] == pytest.approx(b["parts_usd"] + b["assembly_usd"] + b["test_usd"], abs=0.05)  # NRE separate
     assert [ln["count"] for ln in b["lines"]][:3] == [4, 1, 10]  # 4 transceivers, 1 FPGA, 8 + 2 LNAs
     assert custom_board_usd(8, 1000) == pytest.approx(b["total_usd"])

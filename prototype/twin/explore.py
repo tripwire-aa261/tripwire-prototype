@@ -4,7 +4,7 @@
     .venv/bin/python -m twin.explore            (~40 min on 4 cores; writes web/data/explore.json)
     .venv/bin/python -m twin.explore --maps     (~5 min: recommendations and coverage maps only)
 
-Grid: 3 real sites x 2 drones x 6 sensor designs x 3 drone heights x 3 interference-removal levels x
+Grid: 3 real sites x 2 drones x 8 sensor designs x 3 drone heights x 3 interference-removal levels x
 node counts. For each point, at several zone radii (distance protected around the fence):
   area covered  share of the zone where 3+ tower-sensor pairs detect the drone (coverage map)
   accuracy      median expected position error over the covered area (coverage.position_error_m)
@@ -60,6 +60,13 @@ DESIGNS = {
     "ring8_enh_mic": dict(label="8-antenna ring, enhanced processing + microphone (custom receiver)",
                           short="8 antennas · enhanced · mic", radio="custom",
                           p=dict(antenna="omni", rx_elements=8, processing="full", mic_range_m=100.0)),
+    # v0.4.3: the hover is held in software by background history (twin/hover.py) instead of a microphone.
+    "ring4_enh_hist": dict(label="4-antenna ring, enhanced processing, hover by background history",
+                           short="4 antennas · enhanced · history", radio="bladerf",
+                           p=dict(antenna="omni", rx_elements=4, processing="full", hover_history=True)),
+    "ring8_enh_hist": dict(label="8-antenna ring, enhanced processing, hover by background history",
+                           short="8 antennas · enhanced · history", radio="custom",
+                           p=dict(antenna="omni", rx_elements=8, processing="full", hover_history=True)),
 }
 
 
@@ -134,9 +141,10 @@ def node_costs() -> dict:
 
 
 # Each radio comes with one fixed sensor build on the Overview and in Financials (the Simulation tab can
-# explore the other builds). bladeRF and B210 are the same radio in the model (12-bit, 2 channels per board);
+# explore the other builds). Since v0.4.3 the fixed builds hold the hover by background history (software)
+# instead of a microphone (stability -30 dB, ASSUMPTION; twin/hover.py). bladeRF and B210 are the same radio in the model (12-bit, 2 channels per board);
 # the B210 only costs more.
-BUILDS = {"bladerf": "ring4_enh_mic", "b210": "ring4_enh_mic", "custom": "ring8_enh_mic"}
+BUILDS = {"bladerf": "ring4_enh_hist", "b210": "ring4_enh_hist", "custom": "ring8_enh_hist"}
 
 # The option the Overview recommends by default: the cheapest (customer's total over the contract) radio and
 # sensor count that covers at least 90 % of the protected area and holds a track 80 % of the time (ASSUMPTION

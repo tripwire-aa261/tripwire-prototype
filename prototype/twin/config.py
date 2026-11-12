@@ -113,6 +113,9 @@ class Params:
     vegetation_spread_hz: float = 1.5
     zone_buffer_m: float = 150.0
     mic_range_m: float = 0.0  # acoustic detection range of an optional microphone per node (0 = none)
+    hover_history: bool = False  # hold a stopped track by comparing with the learned quiet background (hover.py)
+    background_stability_db: float = -30.0  # what is left of the static background after subtracting its history
+    hover_dwell_s: float = 4.8  # longest listening time on a stopped track
     # --- run ---
     frame_dt_s: float = 1.5
     seed: int = 7
@@ -155,6 +158,9 @@ PARAM_SOURCES = {
     "pointing": ("inward: face the middle of the facility; auto: turn each node (up to 90 deg) to maximise detections over the zone", "design choice"),
     "processing": ("Which LTE resource elements are used (crs_p0 = Fraunhofer method)", "crs_p0 CITED; gains of crs_all and full ASSUMPTION (TS 36.211 resource counts)"),
     "mic_range_m": ("Acoustic detection range per node (optional microphone)", "ASSUMPTION"),
+    "hover_history": ("Hold a stopped (hovering) track by background history: compare each distance bin with its learned quiet level", "design choice (hover.py)"),
+    "background_stability_db": ("Leftover of the static background after subtracting its learned history (-40 dB = echoes steady to ~1 %)", "ASSUMPTION: to be measured on Seed recordings; tools/hover_feasibility.py"),
+    "hover_dwell_s": ("Longest listening time on a stopped track", "ASSUMPTION"),
     "nf_db": ("Receiver noise figure", "ASSUMPTION (typical SDR front end)"),
     "adc_bits": ("ADC resolution", "CITED: USRP B210 = 12 bit (Ettus); KrakenSDR/RTL = 8 bit"),
     "adc_backoff_db": ("ADC headroom for OFDM peaks", "ASSUMPTION"),
@@ -206,5 +212,6 @@ ASSUMPTION_TABLE = [
     ("Several faces in the signal simulation", "each frame uses the face that sees the drone best", "SIMPLIFICATION: equals detecting on every element and keeping the best, without the extra false alarms"),
     ("Processing modes", "port-0 CRS 2 REs per RB-slot; all CRS 8; full signal 8 + 76 x load", "STANDARD RE counts (TS 36.211); ideal gain ASSUMPTION"),
     ("Microphones (optional)", "detect a drone within mic_range_m of a node; located when 2+ nodes hear it", "ASSUMPTION; acoustic range to be sourced"),
+    ("Hover hold by background history", "a held track that stops is kept when 3+ pairs see a steady new echo above noise + background x stability (ground sigma0 -20 dB + buildings), listening up to hover_dwell_s; cued only (never starts a track)", "ASSUMPTION: stability -30 dB default; twin/hover.py"),
     ("Independent validation", "not yet done: both Fraunhofer trials are used for fitting", "NEXT: arXiv 2412.20788 LTE tracking trial"),
 ]

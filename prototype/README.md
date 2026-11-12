@@ -1,11 +1,65 @@
-# Tripwire Twin: prototype v0.4.2
+# Tripwire Twin: prototype v0.4.4
 
-A signal-level digital twin of a passive LTE radar at **three real Georgia facilities**: Hays State Prison
-(rural), Hancock State Prison (remote) and Fulton County Jail (dense urban).
+A signal-level digital twin of a passive LTE radar at **three real Georgia facilities**: Hancock State Prison
+(sparse towers), Hays State Prison (moderate towers) and Fulton County Jail (dense towers, Atlanta).
 It generates the LTE reference signals defined in the standard, propagates them over real terrain and
 buildings, adds drone, bird and clutter echoes, and runs the processing chain the product would run:
 direct-signal cancellation, range-Doppler maps, CFAR detection, multistatic location and tracking.
 The model is calibrated against the only published LTE450 drone-detection field trials (Fraunhofer FKIE).
+
+**v0.4.4 (Nov 12): hover held in software, re-priced costs, pricing models.**
+- *Hover by background history* (`twin/hover.py`, `Params.hover_history`): the normal Doppler chain still does everything;
+  only when a held track stops (drone in the zero-Doppler band and slow enough to stay in one 33 m distance bin) do the
+  pairs compare that spot with their learned quiet background, listening up to 4.8 s. Cued only: it keeps a track, never
+  starts one. The unknown is **background stability** (what is left of the static background after subtracting its
+  history; default -30 dB, ASSUMPTION; `tools/hover_feasibility.py` shows -30 to -40 dB is needed). The fixed builds
+  (`BUILDS`) are now `ring4_enh_hist` / `ring8_enh_hist` with no microphone; the microphone builds stay explorable.
+  Result (explore re-run, 5 kg drone, time tracked): where the radar works, history matches or beats the microphone
+  (Hays 6 bladeRF sensors at 20 dB: 88.9 % vs 88.3 %, none 82.9 %; Hancock and Fulton at 40 dB within ~3 points). Where
+  the radar fails (Hancock, Fulton at 20-30 dB) the microphone scores higher only as a short-range acoustic tracker near the
+  fence; history cannot start tracks. Recommendations are unchanged from v0.4.2.
+- *Re-priced costs* (`twin/cost.py`, every line CITED or ASSUMPTION): edge computer = NVIDIA Jetson Orin Nano Super $249
+  (was $800); GPS module $16.22 (was $150); shared clock for 2 bladeRF boards $30 (was $350; two-board phase lock is a Seed
+  risk); enclosure/power/bracket $190 + $25 lightning arrestor per antenna (was $450); microphone $25 (was $100). Standard
+  bladeRF sensor $1,825 (was $2,990), custom sensor $1,601 (was $3,312). Installation 6 h/sensor at $60/h (BLS median
+  $28.88/h x ~2 for benefits, overhead and travel) + $150 cabling = $510/sensor (was $2,000), plus a $500 on-site hub per
+  facility. Running costs ~$270/sensor/yr + $1,200/facility/yr (was ~$1,600/sensor/yr).
+- *Compute architecture:* each sensor processes its own antennas on the edge board (raw samples, ~2 Gbit/s, cannot leave
+  the pole) and sends range-Doppler maps to one hub per facility (tracking, classifier, background history, alerts).
+- *Pricing:* both margins 40 %. Three models in Financials: cost + margin (installation + subscription), cost + margin
+  all-in (nothing upfront; the fee repays the hardware at 10 %/yr), and value-based (own price per facility; default the
+  data package's $50,000 + $18,000/yr). The custom receiver's $400k NRE is no longer in the board price ($642 at the
+  1,000-board planning volume): it is a company cost, shown with the company's running cost ($1M/yr, ASSUMPTION) as
+  "facilities needed" in a new Company panel. At cost + 40 % a facility earns ~$3-4k/yr gross profit (~250-330 facilities
+  to cover $1M/yr); at the data package's prices ~$22-23k/yr (~43-47 facilities). Cost + 40 % is the floor, not the price.
+- *Every assumption and figure for the business plan:* `Tripwire_Assumptions_and_Figures.md` in the repo root, generated
+  from the twin by `tools/build_assumptions_doc.py` (re-run it after any change).
+- *Pole height* (`tools/hover_feasibility.py`): taller poles do not help. At Fulton 15-25 m poles see over the buildings
+  into more interference (moving-drone coverage 92-99 % at 6 m, 11-61 % at 15-25 m), and everywhere they make a drone
+  harder to tell from a person beneath it. Keep sensors low (~6 m).
+
+**v0.4.3 viewer (Nov 12, feedback round):** the four things a customer chooses (drone, area covered, time
+tracked and a new **tracking accuracy** target, 25 m by default = `default_req.accuracy_m`, ASSUMPTION) sit in a highlighted
+"What the customer wants" block (`web/src/requirements.js`) on the Overview, repeated in Financials. A setup meets the
+targets only if its median position error is within the accuracy target (`meets()` in `web/src/data.js`); at the defaults
+no recommendation changes. In **Financials** the number of sensors is no longer an input: it is the fewest sensors of the
+chosen radio (default: the recommended one) that meet the requirements, at the lowest interference removal that allows it.
+The Simulation tab is renamed **Trade space simulator**: the setup picker sits below the two charts, and the sensitivity
+chart ("What changes the result most") shows the 4 biggest effects (all on request) with a one-line plain reading. The 3D
+replay moved to its own **3D signal simulation** tab; the drone is labeled *ground truth drone* and tracks *track estimate*,
+and a new chart plots the error between them at each update (gaps = no track within 60 m; click to jump the replay).
+Sites are now labeled by the cell towers around them, which is what decides the result: **sparse towers** (Hancock: 2
+within 5 km, nearest 4 km), **moderate towers** (Hays: 6, nearest 2 km) and **dense towers** (Fulton County Jail: 52,
+nearest 1 km). They are shown in that order with Hays selected by default (`SITE_TYPES` in `web/src/data.js`;
+`explore.json` still carries the older rural / remote / dense urban labels).
+**Compared with today's options** (Overview and Financials) is now like for like: the customer's total for one facility
+over the contract. A radar-based system = 3-5 compact radars (ASSUMPTION: ~120° each, CITED Echodyne EchoGuard) at
+$30k-80k each, hardware only (CITED AirSight radar guide, 2026), plus 30-60 % for installation and integration (CITED
+AirSight cost guide), plus AirSight's software packages for the contract (data package ref [4]): about $162k-851k over
+5 years, before hardware upkeep. Also shown: one 360° Robin IRIS radar alone ($396,000, Dedrone price list on OMNIA
+Partners, Feb 2025, seen in a search result) and the RF-only Dedrone configuration ($57,915, ref [3]; it cannot see
+drones that do not transmit). Counts, prices and installation shares are editable in Financials (`competitors()` in
+`web/src/data.js`).
 
 **v0.4.2 (Nov 12):** the customer chooses by **radio**: bladeRF or B210 (off-the-shelf, Seed) or our custom
 receiver (Series A). Each radio has one fixed sensor build (`BUILDS` in `twin/explore.py`): bladeRF/B210 = 2 boards,
@@ -28,16 +82,18 @@ hidden. Price = our cost + margin (40 % / 72 %, ASSUMPTION reproducing the data 
 "Recommended" = cheapest option catching 90 % and covering 90 % (ASSUMPTION thresholds, `twin/explore.py`).
 Sensors are still spaced evenly on the fence; choosing the best spots is the next step.
 
-The viewer has three tabs:
-- **Overview** (for people outside the technical work): set how much area must be covered and how much of the
-  time a drone must be tracked; see the recommended radio and sensor count, its coverage map, our cost and the
+The viewer has four tabs:
+- **Overview** (for people outside the technical work): set the drone, how much area must be covered, how much of the
+  time a drone must be tracked and how accurately; see the recommended radio and sensor count, its coverage map, our cost and the
   suggested price, what it takes at today's vs higher interference removal, which setup suits which site, and
   cost against today's options.
-- **Simulation**: say what to protect (facility, drone, protected distance, drone height) and the interference
-  scenario; pick a radio and a number of sensors (and, to explore, another antenna setup); protection and cost
-  against the number of sensors per radio; what moves the result (sensitivity); and a 3D replay chosen by
-  facility, drone and radio.
-- **Financials**: hardware, installation, labor and maintenance per facility for the chosen radio and sensor count,
+- **Trade space simulator**: say what to protect (facility, drone, protected distance, drone height) and the
+  interference scenario; protection and cost against the number of sensors per radio; pick a radio and a number of
+  sensors (and, to explore, another sensor setup); what changes the result most (sensitivity).
+- **3D signal simulation**: a full-signal replay chosen by facility, drone and radio, with the tracking error
+  between the ground truth drone and the track estimate over the flight.
+- **Financials**: the customer's requirements again (they set the number of sensors); hardware, installation, labor
+  and maintenance per facility for the chosen radio,
   with every assumption editable (saved in your browser) and a reset button; price = cost + editable margins; the
   sourced custom-receiver parts list.
 
@@ -52,8 +108,8 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # first tim
 .venv/bin/python serve.py                                             # then open http://localhost:8000
 ```
 
-The Overview, Simulation and Financials tabs read precomputed results (`web/data/explore.json`). The 3D replay
-in the Simulation tab can run a new full simulation (2–7 minutes on a laptop, up to 4 CPU cores). The 3D library
+The Overview, Trade space simulator and Financials tabs read precomputed results (`web/data/explore.json`). The 3D replay
+in the 3D signal simulation tab can run a new full simulation (2–7 minutes on a laptop, up to 4 CPU cores). The 3D library
 loads from a CDN, so you need internet.
 
 On Windows, use `.venv\Scripts\python` instead of `.venv/bin/python`.
@@ -63,12 +119,14 @@ On Windows, use `.venv\Scripts\python` instead of `.venv/bin/python`.
 | `.venv/bin/python -m twin.explore` | precompute the requirements explorer for all three sites (~40 min, 4 cores) |
 | `.venv/bin/python -m twin.explore --maps` | recompute only the recommendations and the Overview's coverage maps (~6 min) |
 | `.venv/bin/python tools/make_replays.py` | the 12 precomputed 3D replays (facility x drone x radio; ~45 min) |
+| `.venv/bin/python tools/hover_feasibility.py` | hover-by-background-history and pole-height study (~3 min) |
+| `.venv/bin/python tools/build_assumptions_doc.py` | write `Tripwire_Assumptions_and_Figures.md` (all assumptions and figures, for the business plan) |
 | `.venv/bin/python -m twin.run hays --set drone=m210 --set n_listeners=8 --id my-run` | full simulation at a site (`hays`, `hancock`, `fulton`) |
 | `.venv/bin/python -m twin.sweep --drone m210 --id m210` | coverage + scored flights + cost vs node count for the standard designs (~1.5 min) |
 | `.venv/bin/python -m twin.cost` | print the cost model and write `web/runs/cost_model.json` |
 | `.venv/bin/python -m twin.calibrate` | re-fit the calibration to the Fraunhofer trials (~1 min) |
 | `.venv/bin/python -m twin.run --relocate` | re-run location/tracking/metrics on saved runs (seconds) |
-| `.venv/bin/python -m pytest -q` | 37 physics, antenna, cost, flight, pricing and recommendation tests |
+| `.venv/bin/python -m pytest -q` | 38 physics, antenna, cost, flight, pricing, hover and recommendation tests |
 | `.venv/bin/python tools/fetch_site.py --osm-way <id> --id <name> --name "<Facility>"` | fetch another facility (OSM + USGS) |
 | `.venv/bin/python tools/fetch_towers.py --site <name>` | real towers near it (FCC; OpenCelliD if a key is set) |
 

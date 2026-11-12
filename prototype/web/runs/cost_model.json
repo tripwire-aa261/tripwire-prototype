@@ -32,7 +32,8 @@
   "test_calibration_usd": 25.0,
   "learning_per_doubling": 0.93,
   "volume_floor": 0.5,
-  "nre_usd": 400000.0
+  "nre_usd": 400000.0,
+  "planning_qty": 1000
  },
  "custom_bom": [
   {
@@ -421,8 +422,8 @@
    "parts_usd": 774.93,
    "assembly_usd": 5.37,
    "test_usd": 25.0,
-   "nre_per_board_usd": 4000.0,
-   "total_usd": 4805.3
+   "nre_usd": 400000.0,
+   "total_usd": 805.3
   },
   "1000": {
    "channels": 8,
@@ -640,8 +641,8 @@
    "parts_usd": 611.63,
    "assembly_usd": 5.37,
    "test_usd": 25.0,
-   "nre_per_board_usd": 400.0,
-   "total_usd": 1042.0
+   "nre_usd": 400000.0,
+   "total_usd": 642.0
   },
   "10000": {
    "channels": 8,
@@ -859,18 +860,23 @@
    "parts_usd": 500.25,
    "assembly_usd": 5.37,
    "test_usd": 25.0,
-   "nre_per_board_usd": 40.0,
-   "total_usd": 570.62
+   "nre_usd": 400000.0,
+   "total_usd": 530.62
   }
  },
  "node": {
-  "compute_usd": 400.0,
-  "compute_per_extra_4ch_usd": 300.0,
-  "compute_full_signal_factor": 2.0,
-  "gnss_usd": 150.0,
-  "clock_dist_usd": 350.0,
-  "enclosure_usd": 450.0,
-  "mic_usd": 100.0
+  "compute_usd": 249.0,
+  "compute_per_extra_4ch_usd": 0.0,
+  "compute_full_signal_factor": 1.0,
+  "gnss_usd": 16.22,
+  "clock_dist_usd": 30.0,
+  "enclosure_usd": 190.0,
+  "surge_per_antenna_usd": 25.0,
+  "mic_usd": 25.0
+ },
+ "hub": {
+  "usd": 500.0,
+  "source": "N100 mini PC: terminalbytes.com/raspberry-pi-5-vs-n100-mini-pc-2026 (Oct 2026); UPS ASSUMPTION"
  },
  "zone": {
   "nodes_per_zone": 3,
@@ -885,22 +891,27 @@
  },
  "finance": {
   "install": {
-   "tech_hours_per_sensor": 16,
-   "labour_rate_usd_per_h": 95.0,
-   "mounting_cabling_usd": 480.0,
+   "tech_hours_per_sensor": 6,
+   "labour_rate_usd_per_h": 60.0,
+   "mounting_cabling_usd": 150.0,
    "site_works_usd": 0.0,
-   "site_setup_usd": 2500.0
+   "site_setup_usd": 2500.0,
+   "hub_usd": 500.0
   },
   "maintenance": {
    "visits_per_year": 1,
-   "hours_per_visit_per_sensor": 8,
-   "spares_pct_of_hardware": 10.0,
-   "connectivity_usd_per_month": 25.0,
-   "software_usd_per_year": 300.0
+   "hours_per_visit_per_sensor": 2,
+   "spares_pct_of_hardware": 5.0,
+   "connectivity_usd_per_month": 0.0,
+   "software_usd_per_year": 60.0,
+   "backhaul_usd_per_month": 50.0,
+   "cloud_usd_per_year": 600.0
   },
   "pricing": {
    "margin_upfront_pct": 40.0,
-   "margin_yearly_pct": 72.0,
+   "margin_yearly_pct": 40.0,
+   "model": "install_sub",
+   "cost_of_capital_pct": 10.0,
    "install_price_usd": 50000.0,
    "tiers": {
     "80": 18000.0,
@@ -912,7 +923,15 @@
   "benchmarks": {
    "axon_hardware_install_usd": 57915.0,
    "airsight_subscription_low_usd": 9071.0,
-   "airsight_subscription_high_usd": 42143.0
+   "airsight_subscription_high_usd": 42143.0,
+   "radar_n_lo": 3,
+   "radar_n_hi": 5,
+   "radar_usd_lo": 30000.0,
+   "radar_usd_hi": 80000.0,
+   "radar_install_pct_lo": 30.0,
+   "radar_install_pct_hi": 60.0,
+   "robin_iris_usd": 396000.0,
+   "radar_fov_deg": 120.0
   }
  },
  "antennas": {
@@ -955,19 +974,19 @@
  },
  "custom_board_examples": {
   "2": {
-   "100": 4368,
-   "1000": 698,
-   "10000": 295
+   "100": 368,
+   "1000": 298,
+   "10000": 255
   },
   "4": {
-   "100": 4514,
-   "1000": 813,
-   "10000": 387
+   "100": 514,
+   "1000": 413,
+   "10000": 347
   },
   "8": {
-   "100": 4805,
-   "1000": 1042,
-   "10000": 571
+   "100": 805,
+   "1000": 642,
+   "10000": 531
   }
  }
 }

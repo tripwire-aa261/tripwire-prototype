@@ -162,7 +162,7 @@ function droneModel() {
 }
 const drone = droneModel();
 const bird = new THREE.Mesh(new THREE.ConeGeometry(4, 10, 6), new THREE.MeshLambertMaterial({ color: 0x94a3b8 }));
-const droneLabel = label('drone (drawn 14× size)'), birdLabel = label('bird');
+const droneLabel = label('ground truth drone'), birdLabel = label('bird');
 const dropLine = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x64748b }));
 const pairLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6 }));
 const fixPts = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xfacc15, size: 16, sizeAttenuation: true }));
@@ -242,6 +242,7 @@ async function loadRun(id) {
   const p = run.params, dm = run.drone_model;
   $('runSummary').innerHTML = `${replayNote}${esc(X.sites[siteKey].name)} · ${esc(dm.name)} at ${p.altitude_agl_m} m · ${p.n_listeners} sensors, each with ${esc(designText(p, run.listeners[0]))}, ${esc(PROC[p.processing || 'crs_p0'])}${p.mic_range_m ? ' + microphone' : ''} · interference removal ${p.cochannel_suppression_db} dB · ${run.illuminators.length} cell towers used`;
   runCards();
+  errorChart();
   fillParamTable();
   lastFrameIdx = -1;
 }
@@ -278,12 +279,67 @@ function runCards() {
   const cards = [
     ['Area covered', `${run.coverage.zone_located_pct.toFixed(0)}%`, `within ${p.zone_buffer_m} m of the fence (coverage map)`],
     ['Time tracked', `${m.track_availability_pct}%`, 'of this flight inside the zone'],
-    ['Position accuracy', m.median_error_m == null ? '—' : fmtM(m.median_error_m), 'median track error'],
+    ['Tracking accuracy', m.median_error_m == null ? '—' : fmtM(m.median_error_m), 'median track error'],
     ['First tracked', m.first_track_distance_m == null ? 'never' : fmtM(m.first_track_distance_m), 'from the nearest sensor'],
     ['Updates', `every ${p.frame_dt_s} s`, `${p.cit_s} s integration`],
     ['False alerts', `${m.false_tracks}`, `bird tracked ${m.bird_tracks}×`],
   ];
   $('runCards').innerHTML = cards.map(([k, v, s]) => `<div class="card"><small>${k}</small><b>${v}</b><span class="note small">${s}</span></div>`).join('');
+}
+
+// ------------------------------------------------------------------ tracking error chart
+// Per update: distance from the ground truth drone to the nearest track estimate, counted when that track is within
+// 60 m across the ground (the twin's "tracked" rule in twin/run.py); otherwise "no track on the drone".
+const ERR_NEAR_M = 60;
+let errGeom = null;
+function errorChart() {
+  const svg = $('errChart');
+  if (!svg) return;
+  const fr = run.frames, T = fr[fr.length - 1].t, zb = run.params.zone_buffer_m;
+  const pts = fr.map((f) => {
+    const d = f.truth.drone.pos;
+    const near = f.tracks.filter((tr) => Math.hypot(tr.pos[0] - d[0], tr.pos[1] - d[1]) < ERR_NEAR_M);
+    return { t: f.t, e: near.length ? Math.min(...near.map((tr) => Math.hypot(tr.pos[0] - d[0], tr.pos[1] - d[1], tr.pos[2] - d[2]))) : null,
+      zone: distToPolygon(d[0], d[1], site.fence) <= zb };
+  });
+  const emax = Math.max(60, Math.ceil(Math.max(0, ...pts.map((p) => p.e ?? 0)) / 20) * 20);
+  const W = 960, H = 230, ml = 56, mr = 16, mt = 12, mb = 40, pw = W - ml - mr, ph = H - mt - mb, dt = run.params.frame_dt_s;
+  const Xp = (t) => ml + (t / T) * pw, Yp = (e) => mt + ph - (Math.min(e, emax) / emax) * ph;
+  let g = '';
+  // Background: when the drone is inside the protected zone, and when no track is on it.
+  for (const p of pts) {
+    const x = Xp(Math.max(0, p.t - dt / 2)), w2 = Xp(Math.min(T, p.t + dt / 2)) - x;
+    if (p.zone) g += `<rect x="${x}" y="${mt}" width="${w2 + 0.5}" height="${ph}" fill="rgba(56,189,248,.10)"/>`;
+    if (p.e == null) g += `<rect x="${x}" y="${mt + ph - 6}" width="${w2 + 0.5}" height="6" fill="#64748b"/>`;
+  }
+  for (let e = 0; e <= emax; e += 20) g += `<line class="grid" x1="${ml}" x2="${ml + pw}" y1="${Yp(e)}" y2="${Yp(e)}"/><text x="${ml - 6}" y="${Yp(e) + 4}" text-anchor="end">${e} m</text>`;
+  const tstep = T > 120 ? 30 : 20;
+  for (let t = 0; t <= T + 1e-6; t += tstep) g += `<text x="${Xp(t)}" y="${H - 22}" text-anchor="middle">${t} s</text>`;
+  g += `<text class="axis" x="${ml + pw / 2}" y="${H - 4}" text-anchor="middle">time in the flight</text>`;
+  g += `<text class="axis" transform="translate(14 ${mt + ph / 2}) rotate(-90)" text-anchor="middle">error</text>`;
+  const med = run.metrics.median_error_m;
+  if (med != null) g += `<line class="tier" stroke="#fbbf24" x1="${ml}" x2="${ml + pw}" y1="${Yp(med)}" y2="${Yp(med)}"/><text class="target" x="${ml + 6}" y="${Yp(med) - 5}">median ${fmtM(med)}</text>`;
+  // The error line, broken where there is no track on the drone.
+  let seg = [];
+  const flush = () => { if (seg.length > 1) g += `<polyline fill="none" stroke="#fb7185" stroke-width="2" points="${seg.join(' ')}"/>`; seg = []; };
+  for (const p of pts) { if (p.e == null) { flush(); continue; } seg.push(`${Xp(p.t)},${Yp(p.e)}`); g += `<circle cx="${Xp(p.t)}" cy="${Yp(p.e)}" r="2.5" fill="#fb7185"><title>t = ${p.t.toFixed(1)} s: ${Math.round(p.e)} m</title></circle>`; }
+  flush();
+  g += `<line id="errNow" x1="${ml}" x2="${ml}" y1="${mt}" y2="${mt + ph}" stroke="#fbbf24" stroke-width="2"/>`;
+  g += `<rect x="${ml}" y="${mt}" width="${pw}" height="${ph}" fill="transparent" style="cursor:pointer" id="errHit"/>`;
+  svg.innerHTML = g;
+  errGeom = { Xp, T, ml, pw };
+  $('errHit').onclick = (ev) => {
+    const r = svg.getBoundingClientRect(), x = ((ev.clientX - r.left) / r.width) * W;
+    tNow = Math.max(0, Math.min(T, ((x - ml) / pw) * T));
+  };
+  const tracked = pts.filter((p) => p.e != null), inZone = pts.filter((p) => p.zone);
+  $('errNote').innerHTML = `${med != null ? `Dashed line: the median error, ${fmtM(med)}, which is this run's tracking accuracy. ` : ''}The track estimate was on the drone for ${tracked.length} of ${pts.length} updates (${inZone.filter((p) => p.e != null).length} of the ${inZone.length} inside the protected zone).
+    Error = straight-line distance, height included. Click the chart to jump the 3D replay to that moment.`;
+}
+function errCursor() {
+  if (!errGeom || !$('errNow')) return;
+  const x = errGeom.Xp(Math.min(tNow, errGeom.T));
+  $('errNow').setAttribute('x1', x); $('errNow').setAttribute('x2', x);
 }
 
 // ------------------------------------------------------------------ per frame
@@ -307,6 +363,7 @@ function drawFrame(force = false) {
     bird.visible = birdLabel.visible = true;
   } else bird.visible = birdLabel.visible = false;
   $('timeline').value = tNow;
+  errCursor();
   $('timeLabel').textContent = `t = ${tNow.toFixed(1)} s of ${run.frames[run.frames.length - 1].t.toFixed(0)} s`;
   if (i === lastFrameIdx && !force) return;
   lastFrameIdx = i;
@@ -320,7 +377,8 @@ function drawFrame(force = false) {
     if (hist.length > 1) trkGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(hist), new THREE.LineBasicMaterial({ color: 0xfb7185 })));
     const s = new THREE.Mesh(new THREE.SphereGeometry(9, 12, 8), new THREE.MeshBasicMaterial({ color: 0xfb7185 }));
     s.position.copy(w(...tr.pos));
-    const l = label(`track ${tr.id} · ${tr.label}`, 'trk');
+    // The tracker's guess of where the drone is. Tracks without a rotor signature are usually the bird.
+    const l = label(tr.label === 'no rotor signature' ? 'track estimate (no drone rotors seen)' : 'track estimate', 'trk');
     l.position.copy(w(...tr.pos)).add(new THREE.Vector3(0, 20, 0));
     trkGroup.add(s, l);
   }
@@ -335,6 +393,7 @@ function drawFrame(force = false) {
   $('hudDetail').textContent = `${heard.size}/${run.listeners.length} sensors hear the drone${hover ? ' · HOVERING: invisible to radar (no motion, no Doppler)' : ''}`;
   drawRD(i);
 }
+
 
 // ------------------------------------------------------------------ raw radar view (technical)
 const LUT = (() => {
@@ -476,7 +535,7 @@ async function loadReplay() {
   const r = replays?.replays.find((x) => x.id === replayId($('rpSite').value, $('rpDrone').value, $('rpRadio').value));
   if (!r || !r.metrics) { loadSeq++; $('runSummary').innerHTML = '<span class="bad">This replay has not been computed yet</span> (run tools/make_replays.py).'; return; }
   const radio = $('rpRadio').value, t = replays.targets;
-  replayNote = `<b>${r.n} × ${esc(RADIO[radio].name)} sensors</b>: ${r.meets ? `the fewest that meet ${t.area_pct}% area and ${t.tracked_pct}% tracked` : `the best tried; nothing meets ${t.area_pct}% area and ${t.tracked_pct}% tracked`}, with ${r.interference_db} dB of interference removal${r.interference_db > X.axes.interference[0] ? ' (unproven)' : " (today's assumption)"}.${radio === 'b210' ? ' The B210 behaves like the bladeRF in the model, so it shares this replay.' : ''}<br>`;
+  replayNote = `<b>${r.n} × ${esc(RADIO[radio].name)} sensors</b>: ${r.meets ? `the fewest that meet ${t.area_pct}% area and ${t.tracked_pct}% tracked` : `the best tried; nothing meets ${t.area_pct}% area and ${t.tracked_pct}% tracked`}, with ${r.interference_db} dB of interference removal${r.interference_db > X.axes.interference[0] ? ' (unproven)' : " (today's assumption)"}.${radio === 'b210' ? ' The B210 behaves like the bladeRF in the model, so it shares this replay.' : ''} These full simulations use the microphone version of the sensor: background history is not in the full simulation yet.<br>`;
   await loadRun(r.id);
 }
 async function refreshRuns() {
@@ -535,7 +594,7 @@ export async function initViewer(meta) {
 }
 export function showRunFor(siteKeyWanted) {
   if (pinned) { pinned = false; return; }
-  // Follow the facility, drone and radio picked in the Simulation tab.
+  // Follow the facility, drone and radio picked in the other tabs.
   if (!replays) return;
   const want = [siteKeyWanted, state.drone, state.radio];
   if (['rpSite', 'rpDrone', 'rpRadio'].every((id, i) => $(id).value === want[i]) && run?.id?.startsWith('replay-')) return;

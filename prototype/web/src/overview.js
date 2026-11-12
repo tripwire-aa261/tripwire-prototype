@@ -1,12 +1,15 @@
 // Overview tab: the customer says how much area they want covered and how much of the time a drone must be
 // tracked (two sliders); the twin recommends the radio and number of sensors, what it costs us and what we
 // would charge. Interference removal is not a setting here: the page says which level each answer needs.
-import { $, esc, usd, pct, X, state, defaultReq, defaultTargets, fillSelect, INTERF_SHORT, onChange, emit,
+import { $, esc, usd, pct, X, state, defaultReq, defaultTargets, fillSelect, INTERF_SHORT, onChange, emit, targetsText, competitors,
   RADIO, RADIO_KEYS, recommendOverall, radioOption } from './data.js';
 import { info } from './help.js';
 import { distToPolygon } from './viewer3d.js';
+import { mountRequirements } from './requirements.js';
 
 const REQ = () => defaultReq(); // the Overview always uses the default protected distance and height
+const accShort = (x) => (x?.o.acc == null ? 'no fix' : `~${Math.round(x.o.acc)} m`);
+const accTxt = (x) => (x?.o.acc == null ? '' : `, accuracy ~${Math.round(x.o.acc)} m`);
 const usdk = (v) => (v >= 1e6 ? usd(v) : `$${Math.round(v / 1000)}k`);
 let pick = null; // a cell clicked in the "what it takes" table: { interf, radio }
 
@@ -71,9 +74,9 @@ function status(H) {
   const bestToday = RADIO_KEYS.map((r) => today.per[r].best).filter(Boolean).reduce((b, y) => (!b || y.o.cov > b.o.cov ? y : b), null);
   let html;
   if (H.picked) html = `<div class="status ${H.meets ? (lv.interf === today.interf ? 'ok' : 'warn') : 'bad'}">Showing the cell you picked: ${esc(INTERF_SHORT[lv.interf])}, ${esc(RADIO[x.radio].name)}. <button class="link" id="ovUnpick">Back to the recommendation</button></div>`;
-  else if (today.rec) html = `<div class="status ok"><b>Works with today's processing.</b> Meets ${t.area}% area and ${t.tracked}% time tracked with 20 dB of interference removal, which is today's assumption.</div>`;
-  else if (R.first) html = `<div class="status warn"><b>Not possible with today's technology.</b> At 20 dB of interference removal the best is ${pct(bestToday?.o.cov)} area covered and ${pct(bestToday?.o.trk)} time tracked. It needs <b>${R.first.interf} dB</b> of removal, which the Seed recordings must prove. Shown: the setup at ${R.first.interf} dB.</div>`;
-  else html = `<div class="status bad"><b>Not possible, even with 40 dB of interference removal.</b> The best tried covers ${pct(x?.o.cov)} of the area and tracks ${pct(x?.o.trk)} of the time. Lower the targets, or see the Simulation tab for other antenna setups.</div>`;
+  else if (today.rec) html = `<div class="status ok"><b>Works with today's processing.</b> Meets ${targetsText(t)} with 20 dB of interference removal, which is today's assumption.</div>`;
+  else if (R.first) html = `<div class="status warn"><b>Not possible with today's technology.</b> At 20 dB of interference removal the best is ${pct(bestToday?.o.cov)} area covered, ${pct(bestToday?.o.trk)} time tracked${accTxt(bestToday)}. It needs <b>${R.first.interf} dB</b> of removal, which the Seed recordings must prove. Shown: the setup at ${R.first.interf} dB.</div>`;
+  else html = `<div class="status bad"><b>Not possible, even with 40 dB of interference removal.</b> The best tried covers ${pct(x?.o.cov)} of the area and tracks ${pct(x?.o.trk)} of the time${accTxt(x)}. Lower the targets, or see the Trade space simulator for other sensor setups.</div>`;
   let alt = '';
   if (x && x.radio === 'custom' && H.meets) {
     const ots = lv.per.bladerf.ok;
@@ -91,28 +94,28 @@ function kpis(H) {
   if (!x) { $('ovKpis').innerHTML = ''; $('ovPrice').innerHTML = ''; return; }
   const o = x.o, f = x.fin, t = state.targets;
   const card = (k, h, v, s, cls = '') => `<div class="kpi ${cls}"><small>${k} ${info(h)}</small><b>${v}</b><span>${s}</span></div>`;
-  $('ovKpis').innerHTML = `<div class="setup-line"><b>${esc(radioOption(x.radio, x.n))}</b> <span class="badge ${RADIO[x.radio].stage === 'Seed' ? '' : 'alt'}">${RADIO[x.radio].stage}</span><br><span class="note small">Each sensor: ${esc(RADIO[x.radio].build)}. Spaced evenly along the fence.</span></div>` + [
+  $('ovKpis').innerHTML = `<div class="setup-line"><b>${esc(radioOption(x.radio, x.n))}</b> <span class="badge ${RADIO[x.radio].stage === 'Seed' ? '' : 'alt'}">${RADIO[x.radio].stage}</span><br><span class="note small">Each sensor: ${esc(RADIO[x.radio].build)} ${info('history')}. Spaced evenly along the fence.</span></div>` + [
     card('Area covered', 'area', pct(o.cov), `target ${t.area}%`, o.cov >= t.area ? 'ok' : 'bad'),
     card('Time tracked', 'tracked', pct(o.trk), `target ${t.tracked}%`, o.trk >= t.tracked ? 'ok' : 'bad'),
     card('Drones caught', 'caught', pct(o.caught), 'tracked before they reach the fence'),
-    card('Position accuracy', 'accuracy', o.acc == null ? '—' : `~${Math.round(o.acc)} m`, `updated every ${X.update_interval_s} s`),
+    card('Tracking accuracy', 'accuracy', o.acc == null ? '—' : `~${Math.round(o.acc)} m`, `target within ${t.accuracy} m`, o.acc != null && o.acc <= t.accuracy ? 'ok' : 'bad'),
   ].join('');
-  const b = X.finance.benchmarks, Y = state.fin.years, lo = Y * b.airsight_subscription_low_usd, hi = Y * b.airsight_subscription_high_usd;
+  const Y = state.fin.years, C = competitors(), lo = C.radar.lo, hi = C.radar.hi;
   const vsAir = f.customer5 < lo ? 'below' : f.customer5 > hi ? 'above' : 'within';
   $('ovPrice').innerHTML = `<small>Suggested price ${info('price')}</small>
-    <b>${usd(f.price)} installation + ${usd(f.sub)}/yr</b>
-    <span>Our cost ${usd(f.upfront)} upfront ${info('upfront')} + ${usd(f.yearly)}/yr ${info('running')}, plus ${state.fin.margin_upfront}% and ${state.fin.margin_yearly}% margin (editable in Financials).
-    The customer pays ${usd(f.customer5)} over ${Y} years, ${vsAir} the range of AirSight's subscriptions over the same time (${usdk(lo)} to ${usdk(hi)}) [4]. Axon's hardware and installation alone is ${usdk(b.axon_hardware_install_usd)} [3].</span>`;
+    <b>${state.fin.model === 'all_in' ? `${usd(f.sub)}/yr, nothing upfront` : `${usd(f.price)} installation + ${usd(f.sub)}/yr`}</b>
+    <span>Our cost ${usd(f.upfront)} upfront ${info('upfront')} + ${usd(f.yearly)}/yr ${info('running')}, plus a ${state.fin.margin_upfront === state.fin.margin_yearly ? `${state.fin.margin_yearly}%` : `${state.fin.margin_upfront}% / ${state.fin.margin_yearly}%`} margin (editable in Financials; pricing model ${info('pricing_model')}).
+    The customer pays ${usd(f.customer5)} over ${Y} years, ${vsAir} a radar-based system over the same time (${usdk(lo)} to ${usdk(hi)} for ${state.fin.cmp_radar_n_lo}–${state.fin.cmp_radar_n_hi} radars, installation and software; see below). An RF-only system's hardware and installation alone is ${usdk(C.rf)} [3], and it cannot see drones that do not transmit.</span>`;
 }
 
 function cellHtml(lv, r, on) {
   const pr = lv.per[r];
   if (pr.ok) {
     const x = pr.ok;
-    return `<td class="pick${on ? ' on' : ''}" data-i="${lv.interf}" data-r="${r}"><b>${x.n} sensors</b><br><span class="note">${pct(x.o.cov)} area · ${pct(x.o.trk)} tracked</span><br>${usdk(x.fin.price)} + ${usdk(x.fin.sub)}/yr</td>`;
+    return `<td class="pick${on ? ' on' : ''}" data-i="${lv.interf}" data-r="${r}"><b>${x.n} sensors</b><br><span class="note">${pct(x.o.cov)} area · ${pct(x.o.trk)} tracked · ${accShort(x)}</span><br>${usdk(x.fin.price)} + ${usdk(x.fin.sub)}/yr</td>`;
   }
   const y = pr.best;
-  return `<td class="pick no${on ? ' on' : ''}" data-i="${lv.interf}" data-r="${r}"><span class="bad">Not possible</span><br><span class="note">best ${pct(y?.o.cov)} area · ${pct(y?.o.trk)} tracked (${y?.n} sensors)</span></td>`;
+  return `<td class="pick no${on ? ' on' : ''}" data-i="${lv.interf}" data-r="${r}"><span class="bad">Not possible</span><br><span class="note">best ${pct(y?.o.cov)} area · ${pct(y?.o.trk)} tracked · ${accShort(y)} (${y?.n} sensors)</span></td>`;
 }
 
 function levelsTable(H) {
@@ -128,13 +131,13 @@ function levelsTable(H) {
 
 function sitesTable() {
   const t = state.targets, req = REQ();
-  $('ovSitesNote').textContent = `The cheapest setup at each facility that covers ${t.area}% of the area within ${req.radius_m} m of the fence and tracks a drone ${t.tracked}% of the time (drones ${req.height_m} m up), at each level of interference removal.`;
+  $('ovSitesNote').textContent = `The cheapest setup at each facility that covers ${t.area}% of the area within ${req.radius_m} m of the fence, tracks a drone ${t.tracked}% of the time and places it within ${t.accuracy} m (drones ${req.height_m} m up), at each level of interference removal.`;
   const rows = Object.keys(X.sites).map((k) => {
     const s = X.sites[k], R = recommendOverall(k, state.drone, t, req);
     const cells = R.levels.map((lv) => {
       if (lv.rec) return `<td><b>${esc(radioOption(lv.rec.radio, lv.rec.n))}</b><br><span class="note">${usd(lv.rec.fin.price)} + ${usd(lv.rec.fin.sub)}/yr</span></td>`;
       const best = RADIO_KEYS.map((r) => lv.per[r].best).filter(Boolean).reduce((b, y) => (!b || y.o.cov > b.o.cov ? y : b), null);
-      return `<td><span class="bad">Not possible</span><br><span class="note">best ${pct(best?.o.cov)} area · ${pct(best?.o.trk)} tracked</span></td>`;
+      return `<td><span class="bad">Not possible</span><br><span class="note">best ${pct(best?.o.cov)} area · ${pct(best?.o.trk)} tracked · ${accShort(best)}</span></td>`;
     }).join('');
     return `<tr class="${k === state.site ? 'on' : ''}" data-k="${k}"><td><b>${esc(s.name)}</b><br><span class="note">${esc(s.type)} · ${s.towers_5km} towers within 5 km, nearest ${s.nearest_tower_km} km</span></td>${cells}</tr>`;
   }).join('');
@@ -142,23 +145,43 @@ function sitesTable() {
   $('ovSitesTable').querySelectorAll('tr[data-k]').forEach((tr) => (tr.onclick = () => { state.site = tr.dataset.k; pick = null; emit('overview'); }));
 }
 
+// Customer's total per facility against today's options, all over the same contract (apples to apples).
+// Sources: AirSight radar guide and cost guide (2026), Echodyne EchoGuard (field of view), Dedrone/Axon price
+// lists (data package ref [3]; OMNIA AM9), AirSight subscriptions (data package ref [4]). Range bars: low to high.
+const SRC = {
+  radar: 'https://www.airsight.com/blog/drone-detection-radar-guide',
+  cost: 'https://www.airsight.com/blog/drone-detection-system-cost',
+  fov: 'https://www.echodyne.com/newsroom/what-is-a-low-swap-radar',
+};
+const link = (u, t) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
 export function benchBars(el, customer5, years) {
-  const b = X.finance.benchmarks;
+  const C = competitors(), F = state.fin, B = X.finance.benchmarks;
   const items = [
-    ['Tripwire: install + subscription', customer5, 'var(--accent)'],
-    ['Axon: hardware + installation only [3]', b.axon_hardware_install_usd, '#64748b'],
-    [`AirSight: ${years} yrs, low tier [4]`, years * b.airsight_subscription_low_usd, '#64748b'],
-    [`AirSight: ${years} yrs, top tier [4]`, years * b.airsight_subscription_high_usd, '#64748b'],
+    ['Tripwire: installation + subscription', [customer5], 'var(--accent)', 'this setup; hardware upkeep included'],
+    [`Radar-based system (e.g. AirSight): ${F.cmp_radar_n_lo}–${F.cmp_radar_n_hi} radars + installation + software`, [C.radar.lo, C.radar.hi], '#64748b',
+      `${usdk(C.radar.upLo)}–${usdk(C.radar.upHi)} upfront + ${years} yrs of software [4]`],
+    ['One 360° radar alone (Robin IRIS, Dedrone price list)', [C.iris], '#64748b', 'hardware only: no installation or software'],
+    ['RF-only system (Dedrone by Axon): hardware + installation', [C.rf], '#475569', 'software not included [3]; cannot see drones that do not transmit'],
   ];
-  const max = Math.max(...items.map((x) => x[1]));
-  el.innerHTML = items.map(([n, v, c]) => `<div class="bar"><span>${n}</span><div class="track"><div class="fill" style="width:${(100 * v) / max}%;background:${c}"></div><span class="val">${usd(v)}</span></div></div>`).join('');
+  const max = Math.max(...items.flatMap((x) => x[1]));
+  el.innerHTML = items.map(([n, v, c, sub]) => {
+    const val = v.length > 1 ? `${usdk(v[0])} – ${usdk(v[1])}` : usd(v[0]);
+    const fill = v.length > 1
+      ? `<div class="fill rng" style="left:${(100 * v[0]) / max}%;width:${(100 * (v[1] - v[0])) / max}%;background:${c}"></div>`
+      : `<div class="fill" style="width:${(100 * v[0]) / max}%;background:${c}"></div>`;
+    return `<div class="bar"><span>${esc(n)}<small>${esc(sub)}</small></span><div class="track">${fill}<span class="val">${val}</span></div></div>`;
+  }).join('') + `<p class="note small">The first two bars are the customer's total for one facility over ${years} years; the last two are one-time costs only, so they are floors.
+    <b>Radar-based system:</b> a compact drone radar costs ${usdk(F.cmp_radar_lo)}–${usdk(F.cmp_radar_hi)}, hardware only (${link(SRC.radar, 'AirSight radar guide')}).
+    One sees about 120° side to side (${link(SRC.fov, 'Echodyne EchoGuard')}), so ${F.cmp_radar_n_lo} cover 360° from one point and ${F.cmp_radar_n_hi} also fill blind spots behind buildings and along the fence (ASSUMPTION).
+    Installation, site survey, calibration and training add ${F.cmp_install_lo}–${F.cmp_install_hi}% (${link(SRC.cost, 'AirSight cost guide')}).
+    Software: AirSight's yearly packages, ${usd(B.airsight_subscription_low_usd)}–${usd(B.airsight_subscription_high_usd)} [4].
+    Competitors' hardware upkeep is not public and is left out, so their totals are on the low side.
+    <b>Robin IRIS:</b> ${usd(C.iris)} per unit in Dedrone's price list on OMNIA Partners (Feb 2025 edition, seen in a search result; the file is no longer public).
+    <b>RF-only:</b> data package ref [3]. The radar counts, prices and installation shares are editable in Financials.</p>`;
 }
 
 function render() {
   $('ovSites').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.k === state.site));
-  $('ovDrone').value = state.drone;
-  $('ovArea').value = state.targets.area; $('ovAreaOut').textContent = `${state.targets.area}%`;
-  $('ovTrk').value = state.targets.tracked; $('ovTrkOut').textContent = `${state.targets.tracked}%`;
   const H = headline();
   drawMap(H); kpis(H); levelsTable(H); sitesTable();
   if (H.x) benchBars($('ovBench'), H.x.fin.customer5, state.fin.years);
@@ -167,10 +190,7 @@ function render() {
 export function initOverview() {
   $('ovSites').innerHTML = Object.keys(X.sites).map((k) => `<button data-k="${k}"><b>${esc(X.sites[k].name)}</b><span>${esc(X.sites[k].type)}</span></button>`).join('');
   $('ovSites').querySelectorAll('button').forEach((b) => (b.onclick = () => { state.site = b.dataset.k; pick = null; emit('overview'); }));
-  fillSelect($('ovDrone'), Object.entries(X.drones).map(([k, d]) => [k, d.name]), state.drone);
-  $('ovDrone').onchange = () => { state.drone = $('ovDrone').value; pick = null; emit('overview'); };
-  $('ovArea').oninput = () => { state.targets.area = +$('ovArea').value; pick = null; emit('targets'); };
-  $('ovTrk').oninput = () => { state.targets.tracked = +$('ovTrk').value; pick = null; emit('targets'); };
-  onChange(render);
+  mountRequirements('ovReq', 'change these four; the recommendation, map, price and tables below follow');
+  onChange((src) => { if (src === 'targets' || src === 'overview') pick = null; render(); }); // a new requirement drops a clicked cell
   render();
 }

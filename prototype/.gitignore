@@ -31,3 +31,6 @@ web/runs/sweeps/index.json
 # v0.4.2: the 12 precomputed 3D replays (tools/make_replays.py) and their manifest
 !web/runs/replay-*
 !web/runs/replays.json
+data/cache/
+# v0.4.4: the hover / pole-height study, read by tools/build_assumptions_doc.py
+!web/runs/hover_feasibility.json

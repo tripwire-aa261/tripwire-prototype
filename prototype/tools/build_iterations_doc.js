@@ -70,7 +70,16 @@ c.push(B("**Did not work:** the option menu was long and hard to read; interfere
 c.push(B("**Changed:** the customer sets the area covered and time tracked they want (sliders); the twin recommends the radio (bladeRF, B210 or our custom receiver, one fixed build each) and number of sensors, with our cost and a suggested price. The Overview states whether today's processing is enough or which unproven level (30 or 40 dB) the answer needs. Charts show coverage and cost against the number of sensors per radio; the 3D replay is chosen by facility, drone and radio."));
 c.push(B("**Found:** Hays works today (4 custom or 6 bladeRF sensors); Hancock needs 40 dB of interference removal and Fulton 30 dB (custom receiver) or 40 dB (bladeRF). The B210 never wins: same performance as the bladeRF at a higher price."));
 
-c.push(H2("7. Next (proposed)"));
+c.push(H2("7. v0.4.3: viewer feedback round (Nov 12)"));
+c.push(B("**Did not work:** the customer's settings on the Overview were small and easy to miss; \"what moves the result\" was hard to read and showed too much; the 3D replay was hidden at the bottom of the Simulation tab; Financials let you type any number of sensors, unrelated to what the customer asked for."));
+c.push(B("**Changed:** a highlighted \"What the customer wants\" block (drone, area covered, time tracked and a new tracking-accuracy target, 25 m by default) on the Overview and repeated in Financials, where the number of sensors now follows from it. Simulation renamed Trade space simulator, with the setup picker below the charts and the sensitivity chart cut to the 4 biggest effects plus a one-line reading. The 3D replay has its own tab, with a chart of the error between the ground truth drone and the track estimate. Sites are labeled by their towers (sparse, moderate, dense) instead of rural, remote, urban. The comparison with today's options is now like for like (a whole facility over the contract): a radar system of 3-5 radars with installation and software is about $162k-851k over 5 years, against about $38k for Tripwire at Hays."));
+
+c.push(H2("8. v0.4.4: hover in software, realistic costs, pricing models (Nov 12)"));
+c.push(B("**Did not work:** the hover depended on a microphone ($100, ASSUMPTION); several parts were rough guesses (an $800 computer, a $350 clock board, $450 enclosure); 16 installer hours per sensor; the custom receiver's design cost was folded into the board price, so the price moved with how many boards we build; a 72% subscription margin."));
+c.push(B("**Changed:** a hovering drone is held in software by comparing each sensor's echo pattern with a learned history of the quiet scene (only where a track stopped); the standard sensors drop the microphone. Parts re-priced from listings: a $249 edge GPU computer, $16 GPS, $30 clock sharing, $190 enclosure: $1,825 per bladeRF sensor (was $2,990), $1,601 per custom sensor (was $3,312). Installation $510 per sensor (6 h at $60/h: BLS median wage about doubled for benefits, overhead and travel) plus a $500 on-site hub. Both margins 40%. The $400k design cost is a separate company cost. Three pricing models (cost + margin, all-in yearly fee, value-based)."));
+c.push(B("**Found:** at cost + 40% a facility earns only ~$3,000-4,000 a year, so ~250-330 facilities would be needed to cover a $1M/yr company; at the data package's prices (~$50,000 + $18,000/yr) it is ~45. Cost + margin is the floor, the price must come from value. Taller poles make things worse at the dense-tower site. The hover hold needs the background steady to about -30 to -40 dB: to be measured at Seed."));
+
+c.push(H2("9. Next (proposed)"));
 c.push(B("Record real LTE signals and measure interference removal and enhanced-processing gain; model network busyness by hour; check which carriers a radio can capture at once."));
 
 c.push(H1("What the iterations taught us about the product"));
@@ -82,10 +91,11 @@ c.push(H1("Risks"));
 c.push(table([2900, 1300, 4826], ["Risk", "Status", "Where it stands"], [
   ["Can LTE detect a drone at all?", "Reduced", "Fraunhofer trial reproduced (1,608 m vs ~1,600 m); our own recordings still needed."],
   ["Full-signal processing gain", "Open (new)", "Everything good above depends on it; measure it on Seed recordings."],
-  ["Hardware cost", "Reduced", "Estimated by the twin from the sensors each site needs (~$9,300 per 3 bladeRF sensors), replacing the data package's $24,000 planning figure. Part prices are ASSUMPTIONS until supplier quotes."],
-  ["Hovering drone at the drop", "Reduced", "Radar alone tops out just under 90%; microphones lift it to 93%."],
+  ["Hardware cost", "Reduced", "Estimated by the twin from the sensors each site needs (~$5,500 per 3 bladeRF sensors after re-pricing), replacing the data package's $24,000 planning figure. Part prices are listings or ASSUMPTIONS until supplier quotes."],
+  ["Hovering drone at the drop", "Open", "Held in software by background history (no microphone) if the quiet background is steady to about -30 dB or better; unmeasured."],
+  ["Business model", "Open (new)", "Cost + 40% leaves too little gross profit to run the company; value-based pricing needed. Test price levels and the all-in fee with design partners."],
   ["Mavic-class drones", "Open", "Best design needs 12 nodes for 88%; a Series A goal."],
-  ["Pricing", "Reduced", "Price follows cost (our cost + margin); the twin suggests a price for the coverage and tracking the customer asks for."],
+  ["Pricing", "Reduced", "Price per facility for the coverage, tracking and accuracy the customer asks for; three pricing models; cost + 40% is the floor."],
   ["Neighbor-cell interference", "Open (new)", "Decides the remote and city sites: 20 dB removal fails there, 40 dB works. Must be measured."],
 ]));
 
@@ -96,10 +106,10 @@ c.push(B("Tower positions are real (FCC); their sector directions, power and cha
 c.push(B("Cell network 30% busy."));
 c.push(B("Antenna specs and prices are typical values, not supplier quotes."));
 c.push(B("Full-signal processing delivers its ideal ~12 dB gain."));
-c.push(B("Microphones hear a drone within 100 m."));
+c.push(B("Background stability (hover hold): -30 dB (what is left of the quiet background after subtracting its history). Microphones, where used, hear a drone within 100 m."));
 c.push(B("Processing removes 20 dB of interference from neighboring cells on the same carrier (40 dB shown as the optimistic case)."));
-c.push(B("Price = our cost + margin: 40% on installation, 72% on the subscription (reproduces the data package's planning prices; editable)."));
-c.push(B("Recommended setup = the cheapest radio and sensor count that covers 90% of the area and tracks a drone 80% of the time (slider defaults, an assumption; the customer can change them)."));
+c.push(B("Price floor = our cost + 40% on installation and on the subscription (editable); company running cost $1M/yr; custom receiver design cost $400k, kept out of the board price. Full list: Tripwire_Assumptions_and_Figures.md."));
+c.push(B("Recommended setup = the cheapest radio and sensor count that covers 90% of the area, tracks a drone 80% of the time and places it within 25 m (slider defaults, an assumption; the customer can change them)."));
 c.push(B("Installation and maintenance per sensor sized to the data package's $6,000 and $5,000/yr per 3 sensors (editable)."));
 
 c.push(H1("Advantages our solution offers (pitch points)"));

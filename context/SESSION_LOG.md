@@ -2,6 +2,28 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Nimalan · Twin v0.4.3–v0.4.4: hover in software, realistic costs, pricing models, business-plan inputs
+
+Two Claude sessions worked in parallel and coordinated by message; this entry covers both.
+
+**Asked for:** Replace the microphone with "reference history of baseline signals" for the hover ("only for the hover part and use the former approach for everything else"), after a preliminary feasibility computation and "basic pole height calcs"; "if this does not work then no problem, lets go back to earlier tech". Revise Financials "with more realistic costs" (e.g. a microphone "should not cost 100 dollar"; compute "too expensive"), both margins 40 %, the NRE "separately on top", not varying with the board count; advice on fixed subscription vs on-demand, "competitive while being sustainable". A markdown file with all assumptions and figures for updating the business plan, and everything needed to continue on another computer. Other session's asks: rename Simulation to "Trade space simulator", picker below the graphs, a simpler "what moves the result", a 3D tab with an error graph between ground truth and track, Financials repeating the customer requirements with no adjustable sensor count, highlighted customer parameters plus a tracking-accuracy target, sites renamed by tower density (Hays in the middle, default), and a fair, researched competitor comparison (Nimalan's figures: $20-70k per radar, 3-5 per prison).
+**Done:**
+- `twin/hover.py` + `hover_history` scoring in `twin/flights.py`; new fixed builds `ring4_enh_hist` / `ring8_enh_hist`; `tools/hover_feasibility.py` (hover and pole-height study). Explorer re-run 2026-11-12 (first attempt ran out of memory; profiles compacted).
+- `twin/cost.py` re-priced (Jetson $249, GPS $16, clock $30, enclosure $190 + arrestors, mic $25, 6 h at $60/h install, hub $500, running costs per facility), margins 40/40, three pricing models, NRE separate, competitor benchmarks.
+- Viewer: Financials pricing-model selector and Company panel; history builds. Other session: `web/src/requirements.js` (shared requirements block; `meets()` requires 25 m accuracy), derived sensor count in Financials, Trade space simulator layout and top-4 sensitivity chart, 3D signal simulation tab with track-error chart, site renames, competitor comparison (radar system ~$162k-851k over 5 years; Robin IRIS $396k; RF-only Dedrone $57,915).
+- `Tripwire_Assumptions_and_Figures.md` + `tools/build_assumptions_doc.py`; `BUSINESS_PLAN_UPDATE_BRIEF.md`; README (v0.4.4), `Iterations.docx` (entries 7-8). 38 tests pass; all four tabs checked at 1280 and 390 px with no errors.
+**Decided:**
+- Keep background history as the standard hover hold: matches or beats the microphone where the radar works (Hays 88.9 % vs 88.3 % tracked); the microphone only helps where the radar fails. Rejected: going back to microphones.
+- Edge GPU per sensor + on-site hub; raw samples cannot leave the pole. Rejected: per-sensor $800 computers or central raw processing.
+- Cost + 40 % is the floor; recommend value-based fixed yearly subscription with an all-in option; not per-alert (protection must always be on; per-alert bills rise when attacked; billing disputes).
+- Low poles (~6 m): 15-25 m poles cut Fulton coverage to 11-61 % and blur drone vs person.
+- Other session: accuracy target 25 m (ASSUMPTION); 3-5 radars per prison is an ASSUMPTION from a ~120° field of view (Echodyne); competitors' upkeep left out (not public), the fair direction for us.
+**Left open:**
+- Background stability, interference removal, two-board bladeRF phase lock and Jetson capacity are unmeasured (Seed).
+- Many costs are typical listings, not quotes; NRE ($400k) and company running cost ($1M/yr) are ASSUMPTIONS.
+- Background history is not in the full signal simulation; the replays still use microphone builds.
+- From the other session: confirm the Robin IRIS price from a current OMNIA/Dedrone list; verify procurement anchors (Correctional Service Canada CA$6M for 6 prisons, 2019; Tennessee DOC $1.7M request, Feb 2026; search summaries only); the 3D tab renders slowly in headless Chromium (software WebGL).
+
 ## 2026-11-12 · Nimalan · Twin v0.4.1–v0.4.2: plain language, costed custom receiver, choose by radio
 
 **Asked for:** A lessons section in `Iterations.docx` (tower density, antenna types, off-the-shelf receivers too expensive at many nodes → custom receiver at Series A); costs "estimated from this prototype rather than we set a target"; how to deploy on Vercel; a sourced parts list for the custom receiver; a twin that recommends configuration and lets people "choose how much coverage they want based on the cost"; less jargon ("8-antenna ring vs 8 nodes") with a (?) explanation on every parameter. Then: Overview sliders for coverage % and time tracked % with a recommended configuration, estimated cost and what to charge; interference removal parked under Simulation, with the Overview stating "this technology is not possible now until we get 30dB or 40dB removal"; coverage vs number of nodes graphs per receiver; a shorter picker; 3D replay chosen by prison, drone and radio (bladeRF, B210 or custom); Financials "straightforward, BladeRF, B210 or custom receiver". Finally: push to GitHub.

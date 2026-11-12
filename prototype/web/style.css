@@ -273,3 +273,42 @@ svg#chNodes text, svg#chCost text { font-size: 13px; }
 #ovAlt:empty { display: none; }
 #ovLevels td, #ovLevels th, #ovSitesTable td, #ovSitesTable th { text-align: left; }
 #ovLevels td.pick { min-width: 96px; }
+
+/* v0.4.3: "What the customer wants" (Overview + Financials), read-only fields, sensitivity reading, 3D tab */
+.req-card { background: linear-gradient(180deg, rgba(56, 189, 248, .10), rgba(56, 189, 248, .03)); border: 2px solid var(--accent);
+  border-radius: 12px; padding: 14px 18px 16px; margin: 14px 0 18px; }
+.req-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 10px; }
+.req-head h2 { margin: 0; font-size: 15px; color: var(--accent); }
+.req-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 22px; }
+.req-card label.req { display: flex; flex-direction: column; gap: 4px; margin: 0; min-width: 0; }
+.req-lab { font-size: 15px; font-weight: 650; color: var(--text); }
+.req-card output { float: none; font-size: 24px; font-weight: 700; color: var(--accent); line-height: 1.15; }
+.req-card select { font-size: 16px; padding: 9px 10px; margin-top: 2px; }
+.req-card input[type=range] { height: 22px; margin-top: 2px; }
+@media (max-width: 1000px) { .req-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .req-grid { grid-template-columns: 1fr; } }
+.ctl .ro { display: block; background: var(--panel2); border: 1px dashed var(--line); border-radius: 6px; padding: 6px 10px; color: var(--text); font-weight: 600; min-width: 120px; }
+.tz-read { background: var(--panel2); border-left: 3px solid var(--warn); border-radius: 6px; padding: 8px 12px; margin: 10px 0 4px; line-height: 1.5; }
+.tz-key { display: inline-block; width: 3px; height: 14px; background: #fbbf24; vertical-align: -2px; margin-right: 6px; }
+#tornado text.axis { font-size: 13px; }
+#tornado text.lab { font-size: 12px; fill: #c3d0dc; }
+#tornado text.inbar { font-size: 11px; }
+.sig-page { padding: 12px 20px 40px; }
+.sig-page h2:first-child { margin-top: 4px; }
+.err-card { margin-top: 14px; }
+.sw.zone { background: rgba(56, 189, 248, .25); } .sw.notrk { background: #64748b; }
+.dot.gt { background: #f8fafc; }
+.ctl label.check { flex-direction: row; align-items: center; align-self: flex-end; gap: 6px; padding-bottom: 6px; }
+@media (max-width: 1000px) {
+  .tabbar { order: 3; width: 100%; margin-left: 0; overflow-x: auto; scrollbar-width: none; }
+  .tabbar button { white-space: nowrap; padding: 7px 10px; flex: 0 0 auto; }
+}
+
+/* Comparison with today's options: range bars and a second line under each label */
+.bar > span small { display: block; font-size: 11px; opacity: .8; }
+.bar .fill.rng { position: absolute; top: 0; border-radius: 4px; opacity: .9; }
+.compare .bar { grid-template-columns: 300px 1fr; }
+.compare .bar .track { height: 22px; }
+.compare .bar .val { top: 3px; text-shadow: 0 0 3px #000; }
+.compare .note { margin-top: 6px; line-height: 1.5; }
+@media (max-width: 1000px) { .compare .bar { grid-template-columns: 1fr; } }

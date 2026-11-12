@@ -1,0 +1,326 @@
+[
+ {
+  "site": "hays",
+  "design": "ring4_enh_mic",
+  "sensors": 6,
+  "interference_db": 20,
+  "mast_m": 6.0,
+  "hover_points": 125,
+  "pairs": 36,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 100.0,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 1.6,
+   "-30": 71.2,
+   "-40": 98.4,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -25.6,
+   "p90": -34.8
+  },
+  "background_over_drone_db_median": 20.5,
+  "height_sigma_m_median": 19.1,
+  "drone_vs_person_cells_median": 0.17,
+  "pairs_separating_drone_from_person_pct": 0.5
+ },
+ {
+  "site": "hays",
+  "design": "ring4_enh_mic",
+  "sensors": 6,
+  "interference_db": 20,
+  "mast_m": 15.0,
+  "hover_points": 125,
+  "pairs": 36,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 98.7,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 0.0,
+   "-30": 51.2,
+   "-40": 99.2,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -30.0,
+   "p90": -35.7
+  },
+  "background_over_drone_db_median": 22.4,
+  "height_sigma_m_median": 23.1,
+  "drone_vs_person_cells_median": 0.09,
+  "pairs_separating_drone_from_person_pct": 0.0
+ },
+ {
+  "site": "hays",
+  "design": "ring4_enh_mic",
+  "sensors": 6,
+  "interference_db": 20,
+  "mast_m": 25.0,
+  "hover_points": 125,
+  "pairs": 36,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 100.0,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 0.0,
+   "-30": 32.0,
+   "-40": 99.2,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -30.9,
+   "p90": -35.7
+  },
+  "background_over_drone_db_median": 22.0,
+  "height_sigma_m_median": 30.1,
+  "drone_vs_person_cells_median": 0.03,
+  "pairs_separating_drone_from_person_pct": 0.0
+ },
+ {
+  "site": "hancock",
+  "design": "ring4_enh_mic",
+  "sensors": 6,
+  "interference_db": 40,
+  "mast_m": 6.0,
+  "hover_points": 132,
+  "pairs": 36,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 91.7,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 26.5,
+   "-30": 93.2,
+   "-40": 100.0,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -23.4,
+   "p90": -29.2
+  },
+  "background_over_drone_db_median": 23.0,
+  "height_sigma_m_median": 14.4,
+  "drone_vs_person_cells_median": 0.17,
+  "pairs_separating_drone_from_person_pct": 0.8
+ },
+ {
+  "site": "hancock",
+  "design": "ring4_enh_mic",
+  "sensors": 6,
+  "interference_db": 40,
+  "mast_m": 15.0,
+  "hover_points": 132,
+  "pairs": 36,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 97.1,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 0.0,
+   "-30": 65.2,
+   "-40": 100.0,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -29.2,
+   "p90": -32.7
+  },
+  "background_over_drone_db_median": 25.7,
+  "height_sigma_m_median": 17.1,
+  "drone_vs_person_cells_median": 0.1,
+  "pairs_separating_drone_from_person_pct": 0.0
+ },
+ {
+  "site": "hancock",
+  "design": "ring4_enh_mic",
+  "sensors": 6,
+  "interference_db": 40,
+  "mast_m": 25.0,
+  "hover_points": 132,
+  "pairs": 36,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 88.0,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 0.0,
+   "-30": 59.1,
+   "-40": 100.0,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -29.1,
+   "p90": -32.7
+  },
+  "background_over_drone_db_median": 25.1,
+  "height_sigma_m_median": 21.2,
+  "drone_vs_person_cells_median": 0.04,
+  "pairs_separating_drone_from_person_pct": 0.0
+ },
+ {
+  "site": "fulton",
+  "design": "ring4_enh_mic",
+  "sensors": 4,
+  "interference_db": 40,
+  "mast_m": 6.0,
+  "hover_points": 35,
+  "pairs": 24,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 99.3,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 51.4,
+   "-30": 100.0,
+   "-40": 100.0,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -19.5,
+   "p90": -24.3
+  },
+  "background_over_drone_db_median": 17.6,
+  "height_sigma_m_median": 5.0,
+  "drone_vs_person_cells_median": 0.26,
+  "pairs_separating_drone_from_person_pct": 2.5
+ },
+ {
+  "site": "fulton",
+  "design": "ring4_enh_mic",
+  "sensors": 4,
+  "interference_db": 40,
+  "mast_m": 15.0,
+  "hover_points": 35,
+  "pairs": 24,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 50.0,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 14.3,
+   "-30": 80.0,
+   "-40": 100.0,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -24.9,
+   "p90": -32.6
+  },
+  "background_over_drone_db_median": 21.8,
+  "height_sigma_m_median": 10.5,
+  "drone_vs_person_cells_median": 0.15,
+  "pairs_separating_drone_from_person_pct": 0.0
+ },
+ {
+  "site": "fulton",
+  "design": "ring4_enh_mic",
+  "sensors": 4,
+  "interference_db": 40,
+  "mast_m": 25.0,
+  "hover_points": 35,
+  "pairs": 24,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 61.4,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 2.9,
+   "-30": 82.9,
+   "-40": 100.0,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -25.0,
+   "p90": -32.3
+  },
+  "background_over_drone_db_median": 21.6,
+  "height_sigma_m_median": 7.6,
+  "drone_vs_person_cells_median": 0.05,
+  "pairs_separating_drone_from_person_pct": 0.0
+ },
+ {
+  "site": "fulton",
+  "design": "ring8_enh_mic",
+  "sensors": 12,
+  "interference_db": 30,
+  "mast_m": 6.0,
+  "hover_points": 35,
+  "pairs": 72,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 92.1,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 91.4,
+   "-30": 100.0,
+   "-40": 100.0,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -11.9,
+   "p90": -18.5
+  },
+  "background_over_drone_db_median": 16.7,
+  "height_sigma_m_median": 5.1,
+  "drone_vs_person_cells_median": 0.26,
+  "pairs_separating_drone_from_person_pct": 1.8
+ },
+ {
+  "site": "fulton",
+  "design": "ring8_enh_mic",
+  "sensors": 12,
+  "interference_db": 30,
+  "mast_m": 15.0,
+  "hover_points": 35,
+  "pairs": 72,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 10.7,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 57.1,
+   "-30": 91.4,
+   "-40": 100.0,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -18.7,
+   "p90": -27.0
+  },
+  "background_over_drone_db_median": 17.2,
+  "height_sigma_m_median": 8.2,
+  "drone_vs_person_cells_median": 0.17,
+  "pairs_separating_drone_from_person_pct": 0.2
+ },
+ {
+  "site": "fulton",
+  "design": "ring8_enh_mic",
+  "sensors": 12,
+  "interference_db": 30,
+  "mast_m": 25.0,
+  "hover_points": 35,
+  "pairs": 72,
+  "range_cell_m": 33.3,
+  "moving_located_pct": 17.1,
+  "hover_noise_limited_pct": 100.0,
+  "hover_located_pct": {
+   "-20": 25.7,
+   "-30": 94.3,
+   "-40": 97.1,
+   "-50": 100.0,
+   "-60": 100.0
+  },
+  "stability_needed_db": {
+   "half": -21.1,
+   "p90": -27.2
+  },
+  "background_over_drone_db_median": 18.7,
+  "height_sigma_m_median": 6.9,
+  "drone_vs_person_cells_median": 0.06,
+  "pairs_separating_drone_from_person_pct": 0.0
+ }
+]

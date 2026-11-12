@@ -9,6 +9,8 @@ it. Tracks follow the full simulation's tracker rules: confirmed after 2 located
 through up to 2 missed frames, and counted as "tracked" once held 3 frames in a row. Microphone hold
 (ASSUMPTION): a track also survives a missed frame while at least one node's microphone hears the drone.
 Track availability = tracked frames / frames inside fence + buffer.
+Background-history hold (hover.py, when Params.hover_history): a held track also survives a frame in which
+the drone is nearly still and 3+ pairs from 2+ nodes see it against the learned quiet background.
 
 This is an estimate (no false alarms, no position errors): the full simulation is the check on it.
 """
@@ -61,6 +63,35 @@ def random_flights(site, p: Params, n: int, seed: int = 1, agl: float | None = N
     return out
 
 
+def hover_hold(scene, pos, vel, dt, node_of, draws, rng, extra_loss_db=None):
+    """(draws, frames): frames in which background history (hover.py) would hold an existing track. Only
+    for frames where the drone is slow enough to stay in one distance bin over the listening time; the
+    listening time grows with the time spent slow (up to hover_dwell_s). Cued: used only to keep a track."""
+    p = scene.params
+    out = np.zeros((draws, len(pos)), dtype=bool)
+    if not p.hover_history or not scene.pairs:
+        return out
+    from .hover import hover_sinr_db
+    bin_m = min(pr.ill.carrier.range_bin_m for pr in scene.pairs)
+    speed = np.linalg.norm(vel, axis=1)
+    slow = speed * p.hover_dwell_s < bin_m / 2
+    idx = np.nonzero(slow)[0]
+    if not len(idx):
+        return out
+    run = np.zeros(len(pos))
+    for k in range(len(pos)):
+        run[k] = (run[k - 1] + dt if k and slow[k - 1] else 0.0) if slow[k] else 0.0
+    listen = np.minimum(run[idx] + p.cit_s, p.hover_dwell_s)
+    loss = CHAIN_LOSS_DB if extra_loss_db is None else extra_loss_db
+    pd = np.array([pd_from_snr(hover_sinr_db(scene, pr, pos[idx], listen) - loss, p.pfa) for pr in scene.pairs])  # (P, K)
+    hits = rng.random((draws,) + pd.shape) < pd[None]
+    n_nodes = np.zeros((draws, len(idx)), dtype=int)
+    for k in range(len(scene.listeners)):
+        n_nodes += hits[:, node_of == k].any(axis=1)
+    out[:, idx] = (hits.sum(axis=1) >= 3) & (n_nodes >= 2)
+    return out
+
+
 def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = DRAWS, seed: int = 0,
                  extra_loss_db: float | None = None, radii=None) -> dict:
     p, site = scene.params, scene.site
@@ -86,6 +117,7 @@ def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = 
         nodes[:, k] = hits[:, node_of == k].any(axis=1)
     mic = acoustic_count(scene, pos)
     located = ((n_pairs >= 3) & (nodes.sum(axis=1) >= 2)) | (mic >= 2)[None]  # (S, T)
+    hold = hover_hold(scene, pos, vel, dt, node_of, draws, rng, extra_loss_db)  # (S, T): cued hover detections
     # Tracker emulation, vectorised over draws.
     alive = np.zeros(draws, dtype=bool)
     held = np.zeros(draws, dtype=int)
@@ -96,7 +128,7 @@ def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = 
         start = ~alive & located[:, k] & (recent >= 2)
         alive |= start
         held = np.where(start, 1, held)
-        miss = alive & ~located[:, k] & ~(mic[k] >= 1)
+        miss = alive & ~located[:, k] & ~(mic[k] >= 1) & ~hold[:, k]  # background history keeps a held track
         misses = np.where(miss, misses + 1, np.where(alive, 0, misses))
         dead = alive & (misses > MAX_MISSES)
         alive &= ~dead

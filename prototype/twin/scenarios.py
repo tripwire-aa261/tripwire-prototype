@@ -23,7 +23,7 @@ SITES = ROOT / "data" / "sites"
 # Real facilities (real terrain, buildings and towers)
 # ---------------------------------------------------------------------------
 SITE_IDS = {"hays": "hays-state-prison", "hancock": "hancock-state-prison", "fulton": "fulton-county-jail"}
-SITE_LABELS = {"hays": "rural", "hancock": "remote", "fulton": "dense urban"}
+SITE_LABELS = {"hays": "moderate towers", "hancock": "sparse towers", "fulton": "dense towers"}  # by tower density (Nov 12)
 _SITES: dict = {}
 
 

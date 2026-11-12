@@ -40,12 +40,16 @@ def test_flights_fixed_height_and_radius_scoring():
     assert set(r["by_radius"]) == {50, 300} and all(0 <= v <= 100 for v in r["by_radius"].values())
 
 
-def test_financial_defaults_match_data_package_for_three_sensors():
-    n = node_cost(4, "omni", "bladerf", "full", True)["total"]
+def test_financial_defaults_are_below_the_data_package_planning_figures():
+    # v0.4.4 re-priced parts, labor and upkeep (sourced where possible): 3 standard bladeRF sensors now cost less
+    # than the data package's $24,000 hardware + $6,000 deployment and ~$5,000/yr per 3-node zone.
+    n = node_cost(4, "omni", "bladerf", "full", False)["total"]
     c = facility_costs(3, n)
-    per_sensor_install = c["install"] - FINANCE["install"]["site_setup_usd"]
-    assert per_sensor_install == pytest.approx(6000)  # data package: $6,000 deployment per 3-node zone
-    assert c["yearly"] == pytest.approx(5000, rel=0.02)  # data package: ~$5,000/yr maintenance per zone
+    i, m = FINANCE["install"], FINANCE["maintenance"]
+    per_sensor = i["tech_hours_per_sensor"] * i["labour_rate_usd_per_h"] + i["mounting_cabling_usd"]
+    assert c["install"] == pytest.approx(3 * per_sensor + i["site_setup_usd"] + i["hub_usd"])
+    assert c["hardware"] < 24000 and c["install"] < 6000 + i["site_setup_usd"] + i["hub_usd"] and c["yearly"] < 5000
+    assert node_cost(8, "omni", "custom", "full")["items"]["receiver"] < 700  # board price excludes the NRE
 
 
 def test_locator_velocity_fallback_tolerates_pairs_without_doppler_rows():
@@ -63,10 +67,14 @@ def test_drones_caught_and_cost_plus_pricing():
     fl = random_flights(sc.site, p, 2, agl=60)
     r = score_flight(sc, fl[0], radii=[150])
     assert 0 <= r["caught_pct"] <= 100  # share of draws tracked before the drone crosses the fence
-    # Default margins reproduce the data package: $30,000 cost -> $50,000; $5,000/yr -> ~$18,000/yr.
+    # Default margins: 40 % on both (Nov 12): $30,000 cost -> $50,000; $5,000/yr -> $8,333/yr.
     c = customer_price(30000, 5000)
-    assert c["price"] == pytest.approx(50000) and c["sub"] == pytest.approx(17857, rel=0.01)
+    assert c["price"] == pytest.approx(50000) and c["sub"] == pytest.approx(8333.3, rel=0.001)
     assert c["customer_total"] == pytest.approx(c["price"] + FINANCE["pricing"]["years"] * c["sub"])
+    # All-in model: nothing upfront; the yearly fee repays the upfront cost with interest over the contract.
+    f = {**FINANCE, "pricing": {**FINANCE["pricing"], "model": "all_in"}}
+    a = customer_price(30000, 5000, f)
+    assert a["price"] == 0 and a["customer_total"] > c["customer_total"]
 
 
 def test_recommend_picks_cheapest_radio_meeting_area_and_tracking_targets():
@@ -99,3 +107,24 @@ def test_explore_has_a_map_for_every_fixed_build_and_count():
     have = {tuple(m["k"]) for m in doc["maps"]}
     assert all(tuple(j) in have for j in map_jobs())
     assert doc.get("builds") == BUILDS
+
+
+def test_hover_history_needs_stable_background_and_only_holds_tracks():
+    from twin.antenna import zone_samples
+    from twin.flights import scored_flights
+    from twin.hover import hover_sinr_db
+    base = dict(drone="m210", antenna="omni", rx_elements=4, processing="full", n_listeners=4, bird=False,
+                cit_s=0.8, network_load=0.3, cochannel_suppression_db=20)
+    sc = site_scene("hays", Params(**base, hover_history=True, background_stability_db=-30))
+    pts = zone_samples(sc.site, 0.0, 60.0, 80.0)[:20]
+    pr = sc.pairs[0]
+    s30 = hover_sinr_db(sc, pr, pts, 4.8)
+    sc40 = site_scene("hays", Params(**base, hover_history=True, background_stability_db=-40))
+    s40 = hover_sinr_db(sc40, sc40.pairs[0], pts, 4.8)
+    assert np.all(s40 >= s30 - 1e-9) and np.any(s40 > s30 + 1)  # steadier background -> better
+    # Listening longer helps (noise falls behind) but never beyond the background limit.
+    assert np.all(hover_sinr_db(sc40, sc40.pairs[0], pts, 4.8) >= hover_sinr_db(sc40, sc40.pairs[0], pts, 0.8) - 1e-9)
+    # In flights: history only holds tracks, so drones caught is unchanged and time tracked does not fall.
+    off = scored_flights(site_scene("hays", Params(**base)), 4, agl=60, radii=[150])
+    on = scored_flights(sc, 4, agl=60, radii=[150])
+    assert on["caught_pct"] == off["caught_pct"] and on["by_radius"][150] >= off["by_radius"][150]

@@ -16,10 +16,11 @@
 </head>
 <body class="app">
   <header>
-    <div class="brand"><span class="logo">◎</span> Tripwire <span class="tag">digital twin v0.4.2</span></div>
+    <div class="brand"><span class="logo">◎</span> Tripwire <span class="tag">digital twin v0.4.3</span></div>
     <nav class="tabbar" role="tablist">
       <button role="tab" data-tab="overview" class="on">Overview</button>
-      <button role="tab" data-tab="sim">Simulation</button>
+      <button role="tab" data-tab="sim">Trade space simulator</button>
+      <button role="tab" data-tab="signal">3D signal simulation</button>
       <button role="tab" data-tab="fin">Financials</button>
     </nav>
     <div class="spacer"></div>
@@ -37,11 +38,7 @@
       </div>
 
       <div class="chips" id="ovSites"></div>
-      <div class="row wrap ctl targets">
-        <label>Drone <span data-help="drone"></span> <select id="ovDrone"></select></label>
-        <label>Area covered the customer wants <span data-help="target_area"></span> <output id="ovAreaOut"></output><input type="range" id="ovArea" min="50" max="100" step="5" /></label>
-        <label>Time tracked the customer wants <span data-help="target_tracked"></span> <output id="ovTrkOut"></output><input type="range" id="ovTrk" min="50" max="100" step="5" /></label>
-      </div>
+      <div class="req-card" id="ovReq"></div>
 
       <div class="ov-grid">
         <div class="panel-card">
@@ -85,18 +82,19 @@
           <li>Coverage, tracking and accuracy at each facility.</li>
           <li>Hardware and installation cost with off-the-shelf parts.</li></ul></div>
         <div class="kn bad"><b>Still to prove</b><ul>
-          <li>Whole-signal processing gain and interference removal: they decide the remote and city sites (see "What it takes" above).</li>
+          <li>Whole-signal processing gain and interference removal: they decide the sparse-tower and dense-tower sites (see "What it takes" above).</li>
+          <li>How steady the quiet background is: it decides whether software can hold a hovering drone without a microphone.</li>
           <li>Tower details (direction, power, channel) at each site, and network busyness by hour.</li>
           <li>Next step: record real LTE signals at two or more sites (the Seed milestone).</li></ul></div>
       </div>
 
       <h2>Compared with today's options</h2>
       <div class="compare" id="ovBench"></div>
-      <p class="note small">Benchmarks from the Seed data package: Axon hardware + installation configuration (ref [3]); AirSight annual subscriptions (ref [4]). Tripwire figures use the editable assumptions in the Financials tab.</p>
+      <p class="note small">Tripwire figures use the editable assumptions in the Financials tab. [3], [4]: Seed data package references (Axon price list on OMNIA Partners, March 2026; AirSight bid with the NC Sheriffs' Association, August 2024 prices).</p>
     </div>
   </section>
 
-  <!-- ===================================================================== SIMULATION -->
+  <!-- ===================================================================== TRADE SPACE SIMULATOR -->
   <section class="tab" id="tab-sim">
     <div class="sim-layout">
       <aside class="panel" id="reqPanel">
@@ -108,28 +106,10 @@
         <h2>Scenario</h2>
         <label>Interference removal <span data-help="interference"></span> <select id="rqInterf"></select></label>
         <button class="ghost small" id="rqReset">Reset to defaults</button>
-        <p class="note small">Sensors are spaced evenly along the fence. The targets the recommendation uses (area covered, time tracked) are set on the Overview.</p>
+        <p class="note small">Sensors are spaced evenly along the fence. The customer's targets the recommendation uses (area covered, time tracked, tracking accuracy) are set on the Overview or in Financials.</p>
       </aside>
 
       <div class="sim-main">
-        <h2>Pick a setup</h2>
-        <div class="panel-card picker">
-          <div class="pick-row">
-            <span class="pick-lab">Radio <span data-help="radio"></span></span>
-            <div class="seg" id="spRadio" role="radiogroup" aria-label="Radio"></div>
-          </div>
-          <div class="pick-row">
-            <span class="pick-lab">Number of sensors <span data-help="sensors"></span></span>
-            <input type="range" id="spN" min="0" max="5" step="1" aria-label="Number of sensors" /><output id="spNOut"></output>
-          </div>
-          <div class="pick-row">
-            <span class="pick-lab">Antenna setup <span data-help="build"></span></span>
-            <select id="spBuild"></select>
-          </div>
-          <div class="kpis five" id="spKpis"></div>
-          <div class="note" id="spRec"></div>
-        </div>
-
         <div class="two">
           <div class="panel-card">
             <h3>Protection vs number of sensors <span data-help="bynodes"></span></h3>
@@ -142,19 +122,47 @@
             <h3>Customer's cost vs number of sensors <span data-help="total"></span></h3>
             <div class="legend inline" id="chCostLegend"></div>
             <svg id="chCost" class="chart" viewBox="0 0 480 300" role="img" aria-label="Customer's total over the contract against the number of sensors, one line per radio"></svg>
-            <div class="note small">Installation price plus the subscription over the contract (cost plus margin, from Financials).</div>
+            <div class="note small">Installation price plus the subscription over the contract, with the pricing model chosen in Financials.</div>
           </div>
         </div>
 
-        <div class="panel-card">
-          <h3>What moves the result <span class="hint" id="tzBase"></span></h3>
-          <div class="row wrap ctl"><label>Outcome <select id="tzMetric"><option value="cov">Area covered</option><option value="trk">Time tracked</option><option value="caught">Drones caught</option><option value="acc">Position accuracy</option><option value="cost">Customer total</option></select></label></div>
-          <svg id="tornado" class="chart" viewBox="0 0 640 330" role="img" aria-label="Sensitivity of the outcome to each input"></svg>
-          <div class="note small">Each bar: the range of the outcome when one input changes and the rest stay as in the picked setup. The yellow line marks the picked setup.</div>
+        <h2>Pick a setup</h2>
+        <div class="panel-card picker">
+          <div class="pick-row">
+            <span class="pick-lab">Radio <span data-help="radio"></span></span>
+            <div class="seg" id="spRadio" role="radiogroup" aria-label="Radio"></div>
+          </div>
+          <div class="pick-row">
+            <span class="pick-lab">Number of sensors <span data-help="sensors"></span></span>
+            <input type="range" id="spN" min="0" max="5" step="1" aria-label="Number of sensors" /><output id="spNOut"></output>
+          </div>
+          <div class="pick-row">
+            <span class="pick-lab">Sensor setup <span data-help="build"></span></span>
+            <select id="spBuild"></select>
+          </div>
+          <div class="kpis five" id="spKpis"></div>
+          <div class="note" id="spRec"></div>
         </div>
 
-        <details id="v3d" class="panel-card">
-          <summary><h3>Watch a simulated intrusion (3D, full signal simulation)</h3></summary>
+        <div class="panel-card">
+          <h3>What changes the result most <span data-help="sensitivity"></span> <span class="hint" id="tzBase"></span></h3>
+          <p class="note">Start from the setup picked above. Change <b>one</b> setting at a time and keep the rest. Each bar runs from the worst to the best result that setting can give. A long bar means that setting matters a lot; a short bar means it barely matters.</p>
+          <div class="row wrap ctl"><label>Result to look at <select id="tzMetric"><option value="cov">Area covered</option><option value="trk">Time tracked</option><option value="caught">Drones caught</option><option value="acc">Tracking accuracy</option><option value="cost">Customer total</option></select></label>
+            <label class="check"><input type="checkbox" id="tzAll" /> Show all settings</label></div>
+          <div class="tz-read" id="tzRead"></div>
+          <svg id="tornado" class="chart" viewBox="0 0 1000 190" role="img" aria-label="How much each setting changes the result"></svg>
+          <div class="note small"><span class="tz-key"></span> the setup picked above</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== 3D SIGNAL SIMULATION -->
+  <section class="tab" id="tab-signal">
+    <div class="sig-page">
+      <h2>Watch a simulated intrusion <span class="hint">full signal simulation: every tower signal, drone echo and processing step</span></h2>
+      <div id="v3d" class="panel-card">
           <div class="v3d-layout">
             <div class="v3d-left">
               <label>Facility <select id="rpSite"></select></label>
@@ -172,7 +180,7 @@
               <label class="check"><input type="checkbox" id="showAllTowers" /> All registered towers</label>
               <div class="legend">
                 <span><i class="sw trk"></i>Covered</span><span><i class="sw det"></i>Detected only</span>
-                <span><i class="sw gap"></i>Gap in the protected zone</span><span><i class="dot fix"></i>Position fix</span><span><i class="dot trk2"></i>Track</span>
+                <span><i class="sw gap"></i>Gap in the protected zone</span><span><i class="dot gt"></i>Ground truth drone (drawn 14× size)</span><span><i class="dot fix"></i>Position fix</span><span><i class="dot trk2"></i>Track estimate</span>
               </div>
               <details class="newsim">
                 <summary>Saved runs and new simulations</summary>
@@ -213,7 +221,12 @@
               </details>
             </div>
           </div>
-        </details>
+      </div>
+      <div class="panel-card err-card">
+        <h3>Tracking error: ground truth drone vs track estimate <span data-help="track_error"></span></h3>
+        <div class="legend inline"><span><i class="dot" style="background:var(--trk)"></i>Error of the track estimate</span><span><i class="sw zone"></i>Drone inside the protected zone</span><span><i class="sw notrk"></i>No track on the drone</span><span><i class="tz-key"></i>Now</span></div>
+        <svg id="errChart" class="chart" viewBox="0 0 960 230" role="img" aria-label="Distance between the ground truth drone and the track estimate over the flight"></svg>
+        <div class="note small" id="errNote"></div>
       </div>
     </div>
   </section>
@@ -221,11 +234,13 @@
   <!-- ===================================================================== FINANCIALS -->
   <section class="tab" id="tab-fin">
     <div class="page">
+      <div class="req-card" id="fnReq"></div>
       <h2>Facility economics</h2>
       <div class="row wrap ctl">
         <label>Facility <span data-help="facility"></span> <select id="fnSite"></select></label>
         <label>Radio <span data-help="radio"></span> <select id="fnRadio"></select></label>
-        <label>Number of sensors <span data-help="sensors"></span> <input type="number" id="fnN" min="1" max="40" step="1" /></label>
+        <label>Number of sensors <span data-help="fin_sensors"></span> <span class="ro" id="fnN"></span></label>
+        <label>Pricing model <span data-help="pricing_model"></span> <select id="fnModel"></select></label>
       </div>
       <p class="note small" id="fnFrom"></p>
       <div class="kpis wide" id="fnKpis"></div>
@@ -240,6 +255,9 @@
           <div class="compare" id="fnBench"></div>
         </div>
       </div>
+
+      <h2>The company <span class="hint">what the business needs, not the price of one facility</span></h2>
+      <div id="fnCompany"></div>
 
       <h2>Across the three facilities</h2>
       <p class="note" id="fnSitesNote"></p>
