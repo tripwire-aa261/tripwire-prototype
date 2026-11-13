@@ -20,9 +20,11 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 - **Price per facility: $25,000 install + $25,000/yr**, set against the own-receiver cost (Hays floor $19,073 + $3,734/yr at cost + 40 %); larger sites quoted by sensor count. Reason: below every radar system, ~85 % gross margin.
 - **Margins 40 % / 40 % define the floor**; fixed subscription, not per alert. **NRE ($400k) is a company cost.**
 - **First customers:** Hays State Prison (GA) and Clemson Memorial Stadium (SC; chosen for its towers over Sanford and Atlanta venues). Clemson needs 30 dB, so the pre-seed live demo is at Hays only and Clemson gets recordings. Stadiums are a separate segment in the model (sellable from 40 dB). Stadium pitch: the bowl layer next to an RF detector.
+- **Western Europe is the first market abroad, from 2035**, after the company pays its own way, funded from its own cash (decision 2026-11-12; model slider "Sales abroad start"). Airports and bases stay at Series B (hardest requirements, FAA coordination).
+- **Export control:** Tripwire may be ITAR (USML XI(a)(3)(xxvii), passive bistatic radar >125 kHz bandwidth below 2 GHz) or EAR ECCN 5A001.g (passive coherent location). Commodity Jurisdiction request moved to 2028 (Seed).
 - **Company based in Atlanta** (founders move at Seed). $175k loaded per hire (~$125k average BLS Atlanta wage + ~40 %).
 - **No full-time regulatory hire until Series A** (decision 2026-11-12): hourly counsel ~$80k/yr through Seed, Taras coordinates part time, regulatory lead 2029 Q4. Reason: before Series A the legal work is one opinion, two pilot contracts and customers' SAFER SKIES paperwork; saves ~$0.4M.
-- **Seed hires (4):** RF/electronics engineer, signal-processing engineer, field engineer, account executive. Advisors on equity: Adeline (finance), Ashlynn (customers, test drone), Taras (regulatory, flies the drone). Founders unpaid until Seed.
+- **Seed hires (4):** RF/electronics engineer, signal-processing engineer, field engineer, account executive. Part-time until Seed: Adeline (finance), Ashlynn (customers, test drone), Taras (regulatory, flies the drone), Zerina Kapetanovic. Founders unpaid until Seed.
 - **Pre-seed demo:** site visits with one bladeRF sensor (the ESP32 tabletop demo is no longer the pre-seed demo).
 - **Do not claim drone-vs-bird classification** until measured at Seed.
 - **Stadium sensors alternate between the top of the stands and 6 m poles outside**; prisons use ~6 m poles on the fence; customer provides poles, power and network.

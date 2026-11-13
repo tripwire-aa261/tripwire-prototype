@@ -186,6 +186,7 @@ tr.sub td:first-child { padding-left: 22px; color: var(--ink-2); }
 .drop summary::after { content: "+"; color: var(--ink); font: 500 14px var(--mono); }
 .drop[open] summary::after { content: "\2212"; }
 .drop > .notes, .drop > .gloss { padding: 0 18px 18px; }
+.chart text.round { font: 500 9px var(--mono); fill: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .econ { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
 .econ h2 { font-size: 20px; letter-spacing: -0.01em; }
 .econ-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 32px; }
@@ -309,7 +310,7 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
       <div class="two">
         <section class="panel card">
           <div class="card-head"><h2>Facilities protected</h2></div>
-          <p class="howto">Bars are facilities in service. The line is how many could buy: today one in three US prisons and jails has the right cell towers; all of them, plus about 200 large stadiums, once interference removal reaches 40 dB; airports, bases and sites abroad from Series B.</p>
+          <p class="howto">Bars are facilities in service. The line is how many could buy: today one in three US prisons and jails has the right cell towers; all of them, plus about 200 large stadiums, once interference removal reaches 40 dB; airports, bases, refineries and nuclear plants from Series B; sites abroad, Western Europe first, from the "Sales abroad start" date.</p>
           <div class="legend"><span><i class="sw-1"></i>Facilities in service</span><span><i class="ln"></i>Facilities that could buy</span></div>
           <div class="chart" id="facChart"></div>
         </section>
@@ -342,7 +343,7 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
 
       <section class="panel card">
         <h2>Who we hire until Series A</h2>
-        <p class="howto">The company is based in Atlanta, a few hours from both pilots. Founders take no salary before Seed. Ashlynn, Adeline and Taras stay part-time advisors on equity and are not on the payroll. Regulatory counsel is hired by the hour until the regulatory lead starts.</p>
+        <p class="howto">The company is based in Atlanta, a few hours from both pilots. Founders take no salary before Seed. Until Seed, Ashlynn, Adeline, Taras and Zerina Kapetanovic work part time and are not on the payroll. Regulatory counsel is hired by the hour until the regulatory lead starts.</p>
         <div class="tablewrap"><table class="roster" id="roster"></table></div>
       </section>
 
@@ -416,7 +417,7 @@ const ROSTER = [
 ];
 const DEFAULTS = {
   installPrice: 25000, subPrice: 25000, winsPerRep: 2, salesCycle: 3, facPerAccount: 6, rollout: 1,
-  workable: 33, abroad: 1500,
+  workable: 33, abroad: 1500, abroadQ: 32,   // abroadQ: first quarter of sales abroad (Western Europe first); 32 = 2035 Q1, after the company pays its own way
   launch: 7, customQ: 17, q40: 15, hwCost: 100,
   engAdds: 4, repsAdd: 5, costPerHead: 175,
   r0: 0.25, r1: 4, r2: 12, r3: 9,
@@ -457,7 +458,7 @@ function runModel(a) {
   const size = z();   // average facility size against Hays: grows once airports and bases are sold (Series B)
   for (let t = 0; t < N; t++) {
     const share = t >= a.q40 ? 1 : a.workable / 100;
-    const nCore = (F.segCore + (t >= B_Q ? a.abroad : 0)) * share, nStad = t >= a.q40 ? F.segStadium : 0, nLater = t >= B_Q ? F.segLater * share : 0;
+    const nCore = (F.segCore + (t >= a.abroadQ ? a.abroad : 0)) * share, nStad = t >= a.q40 ? F.segStadium : 0, nLater = t >= B_Q ? F.segLater * share : 0;
     addr[t] = nCore + nStad + nLater;
     size[t] = (nCore + nStad * F.stadiumSize + nLater * F.laterSize) / addr[t];
     let planned = 0;
@@ -472,7 +473,7 @@ function runModel(a) {
     }
     const prev = t ? cumSites[t - 1] : 0;
     const pilot = t === F.pilotQ ? F.pilots : 0;
-    const sold = Math.max(0, Math.min(planned, addr[t] - prev - pilot));
+    const sold = Math.max(0, Math.min(planned, addr[t] - (t ? active[t - 1] : 0) - pilot));   // cap on facilities in service, so lost facilities can be won back
     sites[t] = sold + pilot;
     cumSites[t] = prev + sites[t];
     const prevActive = t ? active[t - 1] : 0;
@@ -567,7 +568,8 @@ const INPUTS = {
   facPerAccount: ['Facilities per customer', 'Georgia alone runs 34 state prisons; a county has one jail.'],
   rollout: ['Facilities a customer installs per quarter', 'After signing, until all its facilities are done.'],
   workable: ['Share of facilities that work with today’s processing', 'One of our three simulated sites works at 20 dB interference removal.'],
-  abroad: ['Facilities abroad, from Series B', 'Prisons and airports in allied countries.'],
+  abroad: ['Facilities abroad', 'Prisons, stadiums and airports in allied countries, Western Europe first.'],
+  abroadQ: ['Sales abroad start', 'Plan: once the company pays its own way, funded from its own cash. Needs export licenses first.'],
   launch: ['Product ready to sell', 'After the design-partner pilots and scored flights.'],
   customQ: ['Our own receiver in production', 'Cuts a Hays-size facility from 6 sensors to 4 and the cost per sensor.'],
   q40: ['Interference removal reaches 40 dB', 'Unlocks dense-tower and sparse-tower sites. Unproven.'],
@@ -643,6 +645,7 @@ const FIELDS = {
     { key: 'rollout', min: 0.5, max: 4, step: 0.5, fmt: (v) => String(v) },
     { key: 'workable', min: 10, max: 100, step: 1, fmt: (v) => v + '%' },
     { key: 'abroad', min: 0, max: 6000, step: 250, fmt: int },
+    { key: 'abroadQ', min: 19, max: 64, step: 1, fmt: when },
   ],
   tech: [
     { key: 'launch', min: 5, max: 14, step: 1, fmt: qLabel },
@@ -732,7 +735,7 @@ function buildInputs() {
     'Based in Atlanta, near both pilots. $175k per hire = an average wage of about $125k (BLS May 2025 Atlanta means: electronics engineers $146k, software developers $136k, technical sales $126k; field and admin staff less) + about 40% for benefits and taxes (BLS employer costs: benefits are 30% of total pay). The same team in San Jose would cost about $240k a head. Founders: no salary before Seed, then $' + F.founderPay + 'k each (loaded). Hourly regulatory counsel $' + F.counselQ + 'k a quarter, $' + F.counselLaterQ + 'k once the regulatory lead starts.',
     'Development: $' + F.devPre + 'k a quarter before Seed (two demo kits, travel), $' + F.devSeed + 'k a quarter until launch (pilots, test drones, scored flights).',
     'One field person per ' + F.sitesPerOps + ' facilities in service; one administrator per ' + F.gaPer + ' other staff after Series A; overhead ' + Math.round(F.overhead * 100) + '% of payroll from Seed.',
-    'Market: ' + int(F.segCore) + ' US prisons and jails; about ' + int(F.segStadium) + ' large stadiums once interference removal reaches 40 dB (none work at 20 dB), each needing ' + F.stadiumSize + '× the sensors of Hays; ' + int(F.segLater) + ' airports, bases, refineries and nuclear plants from Series B, each about ' + F.laterSize + '× the size of Hays. ' + Math.round(F.churn * 100) + '% of facilities lost per year.',
+    'Market: ' + int(F.segCore) + ' US prisons and jails; about ' + int(F.segStadium) + ' large stadiums once interference removal reaches 40 dB (none work at 20 dB), each needing ' + F.stadiumSize + '× the sensors of Hays; ' + int(F.segLater) + ' airports, bases, refineries and nuclear plants from Series B, each about ' + F.laterSize + '× the size of Hays; facilities abroad from the "Sales abroad start" date. ' + Math.round(F.churn * 100) + '% of facilities lost per year.',
   ].map((s) => '<li>' + s + '</li>').join('');
   $('lead').textContent = LEAD;
   $('gloss').innerHTML = GLOSSARY.map((g) => '<div><dt>' + g[0] + '</dt><dd>' + g[1] + '</dd></div>').join('');
@@ -879,6 +882,14 @@ function frame(host, end, lo, hi, H, fmt) {
     el('text', { x: L + i * bw + 2, y: H - 6, 'text-anchor': 'start' }, svg, String(START_YEAR + i / 4).slice(every > 1 ? 2 : 0));
     el('line', { x1: L + i * bw, x2: L + i * bw, y1: H - B, y2: H - B + 4, stroke: 'var(--edge)' }, svg);
   }
+  // funding rounds as dashed boundaries, so every time chart shows which stage a quarter belongs to
+  ROUNDS.forEach((r) => {
+    if (r.q <= 0 || r.q >= end) return;
+    const rx = L + r.q * bw;
+    el('line', { x1: rx, x2: rx, y1: Tp, y2: H - B, stroke: 'var(--faint)', 'stroke-dasharray': '4 3', 'stroke-width': 1 }, svg);
+    const short = { 'Pre-seed': 'Pre', 'Seed': 'Seed', 'Series A': 'A', 'Series B': 'B' }[r.name] || r.name;
+    el('text', { x: rx + 3, y: Tp + 11, class: 'round' }, svg, bw * 8 < 80 ? short : r.name);
+  });
   return { svg, W, H, L, R, Tp, B, bw, x, y, lo, hi };
 }
 function hover(host, f, end, rows) {

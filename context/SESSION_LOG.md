@@ -2,6 +2,16 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Europe timing, ITAR, team names, teammate comments, round lines
+
+**Asked for:** when to expand to Western Europe ("our business has to be at a sustainable scale to expand internationally") and whether airports are in the plan; why the facilities-per-customer slider tapers; Zerina Kapetanovic plus Ashlynn, Adeline and Taras as "part time workers/advisors till seed"; funding-round boundaries on the model's charts; keep Google Doc, model and prototype tab in step.
+**Done:**
+- Model v13: sales abroad start slider (default 2035 Q1, was Series B); facilities lost to churn rejoin the pool that could buy (they were capped out forever, which made revenue fall when the market filled); Seed/Series A/Series B dashed lines on every time chart. Plan: peak need $18.6M (2034 Q1), cash-flow positive 2034 Q2, $100M/yr 2040 Q3.
+- Draft 5: Western Europe section (HMPPS drone incidents, EURO 2028, World Cup 2030, EU policy, no evidence on adoption speed), airports section, export-control paragraph (ECCN 5A001.g; possible USML XI) and Commodity Jurisdiction milestone moved to 2028; five teammate comments answered (runway figures, price war defined, Big Idea Memo, FEMA and NSF SBIR sourced directly, who prisons and stadiums pay); airport error fixed (10 m vs 25 m is not "a tenth").
+- Google Doc tabs Draft Report 5 and Product Prototype re-pasted (their comment threads now show as detached; text changed as asked).
+**Decided:** Europe after cash-flow positive rather than at Series B or a new Series C (user's sustainability test).
+**Left open:** export counsel to confirm ITAR vs EAR; an empty bullet may remain at the end of the Draft 5 tab.
+
 ## 2026-11-12 · Sid · Draft 5: assignment gaps filled, citations, model backlog
 
 **Asked for:** check Draft 4 against the assignment brief, then "do all ten" gaps, fix the $25,471 wording, make a Draft 5, "Do not hallucinate any numbers", and "be more rigorous with your citations especially in text".
