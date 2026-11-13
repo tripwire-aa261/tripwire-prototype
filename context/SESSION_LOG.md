@@ -2,6 +2,42 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Investor returns, sales funnel, faster-sale routes
+
+**Asked for:**
+- "is your solution just adding a faster scenario ... arent VS expecting returns sooner? Think critically"
+- the class pipeline format, from two whiteboard photos: stages Lead, Prospect, Negotiation, Signed; 10, 3, 2 and 1 deals over four quarters
+- "do all three, funnel and returns first"
+- a 50-word startup description, separate from the doc
+
+**Done:**
+- Model v16 adds two panels:
+  - Sales funnel: leads, proposals and negotiations per year, at the class rates of 1 in 10, 1 in 3 and 1 in 2.
+  - What investors get back: sliders for sale date, price multiple and valuation against the median.
+    - Valuations are PitchBook-NVCA Q3 2026 medians: Seed $18.3M, A $60.3M, B $187.0M pre-money; pre-seed at a $5M cap (assumption).
+- Draft 5 changes:
+  - "What investors get back" replaces "Investor timeline and exit".
+    - On the plan, a sale at the end of 2034 at 4.5x sales ($116M) returns Seed 4.1x; Series B loses money (0.6x).
+    - Faster sales plus a 9x strategic price gives Seed 13.8x.
+  - The class-format funnel (2031 snapshot, yearly table, first-deal quarters) replaces the earlier per-customer table.
+    - The 20 leads come from 6 Southeast state prison systems (186 prisons) and 33 SEC/ACC stadiums.
+    - Market check: about 8,300 leads by 2042 at 1 in 10, more than the 7,127 facilities.
+  - New "How we shorten the sale":
+    - Georgia bought RF detection through 34 purchase orders (about $13.7M, 22 prisons) from Convergint off a mandatory statewide contract.
+    - Cooperative contracts: OMNIA, Sourcewell, NASPO.
+    - Pilot references.
+  - Re-pasted into the Google tab.
+
+**Decided:**
+- Exit by sale is the investor answer. The plan is honest that a year-8 sale does not pay 10x without faster sales and a strategic buyer.
+- Series B is the weak round; aim for a strategic investor there.
+- Exit multiples: 4.5x (DroneShield, AeroVironment-BlueHalo) and 9x (Motorola-Silvus). Dedrone's revenue was never disclosed.
+
+**Left open:**
+- "Georgia runs RF detection at 25 locations" is a GPS Press figure. The records show it was not a single purchase.
+- The PitchBook 7-9 years to exit figure was seen only in a snippet.
+- Prototype tab comments are still open.
+
 ## 2026-11-12 · Sid · Seven teammate comments on Draft 5, investor timeline, Europe costs
 
 **Asked for:** look up Zerina ("Zerina advises on the technical stuff ... she is a prof"); "the cash in the bank graph goes up after 7 years, but usually vc cycles are less than 6. What is our solution"; then the seven new teammate comments on the Draft 5 tab.

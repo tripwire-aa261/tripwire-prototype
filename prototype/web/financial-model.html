@@ -307,6 +307,25 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
         <div class="chart" id="backlogChart"></div>
       </section>
 
+      <section class="panel card">
+        <div class="card-head"><h2>The sales funnel the plan needs</h2></div>
+        <p class="howto">How many organizations we must be talking to each year to sign the customers the plan assumes. A lead becomes a customer 1 time in 10, a proposal 1 in 3, a negotiation 1 in 2 (the AA261 class example: 10 leads, 3 prospects, 2 negotiations and 1 signature over four quarters), and a sale takes the sales-cycle slider to close. A customer signs for all its facilities at $25,000 to install plus 5 years of subscription, larger facilities in proportion.</p>
+        <div class="tablewrap" id="funnel"></div>
+        <p class="small muted" id="funnelNote"></p>
+      </section>
+
+      <section class="panel card">
+        <div class="card-head"><h2>What investors get back if the company is sold</h2></div>
+        <p class="howto">Venture investors are paid when the company is sold, not from its profits. Pick a sale date and a price as a multiple of the last four quarters of sales; the company's cash is added to the price. Each round buys a share at the US median valuation for its stage (PitchBook-NVCA Venture Monitor, Q3 2026: pre-money $18.3M Seed, $60.3M Series A, $187.0M Series B; pre-seed $5M post-money is our assumption), and later rounds shrink earlier shares. Rounds after the sale date are left out. Employee stock options and investor preferences are ignored, so real returns are a little lower.</p>
+        <div class="fields exitctl">
+          <div class="field"><div class="row"><label for="in-exitQ">Company sold</label><output id="out-exitQ"></output></div><input type="range" id="in-exitQ" min="16" max="63" step="1"><span class="hint">PitchBook: venture-backed companies now take seven to nine years from founding to a sale or listing.</span></div>
+          <div class="field"><div class="row"><label for="in-exitMult">Price, times the last four quarters of sales</label><output id="out-exitMult"></output></div><input type="range" id="in-exitMult" min="2" max="12" step="0.5"><span class="hint">Recent prices: DroneShield trades near 4.4 times its 2025 sales; AeroVironment paid about 4.5 times sales for BlueHalo; Motorola paid about 9.3 times for Silvus.</span></div>
+          <div class="field"><div class="row"><label for="in-valPct">Valuations against the median</label><output id="out-valPct"></output></div><input type="range" id="in-valPct" min="25" max="150" step="5"><span class="hint">100% = the median valuation for each stage. A company with little revenue may raise below it.</span></div>
+        </div>
+        <div class="tablewrap" id="returns"></div>
+        <p class="small muted" id="returnsNote"></p>
+      </section>
+
       <div class="two">
         <section class="panel card">
           <div class="card-head"><h2>Facilities protected</h2></div>
@@ -1022,6 +1041,58 @@ function renderTable(m, end) {
   $('table').innerHTML = '<table><thead><tr><th></th>' + head + '</tr></thead><tbody>' + body + '</tbody></table>';
 }
 
+/* ---------- sales funnel ---------- */
+const FUNNEL = [['Leads (1 in 10 signs)', 0.10], ['Proposals (1 in 3)', 1 / 3], ['Negotiations (1 in 2)', 0.5], ['Customers signed', 1]];   // AA261 class example
+function renderFunnel(m, a) {
+  const years = [], first = START_YEAR + 1, last = START_YEAR + 9;
+  for (let y = first; y <= last; y++) years.push(y - START_YEAR);
+  const wins = (y) => sumRange(m.accounts, y * 4, y * 4 + 4);
+  const tcv = (y) => a.facPerAccount * (a.installPrice + 5 * a.subPrice) * m.size[y * 4 + 3];
+  const head = '<th></th>' + years.map((y) => '<th>' + (START_YEAR + y) + '</th>').join('');
+  const row = (name, fn, cls) => '<tr class="' + (cls || '') + '"><td>' + name + '</td>' + years.map((y) => '<td>' + fn(y) + '</td>').join('') + '</tr>';
+  const n = (v) => (v < 0.05 ? '–' : v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString('en-US'));
+  const body = FUNNEL.map(([name, p]) => row(name, (y) => n(wins(y) / p), p === 1 ? 'total' : '')).join('') +
+    row('Contract value per customer, $M', (y) => (tcv(y) / 1e6).toFixed(2)) +
+    row('Weighted value at each stage, $M', (y) => (wins(y) * tcv(y) / 1e6).toFixed(1), 'total');
+  $('funnel').innerHTML = '<table><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table>';
+  let leads = 0; for (let t = 0; t < T; t++) leads += m.accounts[t] / FUNNEL[0][1];
+  const fac = Math.max(...m.addr);
+  $('funnelNote').textContent = 'Weighted value is each stage count times contract value times its chance of signing, so every stage carries the same value. Check against the market: by ' + (START_YEAR + T / 4 - 1) + ' the plan needs about ' + Math.round(leads).toLocaleString('en-US') + ' leads at 1 in 10, more than the ' + Math.round(fac).toLocaleString('en-US') + ' facilities that could buy, even if each were its own buyer. The buyers are few and public, so after the first years we must sign far more than 1 lead in 10: reference sites and statewide or cooperative contracts have to do that work.';
+}
+
+/* ---------- investor returns at a sale ---------- */
+const PRE_MONEY = { r0: null, r1: 18.3e6, r2: 60.3e6, r3: 187.0e6 };   // PitchBook-NVCA Venture Monitor Q3 2026, 2026 YTD medians
+const PRESEED_POST = 5e6;                                              // ASSUMPTION: pre-seed SAFE at a $5M post-money cap
+const exitState = { q: 31, mult: 4.5, pct: 100 };                      // 2034 Q4, year 8; 4.5x sales (DroneShield, BlueHalo)
+function investorReturns(m, a, ex) {
+  const rounds = ROUNDS.filter((r) => a[r.key] > 0 && r.q <= ex.q).map((r) => {
+    const amt = a[r.key] * 1e6, pre = r.key === 'r0' ? PRESEED_POST - amt : PRE_MONEY[r.key] * ex.pct / 100;
+    return { ...r, amt, pre, post: pre + amt };
+  });
+  rounds.forEach((r, i) => { r.own = r.amt / r.post; for (let j = i + 1; j < rounds.length; j++) r.own *= rounds[j].pre / rounds[j].post; });
+  const price = Math.max(0, m.ttm[ex.q] * ex.mult + Math.max(0, m.cash[ex.q]));
+  rounds.forEach((r) => { r.value = r.own * price; r.multiple = r.value / r.amt; r.years = (ex.q - r.q) / 4; });
+  const founders = 1 - rounds.reduce((s, r) => s + r.own, 0);
+  return { rounds, price, founders };
+}
+function renderReturns(m, a) {
+  const ex = exitState;
+  $('out-exitQ').textContent = qLabel(ex.q) + ' (year ' + (ex.q / 4 + 1).toFixed(0) + ')';
+  $('out-exitMult').textContent = ex.mult.toFixed(1) + '×';
+  $('out-valPct').textContent = ex.pct + '%';
+  const R = investorReturns(m, a, ex), pc = (v) => (100 * v).toFixed(1) + '%';
+  const rows = R.rounds.map((r) => '<tr><td>' + r.name + ' (' + qLabel(r.q) + ')</td><td>' + money(r.amt) + '</td><td>' + money(r.post) + '</td><td>' + pc(r.own) + '</td><td>' + money(r.value) + '</td><td class="' + (r.multiple < 1 ? 'neg' : '') + '">' + r.multiple.toFixed(1) + '×</td><td>' + r.years.toFixed(1) + '</td><td>' + money(10 * r.amt / r.own) + '</td></tr>').join('');
+  $('returns').innerHTML = '<table><thead><tr><th>Round</th><th>Invested</th><th>Value after the round</th><th>Share at the sale</th><th>Paid at the sale</th><th>Multiple</th><th>Years held</th><th>Sale price for 10×</th></tr></thead><tbody>' + rows +
+    '<tr class="total"><td>Founders and team</td><td></td><td></td><td>' + pc(R.founders) + '</td><td>' + money(R.founders * R.price) + '</td><td></td><td></td><td></td></tr></tbody></table>';
+  $('returnsNote').textContent = 'Sale price ' + money(R.price) + ': ' + ex.mult.toFixed(1) + ' × ' + money(m.ttm[ex.q]) + ' of sales in the four quarters to ' + qLabel(ex.q) + ', plus ' + money(Math.max(0, m.cash[ex.q])) + ' of cash. Early investors look for about 10 times their money on a winning investment, because one success has to pay for the failures (a "fund returner"); the last column is the sale price each round would need for that.';
+}
+function buildReturns() {
+  [['exitQ', 'q'], ['exitMult', 'mult'], ['valPct', 'pct']].forEach(([id, k]) => {
+    const inp = $('in-' + id); inp.value = exitState[k];
+    inp.addEventListener('input', () => { exitState[k] = Number(inp.value); render(); });
+  });
+}
+
 /* ---------- render ---------- */
 function render() {
   const a = state.a, m = runModel(a), end = displayEnd(m);
@@ -1042,9 +1113,9 @@ function render() {
   drawStack('headChart', end, [{ color: 'var(--tone-1)', v: m.hEng }, { color: 'var(--tone-2)', v: m.hSales }, { color: 'url(#headChart-hi)', stroke: 'var(--ink)', v: m.hOps },
     { color: 'var(--surface)', stroke: 'var(--ink)', v: m.hGA }], null, (i) => [
     ['Engineering', int(m.hEng[i])], ['Sales', int(m.hSales[i])], ['Field and support', int(m.hOps[i])], ['Admin, regulatory', int(m.hGA[i])], ['Total', int(m.heads[i])]], 'Employees by team', int);
-  renderTornado(m, a); renderTable(m, end);
+  renderTornado(m, a); renderTable(m, end); renderFunnel(m, a); renderReturns(m, a);
 }
-buildInputs(); render();
+buildInputs(); buildReturns(); render();
 let rz; new ResizeObserver(() => { clearTimeout(rz); rz = setTimeout(render, 80); }).observe($('cashChart'));
 </script>
 
