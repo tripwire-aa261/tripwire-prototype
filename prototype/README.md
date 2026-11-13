@@ -126,7 +126,7 @@ The viewer has four tabs:
   sensors (and, to explore, another sensor setup); what changes the result most (sensitivity).
 - **3D signal simulation**: a full-signal replay chosen by facility, drone and radio, with the tracking error
   between the ground truth drone and the track estimate over the flight.
-- **Financials**: the customer's requirements again (they set the number of sensors); hardware, installation, labor
+- **Financials explorer** (renamed from Financials, Nov 12): the customer's requirements again (they set the number of sensors); hardware, installation, labor
   and maintenance per facility for the chosen radio,
   with every assumption editable (saved in your browser) and a reset button; price = cost + editable margins; the
   sourced custom-receiver parts list.
@@ -142,7 +142,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # first tim
 .venv/bin/python serve.py                                             # then open http://localhost:8000
 ```
 
-The Overview, Trade space simulator and Financials tabs read precomputed results (`web/data/explore.json`). The 3D replay
+The Overview, Trade space simulator and Financials explorer tabs read precomputed results (`web/data/explore.json`). The 3D replay
 in the 3D signal simulation tab can run a new full simulation (2–7 minutes on a laptop, up to 4 CPU cores). The 3D library
 loads from a CDN, so you need internet.
 

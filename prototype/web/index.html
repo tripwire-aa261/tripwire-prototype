@@ -21,7 +21,7 @@
       <button role="tab" data-tab="overview" class="on">Overview</button>
       <button role="tab" data-tab="sim">Trade space simulator</button>
       <button role="tab" data-tab="signal">3D signal simulation</button>
-      <button role="tab" data-tab="fin">Financials</button>
+      <button role="tab" data-tab="fin">Financials explorer</button>
     </nav>
     <div class="spacer"></div>
     <button id="openSources" class="ghost small">Sources &amp; assumptions</button>
@@ -99,7 +99,7 @@
       <div class="ov-sec">
         <h2>Compared with today's options</h2>
         <div class="compare" id="ovBench"></div>
-        <p class="note small">Tripwire figures use the editable assumptions in the Financials tab. [3], [4]: Seed data package references (Axon price list on OMNIA Partners, March 2026; AirSight bid with the NC Sheriffs' Association, August 2024 prices).</p>
+        <p class="note small">Tripwire figures use the editable assumptions in the Financials explorer tab. [3], [4]: Seed data package references (Axon price list on OMNIA Partners, March 2026; AirSight bid with the NC Sheriffs' Association, August 2024 prices).</p>
       </div>
     </div>
   </section>
@@ -116,7 +116,7 @@
         <h2>Scenario</h2>
         <label>Interference removal <span data-help="interference"></span> <select id="rqInterf"></select></label>
         <button class="ghost small" id="rqReset">Reset to defaults</button>
-        <p class="note small">Sensors are spaced evenly along the fence. The customer's targets the recommendation uses (area covered, time tracked, tracking accuracy) are set on the Overview or in Financials.</p>
+        <p class="note small">Sensors are spaced evenly along the fence. The customer's targets the recommendation uses (area covered, time tracked, tracking accuracy) are set on the Overview or in Financials explorer.</p>
       </aside>
 
       <div class="sim-main">
@@ -132,7 +132,7 @@
             <h3>Customer's cost vs number of sensors <span data-help="total"></span></h3>
             <div class="legend inline" id="chCostLegend"></div>
             <svg id="chCost" class="chart" viewBox="0 0 480 300" role="img" aria-label="Customer's total over the contract against the number of sensors, one line per radio"></svg>
-            <div class="note small">Installation price plus the subscription over the contract, with the pricing model chosen in Financials.</div>
+            <div class="note small">Installation price plus the subscription over the contract, with the pricing model chosen in Financials explorer.</div>
           </div>
         </div>
 

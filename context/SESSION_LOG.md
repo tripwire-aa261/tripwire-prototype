@@ -2,6 +2,23 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Product Prototype tab comments answered
+
+**Asked for:** "now fix the prototype tab comments". The three comments were:
+- the classifier note ("We can tell but we need to have classifier");
+- "Replace this screenshot. We have renamed this to financials explorer";
+- "We can use this adjust our profit margin and see how much revenue we can generate".
+
+**Done:**
+- No branch had the rename, so the twin's Financials tab is now "Financials explorer": the tab button, notes, help text and README.
+- New headless-Edge screenshot of the renamed tab in the walkthrough.
+- The 3D-simulation "Look for" now says that telling drones from birds needs a classifier (rotor signal plus flight path over a track). The prototype does not simulate it yet; it is a Seed task.
+- The Financials explorer "Try" now covers changing margins and the pricing model to see price, 5-year revenue and gross profit.
+- The Financials explorer "Look for" adds the plan price: $150,000 over 5 years, about $25,471/yr gross profit, 40 facilities cover $1M/yr.
+- Product Prototype tab re-pasted; its 3 comment threads now show as detached.
+
+**Left open:** prototype link and recording placeholders, the ESP32 test, and the Vercel deploy (teammate).
+
 ## 2026-11-12 · Sid · Twin value-based price set to the plan price
 
 **Asked for:** "change it, if our new values are more realistic" (the twin's value-based price default).

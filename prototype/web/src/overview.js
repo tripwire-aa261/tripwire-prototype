@@ -113,7 +113,7 @@ function kpis(H) {
   const vsAir = f.customer5 < lo ? 'below' : f.customer5 > hi ? 'above' : 'within';
   $('ovPrice').innerHTML = `<small>Suggested price ${info('price')}</small>
     <b>${state.fin.model === 'all_in' ? `${usd(f.sub)}/yr, nothing upfront` : `${usd(f.price)} installation + ${usd(f.sub)}/yr`}</b>
-    <span>Our cost ${usd(f.upfront)} upfront ${info('upfront')} + ${usd(f.yearly)}/yr ${info('running')}, plus a ${state.fin.margin_upfront === state.fin.margin_yearly ? `${state.fin.margin_yearly}%` : `${state.fin.margin_upfront}% / ${state.fin.margin_yearly}%`} margin (editable in Financials; pricing model ${info('pricing_model')}).
+    <span>Our cost ${usd(f.upfront)} upfront ${info('upfront')} + ${usd(f.yearly)}/yr ${info('running')}, plus a ${state.fin.margin_upfront === state.fin.margin_yearly ? `${state.fin.margin_yearly}%` : `${state.fin.margin_upfront}% / ${state.fin.margin_yearly}%`} margin (editable in Financials explorer; pricing model ${info('pricing_model')}).
     The customer pays ${usd(f.customer5)} over ${Y} years, ${vsAir} a radar-based system over the same time (${usdk(lo)} to ${usdk(hi)} for ${state.fin.cmp_radar_n_lo}–${state.fin.cmp_radar_n_hi} radars, installation and software; see below). An RF-only system's hardware and installation alone is ${usdk(C.rf)} [3], and it cannot see drones that do not transmit.</span>`;
 }
 
@@ -186,7 +186,7 @@ export function benchBars(el, customer5, years) {
     Software: AirSight's yearly packages, ${usd(B.airsight_subscription_low_usd)}–${usd(B.airsight_subscription_high_usd)} [4].
     Competitors' hardware upkeep is not public and is left out, so their totals are on the low side.
     <b>Robin IRIS:</b> ${usd(C.iris)} per unit in Dedrone's price list on OMNIA Partners (Feb 2025 edition, seen in a search result; the file is no longer public).
-    <b>RF-only:</b> data package ref [3]. The radar counts, prices and installation shares are editable in Financials.</p>`;
+    <b>RF-only:</b> data package ref [3]. The radar counts, prices and installation shares are editable in Financials explorer.</p>`;
 }
 
 function render() {

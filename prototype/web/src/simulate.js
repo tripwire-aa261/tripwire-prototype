@@ -61,7 +61,7 @@ function picker() {
     const d = facility(designFor('b210'), x.n, 'b210').node.total - facility(designFor('bladerf'), x.n, 'bladerf').node.total;
     html += `<br><span class="small">The B210 performs like the bladeRF in the model (both 12-bit, 2 channels per board); it adds ${usd(d)} per sensor.</span>`;
   }
-  if (state.radio === 'custom') html += '<br><span class="small">The custom receiver is a Series A product (parts list in Financials).</span>';
+  if (state.radio === 'custom') html += '<br><span class="small">The custom receiver is a Series A product (parts list in Financials explorer).</span>';
   $('spRec').innerHTML = html;
   if ($('spUse')) $('spUse').onclick = () => { state.radio = rec.radio; state.n = rec.n; state.build = null; emit('sim-select'); };
 }
