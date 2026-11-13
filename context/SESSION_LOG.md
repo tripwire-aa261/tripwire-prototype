@@ -2,6 +2,20 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Draft 5: assignment gaps filled, citations, model backlog
+
+**Asked for:** check Draft 4 against the assignment brief, then "do all ten" gaps, fix the $25,471 wording, make a Draft 5, "Do not hallucinate any numbers", and "be more rigorous with your citations especially in text".
+**Done:**
+- Draft 5 (Claude doc https://claude.ai/artifact/HxtL3TWcyArFEYFmxv95tE, pasted into the Google Doc tab "Draft Report 5"): sales and operating cash flow chart 2027-2042; weighted backlog vs sales chart; products and path to $100M (about 2,460 facilities, about 570 customers); contracts and renewals; direct sales to prisons and integrators for stadiums; adoption barriers; commercial Seed tests; integration, manufacturing and vendor-risk sections; headcount at $100M (about 219). Inline source next to each number (prototype figures file with section, financial model, FCC tower register, BLS pages, or "assumption"/"plan"); source lines under tables.
+- Financial model v11: weighted backlog (remaining contract value, churn-weighted) and its chart; sensor hardware cost slider (+-30% moves peak need $19.2M-$21.9M); gross-profit line rewritten; minus signs explained in the table.
+- Product prototype tab: "From prototype to product" section (engineering challenges, testing, manufacturing, development cost about $4.1M from the model) inserted in place, keeping two teammate comments.
+**Decided:**
+- Partner economics: no published counter-drone margin found; cited the 37.5% average integrator gross margin on video surveillance projects (Security Sales & Integration, 2020) as the planning level; the model keeps stadium sales direct.
+- Removed an unsourced "two hours' drive" claim; replaced "a third less" with BLS figures.
+**Left open:**
+- Teammate comments on the prototype tab's Overview heading ("what we can promise the customer"): heading and caption not yet reworded.
+- Prototype link, recording and ESP32 test placeholders; Vercel deploy by a teammate.
+
 ## 2026-11-12 · Sid · Business plan Draft 4, financial model rebuild, Clemson and Atlanta decisions
 
 **Asked for:** clean up the team Google Doc ("fully clean up everything with the new company plan, numbers from the prototype"), address all of Sid's comments, fill in the funding, hiring, regulatory, go-to-market and technical plans, and redo the financial model ("not super long", "should not feel AI written", "specific about the claims"). Later: switch the stadium after a tower survey, implement Sid's 23 comments on Draft 3 plus PR #2's stadium results, fix the Google Doc formatting, commit and merge.

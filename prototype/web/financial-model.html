@@ -299,6 +299,13 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
         </section>
       </div>
 
+      <section class="panel card">
+        <div class="card-head"><h2>Signed work ahead (weighted backlog) and sales</h2></div>
+        <p class="howto">Bars are sales over the last four quarters. The line is the weighted backlog: contract value already signed but not yet billed, meaning the subscription years left on facilities in service plus facilities a customer has signed for but not yet installed. Each future quarter is weighted by the chance the facility is still a customer (the yearly loss rate under "How the model works").</p>
+        <div class="legend"><span><i class="sw-2"></i>Sales, last four quarters</span><span><i class="ln"></i>Weighted backlog</span></div>
+        <div class="chart" id="backlogChart"></div>
+      </section>
+
       <div class="two">
         <section class="panel card">
           <div class="card-head"><h2>Facilities protected</h2></div>
@@ -329,7 +336,7 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
           <h2>The numbers, year by year</h2>
           <div class="seg" id="period" role="group" aria-label="Table period"></div>
         </div>
-        <p class="howto">In millions of dollars unless stated. A dash means zero; orange means negative.</p>
+        <p class="howto">In millions of dollars unless stated. A dash means zero. A minus sign (shown in orange) means money going out: a loss, or more cash spent than received in that period.</p>
         <div class="tablewrap" id="table"></div>
       </section>
 
@@ -410,7 +417,7 @@ const ROSTER = [
 const DEFAULTS = {
   installPrice: 25000, subPrice: 25000, winsPerRep: 2, salesCycle: 3, facPerAccount: 6, rollout: 1,
   workable: 33, abroad: 1500,
-  launch: 7, customQ: 17, q40: 15,
+  launch: 7, customQ: 17, q40: 15, hwCost: 100,
   engAdds: 4, repsAdd: 5, costPerHead: 175,
   r0: 0.25, r1: 4, r2: 12, r3: 9,
 };
@@ -435,7 +442,7 @@ function runModel(a) {
   const perHeadQ = a.costPerHead * 1000 / 4, founderQ = F.founderPay * 1000 / 4;
   const extra4 = () => (F.stadiumPilotSensors - F.bladeSensors) * F.runPerSensor / 4;
   const sensors = (t) => (t >= a.customQ ? F.customSensors : F.bladeSensors);
-  const sensorCost = (t) => (t >= a.customQ ? F.customCost : F.bladeCost);
+  const sensorCost = (t) => (t >= a.customQ ? F.customCost : F.bladeCost) * (a.hwCost / 100);   // hwCost: sensor hardware cost, % of the prototype's figure
   const roster = (t, team) => ROSTER.filter((r) => r[1] === team && t >= r[2]);
   const paid = (t, team) => roster(t, team).reduce((s, r) => s + (r[3] ? (t >= SEED_Q ? founderQ : 0) : perHeadQ), 0);
 
@@ -505,6 +512,25 @@ function runModel(a) {
     gross[t] = rev[t] - varCost[t];
     opProfit[t] = gross[t] - fixCost[t];
   }
+  // Weighted backlog at the end of each quarter: contract value signed but not yet billed.
+  //  - facilities in service: the subscription quarters left on their 5-year contract;
+  //  - facilities signed but not yet installed (a customer installs its facilities one after another): installation + 5 years.
+  //  Each future quarter is weighted by the chance the facility is still a customer (the model's yearly loss rate, F.churn).
+  const backlog = z(), keep = 1 - F.churn / 4, termQ = 20;
+  const surv = (k) => (keep * (1 - Math.pow(keep, k))) / (1 - keep);   // sum of keep^1..keep^k
+  let committed = 0;
+  for (let t = 0; t < N; t++) {
+    committed += accounts[t] * a.facPerAccount;
+    let b = 0;
+    for (let s = 0; s <= t; s++) {
+      if (!sites[s]) continue;
+      const left = Math.max(0, s + termQ - (t + 1));
+      b += sites[s] * Math.pow(keep, t - s) * surv(left) * a.subPrice * size[t] / 4;
+    }
+    const pending = Math.max(0, Math.min(committed, addr[t]) - cumSites[t]);
+    b += pending * (a.installPrice * size[t] + surv(termQ) * a.subPrice * size[t] / 4);
+    backlog[t] = b;
+  }
   for (const r of ROUNDS) fin[r.q] += (a[r.key] || 0) * 1e6;
   // cash timing: hardware is paid for a quarter before it ships; customers pay a quarter after installation
   for (let t = 0; t < T; t++) {
@@ -524,7 +550,7 @@ function runModel(a) {
     if (-cumOcf[t] > peakNeed) { peakNeed = -cumOcf[t]; qPeak = t; }
   }
   const raised = ROUNDS.reduce((s, r) => s + (a[r.key] || 0) * 1e6, 0);
-  return { size, launch, reps, accounts, sites, cumSites, active, addr, hwRev, subRev, rev, ttm,
+  return { size, launch, reps, accounts, sites, cumSites, active, addr, hwRev, subRev, rev, ttm, backlog,
     cHw, cInstall, cSupport, cOps, varCost, fEng, fSales, fGA, fOver, fDev, fixCost,
     hEng, hSales, hOps, hGA, heads, gross, opProfit, ocf, fin, cash, cumOcf,
     q100, qCfp, minCash, qMinCash, peakNeed, qPeak, raised,
@@ -545,6 +571,7 @@ const INPUTS = {
   launch: ['Product ready to sell', 'After the design-partner pilots and scored flights.'],
   customQ: ['Our own receiver in production', 'Cuts a Hays-size facility from 6 sensors to 4 and the cost per sensor.'],
   q40: ['Interference removal reaches 40 dB', 'Unlocks dense-tower and sparse-tower sites. Unproven.'],
+  hwCost: ['Sensor hardware cost', '% of the prototype\u2019s parts cost ($1,825 bladeRF, $1,601 own receiver). Supplier quotes replace it at Seed.'],
   engAdds: ['Engineers added per year, after Series A', ''],
   repsAdd: ['Salespeople added per year, after Series A', 'Each brings half a sales engineer.'],
   costPerHead: ['Cost of one employee, per year', 'Atlanta: average wage about $125k plus about 40% for benefits and taxes.'],
@@ -621,6 +648,7 @@ const FIELDS = {
     { key: 'launch', min: 5, max: 14, step: 1, fmt: qLabel },
     { key: 'customQ', min: 12, max: 28, step: 1, fmt: qLabel },
     { key: 'q40', min: 8, max: 64, step: 1, fmt: when },
+    { key: 'hwCost', min: 50, max: 200, step: 5, fmt: (v) => v + '%' },
   ],
   hire: [
     { key: 'engAdds', min: 0, max: 15, step: 1, fmt: int },
@@ -641,6 +669,7 @@ const SENS = [
   { key: 'facPerAccount', note: '±30%', lo: (v) => v * 0.7, hi: (v) => v * 1.3 },
   { key: 'workable', note: '±10 points', lo: (v) => v - 10, hi: (v) => v + 10 },
   { key: 'q40', note: '±4 quarters', lo: (v) => v - 4, hi: (v) => v + 4 },
+  { key: 'hwCost', note: '±30%', lo: (v) => v * 0.7, hi: (v) => v * 1.3 },
   { key: 'launch', note: '±2 quarters', lo: (v) => v - 2, hi: (v) => v + 2 },
   { key: 'costPerHead', note: '±15%', lo: (v) => v * 0.85, hi: (v) => v * 1.15 },
 ].map((x) => ({ ...x, label: lab(x.key) }));
@@ -776,7 +805,7 @@ function renderFlow(a) {
     '<li><span>A <b>customer</b>, such as a state prison system, has ' + n(int(a.facPerAccount) + ' facilities') + ' and installs ' + n(a.rollout) + ' a quarter.</span></li>',
     '<li><span>A <b>facility</b> like Hays State Prison needs ' + n(e.n + ' sensors') + ' with our own receiver. It costs us ' + n(usd(e.up)) + ' to equip and ' + n(usd(e.run)) + ' a year to run.</span></li>',
     '<li><span>It pays ' + n(usd(a.installPrice)) + ' to install and ' + n(usd(a.subPrice)) + ' a year, on a 5-year contract.</span></li>',
-    '<li class="sum"><span>So one facility leaves ' + n(usd((e.ours - e.five) / 5)) + ' a year of gross profit toward salaries.</span></li>',
+    '<li class="sum"><span>Over 5 years a facility pays ' + n(usd(e.ours)) + ' and costs us ' + n(usd(e.five)) + ', leaving ' + n(usd(e.ours - e.five)) + ': about ' + n(usd((e.ours - e.five) / 5)) + ' a year toward salaries.</span></li>',
   ].join('');
 }
 
@@ -990,6 +1019,8 @@ function render() {
   drawStack('costChart', end, [{ color: 'url(#costChart-hi)', stroke: 'var(--ink)', v: m.varCost }, { color: 'var(--tone-1)', v: m.fixCost }], null, (i) => [
     ['Grow with every facility', money(m.varCost[i])], ['Paid whatever is sold', money(m.fixCost[i])], ['Employees', int(m.heads[i])],
     ['Left from each $1 of sales', m.rev[i] > 5e4 ? Math.round(100 * m.gross[i] / m.rev[i]) + '¢' : '–']], 'Costs by quarter');
+  drawStack('backlogChart', end, [{ color: 'var(--tone-2)', v: m.ttm }], m.backlog, (i) => [
+    ['Weighted backlog', money(m.backlog[i])], ['Sales, last four quarters', money(m.ttm[i])], ['Facilities in service', int(m.active[i])]], 'Weighted backlog and yearly sales');
   drawStack('facChart', end, [{ color: 'var(--tone-1)', v: m.active }], m.addr, (i) => [
     ['Facilities in service', int(m.active[i])], ['Installed this quarter', int(m.sites[i])], ['Could buy', int(m.addr[i])]], 'Facilities in service and facilities that could buy', int);
   drawStack('headChart', end, [{ color: 'var(--tone-1)', v: m.hEng }, { color: 'var(--tone-2)', v: m.hSales }, { color: 'url(#headChart-hi)', stroke: 'var(--ink)', v: m.hOps },
