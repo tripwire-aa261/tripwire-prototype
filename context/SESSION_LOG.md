@@ -2,6 +2,24 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Sales-speed levers in the model
+
+**Asked for:** put the sales-speed mechanisms in the model, "keep levers off in the plan", and check this does not contradict the twin's Financials tab.
+**Done:**
+- Model v17 has three levers in the go-to-market group, all off in the plan, so plan results are unchanged:
+  - Buy off an existing contract from a chosen quarter. It saves one quarter of the sale (assumption) and costs a 2% fee (assumption).
+  - Customers won by integrators per year. The integrator keeps 37.5% of what those customers pay.
+  - Extra wins per salesperson from pilot references, from 2029 Q1.
+  - A new cost row, "Integrators' share and contract fees".
+- "Faster sales" is now the three levers together (contract from 2029 Q1, 4 integrator wins a year, references +50%): $9.6M needed, pays its own way 2032 Q1, Seed 8.6x / 15.8x on a 2034 sale at 4.5x / 9x sales.
+- Each lever alone, from the model: contracts $15.9M / 2033 Q4; integrators $12.5M / 2033 Q2 (margin 67%); references $13.7M / 2033 Q1.
+- Draft 5:
+  - Returns table and "How we shorten the sale" updated with a table of the levers.
+  - Notes that Georgia's contract runs to April 2027.
+  - Re-pasted into the Google tab.
+**Decided:** levers stay off in the plan until Seed measures them.
+**Left open:** the twin's Financials tab uses old prices: its value-based model defaults to $50,000 + $18,000/yr (`ZONE` in `twin/cost.py`), not the plan's $25,000 + $25,000/yr. Its default cost + margin view is not affected. Fixing it means changing `twin/cost.py`, the tests and the figures doc (Nimalan's area).
+
 ## 2026-11-12 · Sid · Investor returns, sales funnel, faster-sale routes
 
 **Asked for:**

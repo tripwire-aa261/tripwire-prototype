@@ -424,6 +424,8 @@ const FIXED = {
   segLater: 1150,                        // airports 518 + military 450 + refineries 128 + nuclear 54 (memo), from Series B
   abroadOps: 2, abroadSales: 1,          // ASSUMPTION: team abroad from the first quarter of sales there (2 field engineers + 1 salesperson); UK median pay + 15% employer NI is about GBP 167k a year for the three (ONS ASHE 2025, GOV.UK), below 3 x $175k
   abroadCert: 25000,                     // ASSUMPTION: CE marking under the Radio Equipment Directive, top of the EUR 8,000-25,000 notified-body estimate, paid the quarter before sales abroad
+  partnerShare: 0.375,                   // share of a customer's payments an integrator keeps: 37.5% average integrator gross margin on video surveillance projects (Security Sales & Integration, 2020)
+  contractCut: 1,                        // ASSUMPTION: buying off an existing contract saves one quarter of the sale
   laterSize: 4,                          // ASSUMPTION: an airport or base perimeter needs about 4x the sensors of Hays, priced and costed in proportion
 };
 // Named hires until Series A [role, team, first quarter, founder?]; formulas take over after Series A.
@@ -440,6 +442,7 @@ const DEFAULTS = {
   installPrice: 25000, subPrice: 25000, winsPerRep: 2, salesCycle: 3, facPerAccount: 6, rollout: 1,
   workable: 33, abroad: 1500, abroadQ: 32,   // abroadQ: first quarter of sales abroad (Western Europe first); 32 = 2035 Q1, after the company pays its own way
   launch: 7, customQ: 17, q40: 15, hwCost: 100,
+  contractQ: 64, contractFee: 2, partnerWins: 0, refGain: 0,   // sales-speed levers, all off in the plan (64 = never)
   engAdds: 4, repsAdd: 5, costPerHead: 175,
   r0: 0.25, r1: 4, r2: 12, r3: 9,
 };
@@ -455,7 +458,7 @@ function qLabel(t) { return (START_YEAR + Math.floor(t / 4)) + ' Q' + (t % 4 + 1
 function runModel(a) {
   const N = T + 1, z = () => new Array(N).fill(0), F = FIXED;
   const launch = a.launch;
-  const reps = z(), accounts = z(), sites = z(), cumSites = z(), active = z(), addr = z();
+  const reps = z(), accounts = z(), accP = z(), accC = z(), cChannel = z(), sites = z(), cumSites = z(), active = z(), addr = z();
   const hwRev = z(), subRev = z(), rev = z();
   const cHw = z(), cInstall = z(), cSupport = z(), cOps = z(), varCost = z();
   const fEng = z(), fSales = z(), fGA = z(), fOver = z(), fDev = z(), fixCost = z();
@@ -472,10 +475,18 @@ function runModel(a) {
   for (let t = 0; t < N; t++) {
     reps[t] = (t >= SEED_Q ? 0.5 : 0) + (t >= 6 ? 1 : 0) + (t >= A_Q ? Math.floor(a.repsAdd * (t - A_Q + 1) / 4) : 0);
   }
+  // sales-speed levers (all off in the plan): an existing contract shortens the sale; integrators win customers of their own
+  // (and keep a share of what those customers pay); pilot references raise each salesperson's wins once the pilots end
+  const refQ = F.pilotQ + 4;
   for (let t = launch; t < N; t++) {
-    const src = t - a.salesCycle;
-    accounts[t] = (src >= 0 ? reps[src] * a.winsPerRep / 4 : 0) + (t === launch ? F.pilots : 0);
+    const onContract = t >= a.contractQ, cycle = onContract ? Math.max(1, a.salesCycle - F.contractCut) : a.salesCycle;
+    const src = t - cycle, wins = a.winsPerRep * (t >= refQ ? 1 + a.refGain / 100 : 1);
+    const direct = src >= 0 ? reps[src] * wins / 4 : 0;
+    accP[t] = t > launch ? a.partnerWins / 4 : 0;
+    accounts[t] = direct + accP[t] + (t === launch ? F.pilots : 0);
+    accC[t] = onContract ? direct : 0;
   }
+  let cumA = 0, cumP = 0, cumC = 0;
   const size = z();   // average facility size against Hays: grows once airports and bases are sold (Series B)
   for (let t = 0; t < N; t++) {
     const share = t >= a.q40 ? 1 : a.workable / 100;
@@ -521,7 +532,9 @@ function runModel(a) {
     const runPer = t >= a.customQ ? F.runPerSensorCustom : F.runPerSensor;
     cSupport[t] = (prevActive + active[t]) / 2 * (ns * runPer + F.runPerFacility) / 4 + (t >= F.pilotQ && t < F.pilotQ + 4 ? extra4(t) : 0);
     cOps[t] = paid(t, 'ops') + Math.max(0, hOps[t] - roster(t, 'ops').length) * perHeadQ;
-    varCost[t] = cHw[t] + cInstall[t] + cSupport[t] + cOps[t];
+    cumA += accounts[t]; cumP += accP[t]; cumC += accC[t];
+    cChannel[t] = cumA ? rev[t] * (cumP / cumA * F.partnerShare + cumC / cumA * a.contractFee / 100) : 0;   // integrators' share and contract fees, by share of customers won that way
+    varCost[t] = cHw[t] + cInstall[t] + cSupport[t] + cOps[t] + cChannel[t];
 
     fEng[t] = paid(t, 'eng') + (hEng[t] - roster(t, 'eng').length) * perHeadQ;
     fSales[t] = paid(t, 'sales') + (hSales[t] - roster(t, 'sales').length) * perHeadQ;
@@ -574,7 +587,7 @@ function runModel(a) {
     if (-cumOcf[t] > peakNeed) { peakNeed = -cumOcf[t]; qPeak = t; }
   }
   const raised = ROUNDS.reduce((s, r) => s + (a[r.key] || 0) * 1e6, 0);
-  return { size, launch, reps, accounts, sites, cumSites, active, addr, hwRev, subRev, rev, ttm, backlog,
+  return { size, launch, reps, accounts, accP, accC, cChannel, sites, cumSites, active, addr, hwRev, subRev, rev, ttm, backlog,
     cHw, cInstall, cSupport, cOps, varCost, fEng, fSales, fGA, fOver, fDev, fixCost,
     hEng, hSales, hOps, hGA, heads, gross, opProfit, ocf, fin, cash, cumOcf,
     q100, qCfp, minCash, qMinCash, peakNeed, qPeak, raised,
@@ -589,7 +602,11 @@ const INPUTS = {
   winsPerRep: ['Customers won per salesperson, per year', 'A customer is one buyer: a state prison system, a county, a venue owner.'],
   salesCycle: ['Time to close a sale', 'Government buying is slow: budget cycles and procurement.'],
   facPerAccount: ['Facilities per customer', 'Georgia alone runs 34 state prisons; a county has one jail.'],
-  rollout: ['Facilities a customer installs per quarter', 'After signing, until all its facilities are done.'],
+  rollout: ['Facilities a customer installs per quarter', 'After signing, until all its facilities are done. Georgia added nine prison sites in one month in June 2024 (state purchase records).'],
+  contractQ: ['Sales lever: buy off an existing contract, from', 'Statewide or cooperative contracts (OMNIA, Sourcewell, NASPO) let an agency buy without its own tender; we assume it saves 3 months of the sale. Off in the plan.'],
+  contractFee: ['Fee on sales through a contract', 'ASSUMPTION: what the contract holder or reseller keeps; not researched.'],
+  partnerWins: ['Sales lever: customers won by integrators, per year', 'Integrators such as Convergint sell for us; they keep 37.5% of what those customers pay (average integrator margin). Off in the plan.'],
+  refGain: ['Sales lever: more wins once the pilots are references', 'Extra customers per salesperson from 2029 Q1, when Hays and Clemson results are out. Unsourced. Off in the plan.'],
   workable: ['Share of facilities that work with today’s processing', 'One of our three simulated sites works at 20 dB interference removal.'],
   abroad: ['Facilities abroad', 'Prisons, stadiums and airports in allied countries, Western Europe first.'],
   abroadQ: ['Sales abroad start', 'Plan: once the company pays its own way, funded from its own cash. Adds 2 field engineers and 1 salesperson there and CE marking; needs export licenses first.'],
@@ -613,7 +630,7 @@ const SCENARIOS = [
   ['40 dB never comes', 'Interference removal stays at today’s 20 dB: only one facility in three can ever be protected.', { q40: 64 }],
   ['Slower sales', 'Half as many wins per salesperson, sales take two quarters longer and customers are smaller.', { winsPerRep: 1, salesCycle: 5, facPerAccount: 4 }],
   ['Price war', 'A competitor forces prices down to $15,000 + $15,000 a year.', { installPrice: 15000, subPrice: 15000 }],
-  ['Faster sales', 'Each salesperson wins 3 customers a year instead of 2, and a sale takes 6 months instead of 9: what Seed has to prove for investors to see cash flow within about 6 years.', { winsPerRep: 3, salesCycle: 2 }],
+  ['Faster sales', 'All three sales levers on (assumptions): buying off existing contracts from 2029 Q1 saves 3 months of each sale, integrators win 4 customers a year, and pilot references raise wins per salesperson by half, from 2 to 3 a year.', { contractQ: 8, partnerWins: 4, refGain: 50 }],
   ['Late hardware', 'The product is ready a year late and our own receiver 18 months late.', { launch: 11, customQ: 23 }],
 ];
 const KPI = {
@@ -622,7 +639,7 @@ const KPI = {
   share: ['Share of reachable facilities it must win', 'Market share needed'], gm: ['Left from each $1 of sales after direct costs', 'Gross margin'],
 };
 const ROWS = { hwRev: 'Installation fees', subRev: 'Subscriptions', rev: 'Total sales (revenue)', cHw: 'Sensors and hubs', cInstall: 'Installing facilities',
-  cSupport: 'Upkeep, internet and cloud', cOps: 'Field and support staff', varCost: 'Total of these costs', gross: 'Left after these costs (gross profit)',
+  cSupport: 'Upkeep, internet and cloud', cOps: 'Field and support staff', cChannel: 'Integrators’ share and contract fees', varCost: 'Total of these costs', gross: 'Left after these costs (gross profit)',
   gm: 'The same, as a share of sales (gross margin)', fEng: 'Engineering', fSales: 'Sales', fGA: 'Founders, admin, regulatory and counsel',
   fOver: 'Overhead: rent, insurance, tools', fDev: 'Development: demo kits, pilots, scored flights, own receiver design', fixCost: 'Total of these costs',
   opProfit: 'Profit after all costs (operating profit)', ocf: 'Cash in minus cash out (operating cash flow)', fin: 'Invested (capital raised)',
@@ -670,6 +687,10 @@ const FIELDS = {
     { key: 'workable', min: 10, max: 100, step: 1, fmt: (v) => v + '%' },
     { key: 'abroad', min: 0, max: 6000, step: 250, fmt: int },
     { key: 'abroadQ', min: 19, max: 64, step: 1, fmt: when },
+    { key: 'contractQ', min: 7, max: 64, step: 1, fmt: when },
+    { key: 'contractFee', min: 0, max: 10, step: 0.5, fmt: (v) => v + '%' },
+    { key: 'partnerWins', min: 0, max: 20, step: 1, fmt: int },
+    { key: 'refGain', min: 0, max: 100, step: 5, fmt: (v) => '+' + v + '%' },
   ],
   tech: [
     { key: 'launch', min: 5, max: 14, step: 1, fmt: qLabel },
@@ -1024,7 +1045,7 @@ function renderTable(m, end) {
   const months = (c) => (c[1] - c[0]) * 3, R = ROWS, sub = 'sub';
   const body = [
     sect('Sales (revenue): what customers are billed'), flow(R.hwRev, m.hwRev), flow(R.subRev, m.subRev), flow(R.rev, m.rev, 'total'),
-    sect('Costs that grow with every facility'), flow(R.cHw, m.cHw), flow(R.cInstall, m.cInstall), flow(R.cSupport, m.cSupport), flow(R.cOps, m.cOps),
+    sect('Costs that grow with every facility'), flow(R.cHw, m.cHw), flow(R.cInstall, m.cInstall), flow(R.cSupport, m.cSupport), flow(R.cOps, m.cOps), flow(R.cChannel, m.cChannel),
     flow(R.gross, m.gross, 'total'),
     calc(R.gm, (c) => { const r = sumRange(m.rev, c[0], c[1]); return r > 5e4 ? Math.round(100 * sumRange(m.gross, c[0], c[1]) / r) + '%' : '–'; }),
     sect('Costs paid whatever is sold'), flow(R.fEng, m.fEng), flow(R.fSales, m.fSales), flow(R.fGA, m.fGA), flow(R.fOver, m.fOver), flow(R.fDev, m.fDev),
@@ -1046,16 +1067,17 @@ const FUNNEL = [['Leads (1 in 10 signs)', 0.10], ['Proposals (1 in 3)', 1 / 3], 
 function renderFunnel(m, a) {
   const years = [], first = START_YEAR + 1, last = START_YEAR + 9;
   for (let y = first; y <= last; y++) years.push(y - START_YEAR);
-  const wins = (y) => sumRange(m.accounts, y * 4, y * 4 + 4);
+  const wins = (y) => sumRange(m.accounts, y * 4, y * 4 + 4) - sumRange(m.accP, y * 4, y * 4 + 4);   // won by our own salespeople
   const tcv = (y) => a.facPerAccount * (a.installPrice + 5 * a.subPrice) * m.size[y * 4 + 3];
   const head = '<th></th>' + years.map((y) => '<th>' + (START_YEAR + y) + '</th>').join('');
   const row = (name, fn, cls) => '<tr class="' + (cls || '') + '"><td>' + name + '</td>' + years.map((y) => '<td>' + fn(y) + '</td>').join('') + '</tr>';
   const n = (v) => (v < 0.05 ? '–' : v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString('en-US'));
   const body = FUNNEL.map(([name, p]) => row(name, (y) => n(wins(y) / p), p === 1 ? 'total' : '')).join('') +
+    (a.partnerWins > 0 ? row('Won by integrators (no leads of ours)', (y) => n(sumRange(m.accP, y * 4, y * 4 + 4))) : '') +
     row('Contract value per customer, $M', (y) => (tcv(y) / 1e6).toFixed(2)) +
     row('Weighted value at each stage, $M', (y) => (wins(y) * tcv(y) / 1e6).toFixed(1), 'total');
   $('funnel').innerHTML = '<table><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table>';
-  let leads = 0; for (let t = 0; t < T; t++) leads += m.accounts[t] / FUNNEL[0][1];
+  let leads = 0; for (let t = 0; t < T; t++) leads += (m.accounts[t] - m.accP[t]) / FUNNEL[0][1];
   const fac = Math.max(...m.addr);
   $('funnelNote').textContent = 'Weighted value is each stage count times contract value times its chance of signing, so every stage carries the same value. Check against the market: by ' + (START_YEAR + T / 4 - 1) + ' the plan needs about ' + Math.round(leads).toLocaleString('en-US') + ' leads at 1 in 10, more than the ' + Math.round(fac).toLocaleString('en-US') + ' facilities that could buy, even if each were its own buyer. The buyers are few and public, so after the first years we must sign far more than 1 lead in 10: reference sites and statewide or cooperative contracts have to do that work.';
 }
