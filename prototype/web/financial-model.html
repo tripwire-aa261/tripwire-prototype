@@ -270,6 +270,8 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
           <ul>
             <li><b>Every customer of a type is the same.</b> A facility pays in proportion to the sensors it needs against Hays: prisons and jails 1×, large stadiums 1.5×, airports and bases 4×. Within a type, every site is the same size and willing to pay the same. In reality stadiums need different numbers of sensors, and venues with big concerts, playoffs or other large events would likely pay more (pricing per event or by tier). We test this with design partners.</li>
             <li><b>No defense programs.</b> Military bases (450, Big Idea Memo) are counted only as fixed sites like airports, from Series B. Defense procurement of counter-drone systems, kits that troops carry, and sales to allied militaries are not in the model.</li>
+            <li><b>Volume discounts only on our own board.</b> The board price falls with volume (parts list); the computer, antennas, enclosure and bladeRF radios keep today's prices, and the cost of installing and running a facility does not fall as we grow. Supplier quotes at Seed replace these.</li>
+            <li><b>Abroad looks like the US.</b> Sites abroad are Hays-size prisons and jails at the US price and US installation and upkeep cost; only staff cost less (sliders above). European prices, labor and import costs are not yet researched.</li>
             <li><b>One product only: the facility subscription.</b> Not counted: the airspace-map data feed, selling sensors or software to integrators or other vendors, installation and consulting services, taking down drones (which we do not do and which needs legal authority), and other site types such as data centers (3,068 sites, Big Idea Memo).</li>
           </ul>
         </div>
@@ -432,6 +434,7 @@ const FIXED = {
   segCore: 4277,                         // US prisons 1,161 + jails 3,116 (memo)
   segStadium: 200, stadiumSize: 1.5,     // about 200 large US stadiums (ASSUMPTION); sellable once 30-40 dB works (Clemson: not possible at 20 dB); 6 custom sensors at 40 dB vs 4 at Hays
   segLater: 1150,                        // airports 518 + military 450 + refineries 128 + nuclear 54 (memo), from Series B
+  boardCost100: 805, boardCost1k: 642, boardCost10k: 531,   // our own 8-channel board at 100 / 1,000 / 10,000 boards (prototype figures, section 3); customCost uses the 1,000 price
   abroadOps: 2, abroadSales: 1,          // ASSUMPTION: team abroad from the first quarter of sales there (2 field engineers + 1 salesperson); UK median pay + 15% employer NI is about GBP 167k a year for the three (ONS ASHE 2025, GOV.UK), below 3 x $175k
   abroadCert: 25000,                     // ASSUMPTION: CE marking under the Radio Equipment Directive, top of the EUR 8,000-25,000 notified-body estimate, paid the quarter before sales abroad
   partnerShare: 0.375,                   // share of a customer's payments an integrator keeps: 37.5% average integrator gross margin on video surveillance projects (Security Sales & Integration, 2020)
@@ -453,7 +456,8 @@ const DEFAULTS = {
   installPrice: 25000, subPrice: 25000, winsPerRep: 2, salesCycle: 3, facPerAccount: 6, rollout: 1,
   workable: 33, abroad: 1500, abroadQ: 32,   // abroadQ: first quarter of sales abroad (Western Europe first); 32 = 2035 Q1, after the company pays its own way
   launch: 7, customQ: 17, q40: 15, hwCost: 100,
-  contractQ: 64, contractFee: 2, partnerWins: 0, refGain: 0,   // sales-speed levers, all off in the plan (64 = never)
+  contractQ: 64, contractFee: 2, partnerWins: 0, refGain: 0,
+  abroadRepsAdd: 1, abroadHead: 90, abroadPrice: 100, abroadCostPct: 100,   // abroad: salespeople added per year, $k per employee there, price and install/upkeep cost as % of the US   // sales-speed levers, all off in the plan (64 = never)
   engAdds: 4, repsAdd: 5, costPerHead: 175,
   r0: 0.25, r1: 4, r2: 12, r3: 9,
 };
@@ -469,6 +473,7 @@ function qLabel(t) { return (START_YEAR + Math.floor(t / 4)) + ' Q' + (t % 4 + 1
 function runModel(a) {
   const N = T + 1, z = () => new Array(N).fill(0), F = FIXED;
   const launch = a.launch;
+  const repsAb = z(), accAb = z(), soldAb = z(), activeAb = z(), addrAb = z(), headsAb = z();
   const reps = z(), accounts = z(), accP = z(), accC = z(), cChannel = z(), sites = z(), cumSites = z(), active = z(), addr = z();
   const hwRev = z(), subRev = z(), rev = z();
   const cHw = z(), cInstall = z(), cSupport = z(), cOps = z(), varCost = z();
@@ -478,7 +483,12 @@ function runModel(a) {
   const perHeadQ = a.costPerHead * 1000 / 4, founderQ = F.founderPay * 1000 / 4;
   const extra4 = () => (F.stadiumPilotSensors - F.bladeSensors) * F.runPerSensor / 4;
   const sensors = (t) => (t >= a.customQ ? F.customSensors : F.bladeSensors);
-  const sensorCost = (t) => (t >= a.customQ ? F.customCost : F.bladeCost) * (a.hwCost / 100);   // hwCost: sensor hardware cost, % of the prototype's figure
+  // our own board gets cheaper as we buy more of them (log-linear between the parts list's 100, 1,000 and 10,000-board prices)
+  let boards = 0;
+  const boardPrice = (n) => { const p = [[100, F.boardCost100], [1000, F.boardCost1k], [10000, F.boardCost10k]];
+    if (n <= 100) return p[0][1]; if (n >= 10000) return p[2][1];
+    const k = n < 1000 ? 0 : 1, f = Math.log(n / p[k][0]) / Math.log(p[k + 1][0] / p[k][0]); return p[k][1] + f * (p[k + 1][1] - p[k][1]); };
+  const sensorCost = (t) => (t >= a.customQ ? F.customCost - F.boardCost1k + boardPrice(boards + 1) : F.bladeCost) * (a.hwCost / 100);   // hwCost: sensor hardware cost, % of the prototype's figure
   const roster = (t, team) => ROSTER.filter((r) => r[1] === team && t >= r[2]);
   const paid = (t, team) => roster(t, team).reduce((s, r) => s + (r[3] ? (t >= SEED_Q ? founderQ : 0) : perHeadQ), 0);
 
@@ -497,29 +507,43 @@ function runModel(a) {
     accounts[t] = direct + accP[t] + (t === launch ? F.pilots : 0);
     accC[t] = onContract ? direct : 0;
   }
+  // abroad has its own salespeople (one from the first quarter of sales there, more each year) who sell only abroad
+  for (let t = 0; t < N; t++) repsAb[t] = a.abroad > 0 && t >= a.abroadQ ? F.abroadSales + Math.floor(a.abroadRepsAdd * (t - a.abroadQ) / 4) : 0;
+  for (let t = launch; t < N; t++) {
+    const cycle = t >= a.contractQ ? Math.max(1, a.salesCycle - F.contractCut) : a.salesCycle, src = t - cycle;
+    accAb[t] = src >= 0 ? repsAb[src] * a.winsPerRep * (t >= refQ ? 1 + a.refGain / 100 : 1) / 4 : 0;
+  }
+  const accUS = accounts.slice();
   let cumA = 0, cumP = 0, cumC = 0;
   const size = z();   // average size against Hays of the facilities sold this quarter (each site type keeps its own size)
   const SEG = [() => F.coreSize, () => F.stadiumSize, () => F.laterSize];
   const actS = [z(), z(), z()], units = z();   // facilities in service by type: prisons/jails (+ abroad), stadiums, airports/bases; units = size-weighted
   for (let t = 0; t < N; t++) {
     const share = t >= a.q40 ? 1 : a.workable / 100;
-    const nCore = (F.segCore + (t >= a.abroadQ ? a.abroad : 0)) * share, nStad = t >= a.q40 ? F.segStadium : 0, nLater = t >= B_Q ? F.segLater * share : 0;
-    addr[t] = nCore + nStad + nLater;
+    addrAb[t] = t >= a.abroadQ ? a.abroad * share : 0;
+    const nCore = F.segCore * share, nStad = t >= a.q40 ? F.segStadium : 0, nLater = t >= B_Q ? F.segLater * share : 0;
+    addr[t] = nCore + nStad + nLater + addrAb[t];
     const segAddr = [nCore, nStad, nLater];
     let planned = 0;
     for (let s = 0; s < t; s++) {
-      if (!accounts[s]) continue;
-      const partners = s === launch ? Math.min(F.pilots, accounts[s]) : 0;
-      const fresh = accounts[s] - partners;
+      if (!accUS[s]) continue;
+      const partners = s === launch ? Math.min(F.pilots, accUS[s]) : 0;
+      const fresh = accUS[s] - partners;
       const doneF = Math.min(a.facPerAccount, a.rollout * (t - s - 1));
       planned += fresh * Math.max(0, Math.min(a.rollout, a.facPerAccount - doneF));
       const doneP = Math.min(a.facPerAccount - 1, a.rollout * (t - s - 1));      // partners already have their pilot facility
       planned += partners * Math.max(0, Math.min(a.rollout, a.facPerAccount - 1 - doneP));
     }
+    let plannedAb = 0;
+    for (let s = 0; s < t; s++) if (accAb[s]) plannedAb += accAb[s] * Math.max(0, Math.min(a.rollout, a.facPerAccount - Math.min(a.facPerAccount, a.rollout * (t - s - 1))));
+    const prevAb = t ? activeAb[t - 1] : 0;
+    soldAb[t] = Math.max(0, Math.min(plannedAb, addrAb[t] - prevAb));
+    activeAb[t] = prevAb * (1 - F.churn / 4) + soldAb[t];
     const prev = t ? cumSites[t - 1] : 0;
     const pilot = t === F.pilotQ ? F.pilots : 0;
-    const sold = Math.max(0, Math.min(planned, addr[t] - (t ? active[t - 1] : 0) - pilot));   // cap on facilities in service, so lost facilities can be won back
-    sites[t] = sold + pilot;
+    const usIn = (t ? active[t - 1] : 0) - prevAb;
+    const sold = Math.max(0, Math.min(planned, addr[t] - addrAb[t] - usIn - pilot));   // US cap on facilities in service, so lost facilities can be won back
+    sites[t] = sold + pilot + soldAb[t];
     cumSites[t] = prev + sites[t];
     const prevActive = t ? active[t - 1] : 0;
     active[t] = prevActive * (1 - F.churn / 4) + sites[t];
@@ -533,36 +557,42 @@ function runModel(a) {
       newUnits += sold * rem[k] / remT * SEG[k]();
     }
     units[t] = actS.reduce((x, arr, k) => x + arr[t] * SEG[k](), 0);
-    size[t] = sites[t] ? newUnits / sites[t] : (t ? size[t - 1] : F.coreSize);
+    size[t] = sites[t] ? (newUnits + soldAb[t] * F.coreSize) / sites[t] : (t ? size[t - 1] : F.coreSize);
     const prevUnits = t ? units[t - 1] : 0;
-    const billed = (prevUnits + units[t]) / 2 - (t < F.pilotQ + 4 ? Math.min(F.pilots, active[t]) * F.coreSize : 0);   // size-weighted; pilots pay the pilot fee for year one
+    const billed = (prevUnits + units[t]) / 2 - (t < F.pilotQ + 4 ? Math.min(F.pilots, active[t]) * F.coreSize : 0);   // size-weighted (US); pilots pay the pilot fee for year one
+    const pf = a.abroadPrice / 100, billedAb = (prevAb + activeAb[t]) / 2 * F.coreSize;
 
-    hwRev[t] = (newUnits - pilot * F.coreSize) * a.installPrice + (pilot ? F.pilotFee + F.stadiumPilotFee : 0);
-    subRev[t] = Math.max(0, billed) * a.subPrice / 4;
+    hwRev[t] = (newUnits - pilot * F.coreSize) * a.installPrice + soldAb[t] * F.coreSize * a.installPrice * pf + (pilot ? F.pilotFee + F.stadiumPilotFee : 0);
+    subRev[t] = (Math.max(0, billed) + billedAb * pf) * a.subPrice / 4;
     rev[t] = hwRev[t] + subRev[t];
 
     const others = () => hEng[t] + hSales[t] + hOps[t];
     hEng[t] = roster(t, 'eng').length + (t >= A_Q ? Math.floor(a.engAdds * (t - A_Q + 1) / 4) : 0);
     hSales[t] = roster(t, 'sales').length + (t >= A_Q ? Math.floor(a.repsAdd * (t - A_Q + 1) / 4) * (1 + F.salesSupport) : 0);
     const abroadOn = a.abroad > 0 && t >= a.abroadQ;
-    hSales[t] = Math.ceil(hSales[t]) + (abroadOn ? F.abroadSales : 0);
-    hOps[t] = Math.max(roster(t, 'ops').length, t >= launch ? Math.ceil(active[t] / F.sitesPerOps) : 0) + (abroadOn ? F.abroadOps : 0);
+    const salesAb = Math.ceil(repsAb[t] * (1 + F.salesSupport)), opsAb = abroadOn ? Math.max(F.abroadOps, Math.ceil(activeAb[t] / F.sitesPerOps)) : 0;
+    headsAb[t] = salesAb + opsAb;   // employees abroad, paid at the abroad rate
+    hSales[t] = Math.ceil(hSales[t]) + salesAb;
+    hOps[t] = Math.max(roster(t, 'ops').length, t >= launch ? Math.ceil((active[t] - activeAb[t]) / F.sitesPerOps) : 0) + opsAb;
     hGA[t] = roster(t, 'ga').length + (t >= A_Q ? Math.floor(others() / F.gaPer) : 0);
     heads[t] = hEng[t] + hSales[t] + hOps[t] + hGA[t];
 
-    const ns = sensors(t) * size[t], nsAct = sensors(t) * (active[t] ? units[t] / active[t] : 1);
+    const ns = sensors(t) * size[t], actAll = units[t] + activeAb[t] * F.coreSize, nsAct = sensors(t) * (active[t] ? actAll / active[t] : 1);
+    const cf = a.abroadCostPct / 100, abShare = sites[t] ? soldAb[t] / sites[t] : 0, abActShare = active[t] ? activeAb[t] / active[t] : 0;
     const extra = pilot ? F.stadiumPilotSensors - F.bladeSensors : 0;   // the stadium pilot needs 12 bladeRF sensors, not 6
     cHw[t] = sites[t] * (ns * sensorCost(t) + F.hubPerFacility) + extra * F.bladeCost;
-    cInstall[t] = sites[t] * (ns * F.installPerSensor + F.setupPerFacility) + extra * F.installPerSensor;
+    cInstall[t] = sites[t] * (ns * F.installPerSensor + F.setupPerFacility) * (1 - abShare + abShare * cf) + extra * F.installPerSensor;
+    if (t >= a.customQ) boards += sites[t] * ns;
     const runPer = t >= a.customQ ? F.runPerSensorCustom : F.runPerSensor;
-    cSupport[t] = (prevActive + active[t]) / 2 * (nsAct * runPer + F.runPerFacility) / 4 + (t >= F.pilotQ && t < F.pilotQ + 4 ? extra4(t) : 0);
-    cOps[t] = paid(t, 'ops') + Math.max(0, hOps[t] - roster(t, 'ops').length) * perHeadQ;
+    cSupport[t] = (prevActive + active[t]) / 2 * (nsAct * runPer + F.runPerFacility) / 4 * (1 - abActShare + abActShare * cf) + (t >= F.pilotQ && t < F.pilotQ + 4 ? extra4(t) : 0);
+    const abHeadQ = a.abroadHead * 1000 / 4;
+    cOps[t] = paid(t, 'ops') + Math.max(0, hOps[t] - opsAb - roster(t, 'ops').length) * perHeadQ + opsAb * abHeadQ;
     cumA += accounts[t]; cumP += accP[t]; cumC += accC[t];
     cChannel[t] = cumA ? rev[t] * (cumP / cumA * F.partnerShare + cumC / cumA * a.contractFee / 100) : 0;   // integrators' share and contract fees, by share of customers won that way
     varCost[t] = cHw[t] + cInstall[t] + cSupport[t] + cOps[t] + cChannel[t];
 
     fEng[t] = paid(t, 'eng') + (hEng[t] - roster(t, 'eng').length) * perHeadQ;
-    fSales[t] = paid(t, 'sales') + (hSales[t] - roster(t, 'sales').length) * perHeadQ;
+    fSales[t] = paid(t, 'sales') + (hSales[t] - salesAb - roster(t, 'sales').length) * perHeadQ + salesAb * abHeadQ;
     fGA[t] = paid(t, 'ga') + (hGA[t] - roster(t, 'ga').length) * perHeadQ + (t < A_Q ? F.counselQ : F.counselLaterQ) * 1000;
     const payroll = fEng[t] + fSales[t] + fGA[t] + cOps[t];
     fOver[t] = t >= SEED_Q ? F.overhead * payroll : 0;
@@ -578,6 +608,7 @@ function runModel(a) {
   //  - facilities in service: the subscription quarters left on their 5-year contract;
   //  - facilities signed but not yet installed (a customer installs its facilities one after another): installation + 5 years.
   //  Each future quarter is weighted by the chance the facility is still a customer (the model's yearly loss rate, F.churn).
+  for (let t = 0; t < N; t++) accounts[t] += accAb[t];   // all customers, at home and abroad (funnel, backlog)
   const backlog = z(), keep = 1 - F.churn / 4, termQ = 20;
   const surv = (k) => (keep * (1 - Math.pow(keep, k))) / (1 - keep);   // sum of keep^1..keep^k
   let committed = 0;
@@ -597,7 +628,7 @@ function runModel(a) {
   // cash timing: hardware is paid for a quarter before it ships; customers pay a quarter after installation
   for (let t = 0; t < T; t++) {
     const receipts = (t ? hwRev[t - 1] : 0) + subRev[t];
-    const payments = cHw[t + 1] + cInstall[t] + cSupport[t] + cOps[t] + fixCost[t];
+    const payments = cHw[t + 1] + cInstall[t] + cSupport[t] + cOps[t] + cChannel[t] + fixCost[t];   // integrators' share and contract fees are paid too
     ocf[t] = receipts - payments;
     cumOcf[t] = (t ? cumOcf[t - 1] : 0) + ocf[t];
     cash[t] = (t ? cash[t - 1] : 0) + ocf[t] + fin[t];
@@ -612,7 +643,7 @@ function runModel(a) {
     if (-cumOcf[t] > peakNeed) { peakNeed = -cumOcf[t]; qPeak = t; }
   }
   const raised = ROUNDS.reduce((s, r) => s + (a[r.key] || 0) * 1e6, 0);
-  return { size, launch, reps, accounts, accP, accC, cChannel, sites, cumSites, active, addr, hwRev, subRev, rev, ttm, backlog,
+  return { repsAb, accAb, soldAb, activeAb, headsAb, size, launch, reps, accounts, accP, accC, cChannel, sites, cumSites, active, addr, hwRev, subRev, rev, ttm, backlog,
     cHw, cInstall, cSupport, cOps, varCost, fEng, fSales, fGA, fOver, fDev, fixCost,
     hEng, hSales, hOps, hGA, heads, gross, opProfit, ocf, fin, cash, cumOcf,
     q100, qCfp, minCash, qMinCash, peakNeed, qPeak, raised,
@@ -634,7 +665,11 @@ const INPUTS = {
   refGain: ['Sales lever: more wins once the pilots are references', 'Extra customers per salesperson from 2029 Q1, when Hays and Clemson results are out. Unsourced. Off in the plan.'],
   workable: ['Share of facilities that work with today’s processing', 'One of our three simulated sites works at 20 dB interference removal.'],
   abroad: ['Facilities abroad', 'Prisons, stadiums and airports in allied countries, Western Europe first.'],
-  abroadQ: ['Sales abroad start', 'Plan: once the company pays its own way, funded from its own cash. Adds 2 field engineers and 1 salesperson there and CE marking; needs export licenses first.'],
+  abroadQ: ['Sales abroad start', 'Plan: once the company pays its own way, funded from its own cash. Starts with 2 field engineers and 1 salesperson there, plus CE marking; needs export licenses first.'],
+  abroadRepsAdd: ['Salespeople added abroad per year', 'They sell only abroad, at the same pace as US salespeople. Field staff abroad grow with the facilities there. ASSUMPTION.'],
+  abroadHead: ['Cost of one employee abroad, per year', 'UK median pay plus 15% employer National Insurance is about $74.5k (field engineer GBP 50.8k, salesperson GBP 65.5k; ONS ASHE 2025, GOV.UK; $1.3371 a pound, Federal Reserve H.10, Nov 6 2026); plus about 20% for pension and benefits (ASSUMPTION). Germany costs more.'],
+  abroadPrice: ['Price abroad, % of the US price', 'No European price data yet. ASSUMPTION: the same price.'],
+  abroadCostPct: ['Installing and running a facility abroad, % of the US cost', 'Sensors cost the same; local labor, shipping and import duties differ. ASSUMPTION: the same.'],
   launch: ['Product ready to sell', 'After the design-partner pilots and scored flights.'],
   customQ: ['Our own receiver in production', 'Cuts a Hays-size facility from 6 sensors to 4 and the cost per sensor.'],
   q40: ['Interference removal reaches 40 dB', 'Unlocks dense-tower and sparse-tower sites. Unproven.'],
@@ -712,6 +747,10 @@ const FIELDS = {
     { key: 'workable', min: 10, max: 100, step: 1, fmt: (v) => v + '%' },
     { key: 'abroad', min: 0, max: 6000, step: 250, fmt: int },
     { key: 'abroadQ', min: 19, max: 64, step: 1, fmt: when },
+    { key: 'abroadRepsAdd', min: 0, max: 6, step: 1, fmt: int },
+    { key: 'abroadHead', min: 50, max: 200, step: 5, fmt: (v) => '$' + v + 'k' },
+    { key: 'abroadPrice', min: 50, max: 150, step: 5, fmt: (v) => v + '%' },
+    { key: 'abroadCostPct', min: 50, max: 200, step: 5, fmt: (v) => v + '%' },
     { key: 'contractQ', min: 7, max: 64, step: 1, fmt: when },
     { key: 'contractFee', min: 0, max: 10, step: 0.5, fmt: (v) => v + '%' },
     { key: 'partnerWins', min: 0, max: 20, step: 1, fmt: int },
@@ -800,6 +839,7 @@ function buildInputs() {
     'Sensor (prototype): $' + int(F.bladeCost) + ' with two bladeRF radios, 6 per Hays-size facility; $' + int(F.customCost) + ' with our own receiver, 4 per facility. Hub $' + F.hubPerFacility + ' per facility.',
     'Installation (prototype): $' + F.installPerSensor + ' per sensor + $' + int(F.setupPerFacility) + ' site set-up per facility.',
     'Upkeep (prototype): $' + int(F.runPerSensor) + ' per bladeRF sensor or $' + int(F.runPerSensorCustom) + ' per own-receiver sensor, + $' + int(F.runPerFacility) + ' per facility per year (service visit, spares, software, internet line, cloud).',
+    'Our own board gets cheaper as we buy more: $' + F.boardCost100 + ' each at 100 boards, $' + F.boardCost1k + ' at 1,000 and $' + F.boardCost10k + ' at 10,000 (prototype figures, section 3), so the first own-receiver sensors cost more than $' + int(F.customCost) + ' and later ones less. Other sensor parts and the bladeRF radios keep their prices (no volume quotes yet).',
     'Own receiver design: $' + int(F.nre) + ', spent over the ' + F.nreQuarters + ' quarters before it ships (assumption, prototype section 7).',
     'Two design-partner pilots from ' + qLabel(F.pilotQ) + ' for one year (pilot cost + 40%, credited if they buy): Hays State Prison $' + int(F.pilotFee) + ' with 6 bladeRF sensors; Clemson Memorial Stadium $' + int(F.stadiumPilotFee) + ' with ' + F.stadiumPilotSensors + ', because the stadium needs 30 dB of interference removal and sensors on the stands as well as outside (prototype v0.5).',
     'Based in Atlanta, near both pilots. $175k per hire = an average wage of about $125k (BLS May 2025 Atlanta means: electronics engineers $146k, software developers $136k, technical sales $126k; field and admin staff less) + about 40% for benefits and taxes (BLS employer costs: benefits are 30% of total pay). The same team in San Jose would cost about $240k a head. Founders: no salary before Seed, then $' + F.founderPay + 'k each (loaded). Hourly regulatory counsel $' + F.counselQ + 'k a quarter, $' + F.counselLaterQ + 'k once the regulatory lead starts.',

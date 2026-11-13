@@ -2,6 +2,39 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Abroad sales team, abroad labor rates and prices, board volume prices
+
+**Asked for:**
+- "give the abroad team its own sales";
+- abroad labor rates "probably lower than US";
+- price and costs "would definitely change" in Europe;
+- "are you taking into account the economies of scale effect ... when we buy our hardware in bulk".
+
+**Done:**
+- Model v20, abroad:
+  - Sites abroad are their own pool, sold only by salespeople abroad: 1 from 2035 Q1, then 1 more a year (ASSUMPTION, slider). US salespeople sell only US sites.
+  - Field staff abroad grow with the facilities there (minimum 2).
+  - Abroad staff cost $90k a head (slider): UK median pay plus 15% NI is about $74.5k at $1.3371/GBP (Federal Reserve H.10, Nov 6 2026), plus about 20% pension and benefits (ASSUMPTION).
+  - Price abroad and install/upkeep cost abroad are sliders, both 100% of the US (ASSUMPTION, no European data).
+- Model v20, scale and fixes:
+  - Own board price falls with cumulative boards: $805 at 100, $642 at 1,000, $531 at 10,000 (prototype figures, section 3), interpolated on a log scale. Other parts keep their prices. Effect on the plan is about $0.1M.
+  - Bug fix: integrators' share and contract fees are now paid in cash (they were a cost but not a cash outflow), which raises the cash the integrator and Faster sales cases need.
+- Plan results:
+  - $20.5M needed; pays its own way 2034 Q2; $100M/yr 2039 Q4 (was 2040 Q2), because US salespeople no longer spend time on sites abroad;
+  - 2042 sales $171M, with about 255 facilities and 19 people abroad;
+  - slower sales $87M, paying its own way in 2041 Q4; price war $53M; faster sales $12.8M, 2032 Q4.
+- Draft 5:
+  - The Western Europe paragraph is rewritten.
+  - Two new assumption bullets: volume discounts on our board only; abroad is like the US except staff cost.
+  - All changed figures updated, including the levers table and its text. References now cut cash the most.
+  - Three charts re-published (axes widened) and the roadmap reads "$100M a year by 2039".
+  - Both Google tabs re-pasted.
+
+**Left open:**
+- European prices, labor rates, shipping and import duties are not yet researched.
+- Volume quotes for parts other than the board are missing.
+- The twin's flat plan price.
+
 ## 2026-11-12 · Sid · Each site type billed at its own size; uniform-customer, defense and one-product assumptions
 
 **Asked for:**
