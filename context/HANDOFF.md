@@ -40,12 +40,20 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 
 ## Next steps
 
-1. Deploy the prototype (Vercel, teammate) so the teaching team and the Draft 4 model link work without a local server.
-2. Drone-vs-bird classifier in the twin (rotor evidence over a track + flight behavior; re-score saved replays).
-3. Stadium follow-ups: bowl-specific area target; real stand heights and mounting points; DAS layout; game-day network load.
-4. `Iterations.docx`: fix stale receiver figures in the lessons; add the new lessons.
-5. Seed tests that decide the product: interference removal (30-40 dB?), background stability (-30 dB), two-board bladeRF phase lock, Jetson capacity; record drones and birds.
-6. Sensor placement search along the fence (weak direction at Hays); supplier and installer quotes.
+1. **Before the Nov 13 deadline (Sid):**
+   - Read Draft 5 once end to end on the Google tab, since its numbers changed several times today.
+   - Delete the stray empty bullet at its end.
+   - Fill the Product Prototype tab's prototype link and recording placeholders.
+2. Deploy the prototype (Vercel, teammate) so the teaching team and the model link work without a local server.
+3. **Customer contact:** the pilots need 20 leads in 2027 Q2 (6 Southeast prison systems, 33 SEC/ACC stadiums). No one has been contacted yet; one letter of intent changes the pipeline and the investor story.
+4. ESP32 Wi-Fi motion test next week (code written, hardware delayed).
+5. **Research to replace assumptions:**
+   - European prices, labor, shipping and import duties;
+   - volume quotes for parts other than our board;
+   - stadium and event pricing tiers;
+   - defense programs and data centers as markets (path to $1B).
+6. Twin: scale the value-based plan price by sensors (it is flat per facility today).
+7. Drone-vs-bird classifier in the twin; stadium follow-ups; `Iterations.docx` lessons; Seed tests (30-40 dB, -30 dB background, two-board phase lock, Jetson capacity); sensor placement along the Hays fence.
 
 ## Open questions
 

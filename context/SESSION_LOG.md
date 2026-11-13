@@ -2,6 +2,17 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Bill of materials highlighted
+
+**Asked for:** "the prototype dashboard has an excellent BOM list which is used to calculate our unit price. I want to highlight that somewhere": reference it in the bottom-up cost estimate, and give it a special mention in the prototype tab.
+**Done:**
+- Draft 5, "Bottom up": costs come from the twin's bill of materials (Financials explorer). Every sensor part, the hub, installation and upkeep is priced line by line.
+  - The own receiver has 16 parts lines: 11 are distributor prices with supplier links, covering $536 of $612 of parts; 5 are assumptions.
+  - Board price $805 / $642 / $531 at 100 / 1,000 / 10,000 boards. The financial model uses the same list.
+- Product Prototype tab: a "Worth a closer look: the bill of materials" paragraph and a screenshot of the parts list (`prototype_tab_images/bom_s.jpg`).
+- The model's bottom-up table now has a note pointing to the bill of materials.
+**Left open:** see Next steps in HANDOFF.
+
 ## 2026-11-12 · Sid · Abroad sales team, abroad labor rates and prices, board volume prices
 
 **Asked for:**
