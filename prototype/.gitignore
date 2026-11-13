@@ -34,3 +34,4 @@ web/runs/sweeps/index.json
 data/cache/
 # v0.4.4: the hover / pole-height study, read by tools/build_assumptions_doc.py
 !web/runs/hover_feasibility.json
+!web/runs/placement_study.json

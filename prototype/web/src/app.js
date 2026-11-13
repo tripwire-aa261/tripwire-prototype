@@ -1,4 +1,4 @@
-// Tripwire digital twin v0.4.3: tabs (Overview, Trade space simulator, 3D signal simulation, Financials) over shared state.
+// Tripwire digital twin v0.5.1: tabs (Overview, Trade space simulator, 3D signal simulation, Financials) over shared state.
 import { $, esc, X, state, loadData } from './data.js';
 import { initOverview } from './overview.js';
 import { initSimulate } from './simulate.js';

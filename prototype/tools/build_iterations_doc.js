@@ -84,7 +84,16 @@ c.push(B("**Did not work:** customers could not ask how early a drone must be pi
 c.push(B("**Changed:** a fifth requirement, detection range: how far outside the fence the typical incoming drone is first tracked (300 m by default), with the distance 8 in 10 drones reach and the directions where drones are seen late. Flights now start 1.8 km out."));
 c.push(B("**Found:** at Hays drones flying in from the south-southwest, along the line between the southern towers and the sensors, are picked up only ~50-300 m out even with 16 sensors, against 1-1.6 km from other directions. Placing sensors deliberately (not evenly) is the next fix. With 300 m required, the cheapest answers do not change (Hays: 4 custom or 6 bladeRF sensors); with bladeRF, Fulton at 40 dB needs 6 sensors (was 4) and Hancock at 40 dB 12 (was 6)."));
 
-c.push(H2("10. Next (proposed)"));
+c.push(H2("10. v0.5: a stadium customer (Nov 12)"));
+c.push(B("**Did not work:** the twin only knew prisons; sensors could only stand on poles at the fence; the site tools could not read a stadium from OpenStreetMap (a ring of stands around an open field)."));
+c.push(B("**Changed:** Clemson Memorial Stadium (South Carolina) as a fourth site, with its stands around an open field (stands 30 m tall, ASSUMPTION). Sensors can now go on poles, on top of the structure, or alternate between the two. A placement study compares the three."));
+c.push(B("**Found:** poles alone never see into the bowl (the stands block it: at most ~50-65% of the inside covered at any count). Sensors on top of the stands see the bowl but also every tower around, so below 40 dB of interference removal they lose the area around the stadium. Alternating the two works and is the stadium default. The area target can hide this: 16 poles meet 90% of the area at 30-40 dB while a third of the bowl is blind, so a stadium's target should be set for the bowl itself. With today's 20 dB nothing works (16 custom sensors reach 91% of the area but track only 78% of the time); with 30 dB, 8 custom or 12 bladeRF sensors; with 40 dB, 6 of either. The typical drone is picked up ~1.1-1.2 km out. Not modeled: the stadium's own cell antennas, game-day network load, the crowd. Microphones are off at the stadium (crowd noise). A stadium also wants the pilot's location and a 3-mile restriction zone, which an RF detector covers better: we would sell the bowl layer."));
+
+c.push(H2("11. v0.5.1: bird display option (Nov 12)"));
+c.push(B("**Did not work:** the bird circling near the facility got a track, shown like a drone. The rotor score meant to tell them apart is above 6 dB on 37% of drone and 33% of bird detections (and 65% of false detections), so it separates nothing."));
+c.push(B("**Changed:** a Bird checkbox in the 3D tab hides the bird and its tracks (display only; the replays were simulated with the bird). Proposed fix: rotor evidence built up over a track plus flight behavior, with alerts only on tracks classified as drones; real drone and bird recordings at Seed to train the classifier."));
+
+c.push(H2("12. Next (proposed)"));
 c.push(B("Record real LTE signals and measure interference removal and enhanced-processing gain; model network busyness by hour; check which carriers a radio can capture at once."));
 
 c.push(H1("What the iterations taught us about the product"));

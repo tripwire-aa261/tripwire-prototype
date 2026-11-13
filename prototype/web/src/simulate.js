@@ -5,7 +5,7 @@
 import { $, esc, usd, pct, meters, X, state, defaultReq, fillSelect, INTERF_LABEL, onChange, emit,
   DESIGN, RADIO, RADIO_KEYS, fixedBuild, designFor, OTS_BUILDS, BUILDS_FOR, setup, recommendAt, radioOption, nearestN, outcome, facility, targetsText } from './data.js';
 import { info } from './help.js';
-import { weakDirections } from './data.js';
+import { weakDirections, edgeWord } from './data.js';
 
 // Detection range card: the typical drone (the requirement), with the 8-in-10 figure and weak directions.
 function detCard(o, t, card) {
@@ -47,7 +47,7 @@ function picker() {
   $('spKpis').innerHTML = [
     card('Area covered', 'area', pct(o.cov), `target ${t.area}%`, o.cov >= t.area ? 'ok' : 'bad'),
     card('Time tracked', 'tracked', pct(o.trk), `target ${t.tracked}%`, o.trk >= t.tracked ? 'ok' : 'bad'),
-    card('Drones caught', 'caught', pct(o.caught), 'before they reach the fence'),
+    card('Drones caught', 'caught', pct(o.caught), `before they reach the ${edgeWord()}`),
     card('Tracking accuracy', 'accuracy', o.acc == null ? '—' : `~${Math.round(o.acc)} m`, `target within ${t.accuracy} m`, o.acc != null && o.acc <= t.accuracy ? 'ok' : 'bad'),
     detCard(o, t, card),
     card('Customer pays', 'price', `${usd(f.price)}`, `+ ${usd(f.sub)}/yr · ${usd(x.total)} over ${state.fin.years} yrs`),
@@ -74,7 +74,7 @@ function frame(ymax, ystep, yfmt, ytitle) {
   let g = '';
   for (let v = 0; v <= ymax + 1e-9; v += ystep) { g += `<line class="grid" x1="${ml}" x2="${ml + pw}" y1="${Yp(v)}" y2="${Yp(v)}"/><text x="${ml - 6}" y="${Yp(v) + 4}" text-anchor="end">${yfmt(v)}</text>`; }
   for (const n of ns) g += `<line class="grid" x1="${Xp(n)}" x2="${Xp(n)}" y1="${mt}" y2="${mt + ph}"/><text x="${Xp(n)}" y="${H - 26}" text-anchor="middle">${n}</text>`;
-  g += `<text class="axis" x="${ml + pw / 2}" y="${H - 6}" text-anchor="middle">number of sensors on the fence</text>`;
+  g += `<text class="axis" x="${ml + pw / 2}" y="${H - 6}" text-anchor="middle">number of sensors around the ${edgeWord()}</text>`;
   g += `<text class="axis" transform="translate(14 ${mt + ph / 2}) rotate(-90)" text-anchor="middle">${ytitle}</text>`;
   return { g, Xp, Yp, ml, pw };
 }

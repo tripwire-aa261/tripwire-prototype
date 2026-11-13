@@ -1,7 +1,23 @@
 # Brief: updating the business plan from the prototype
 
 For a new Claude Code session (any computer) whose job is to bring the business plan and its financials in line with the
-prototype. Written 2026-11-12 at twin v0.4.5.
+prototype. Written 2026-11-12 at twin v0.5.1.
+
+> **NEW since v0.4.5 (2026-11-12, twin v0.5 and v0.5.1). If you already updated the plan from v0.4.5, add only
+> these:**
+>
+> 1. **A second customer type, stadiums** (Clemson Memorial Stadium, SC). Figures: `Tripwire_Assumptions_and_Figures.md`
+>    section 8 (rows marked **NEW**) and section 12 (*Stadium: where to put the sensors*). Not possible at 20 dB of
+>    interference removal; 30 dB: 8 custom-receiver or 12 bladeRF sensors; 40 dB: 6 of either. Price at cost + 40%:
+>    $33,147 + $5,467/yr (8 custom, 30 dB) to $26,110 + $4,601/yr (6 custom, 40 dB).
+> 2. **Stadium positioning:** the bowl layer that also sees drones emitting nothing, sold next to an RF detector (the FAA
+>    stadium restriction reaches 3 nautical miles and security wants the pilot's location; RF detectors cover both).
+>    Stadium prices and buying process are untested.
+> 3. **Do not claim drone-vs-bird classification yet:** the twin cannot tell them apart (v0.5.1 finding); it is a Seed
+>    measurement.
+> 4. **Unchanged:** every price, cost, margin and prison result from v0.4.5.
+>
+> The **WHAT'S NEW** block at the top of `Tripwire_Assumptions_and_Figures.md` has the full list.
 
 ## 1. Set up
 
@@ -23,7 +39,7 @@ cd tripwire-prototype
    costs, per-facility results, competitor figures, technical assumptions, sources). Each figure is tagged CITED,
    MEASURED, FIT, STANDARD, ASSUMPTION or DECISION.
 2. `context/HANDOFF.md`: current state, decisions in force, open questions.
-3. `prototype/README.md`: what the twin does and the findings per version (v0.4.5 at the top).
+3. `prototype/README.md`: what the twin does and the findings per version (v0.5.1 at the top).
 4. `Iterations.docx`: one short entry per build (what did not work, what changed), lessons for the product, risks, key
    assumptions.
 5. Background only: `Your Seed Pitch Data Package and Prototype.pdf` (the team's earlier planning numbers),
@@ -42,7 +58,7 @@ cd tripwire-prototype
 
 ## 4. What changed since the Seed data package (headline)
 
-| | Data package | Prototype v0.4.5 |
+| | Data package | Prototype v0.5.1 |
 |---|---|---|
 | Hardware per 3 sensors | $24,000 | ~$5,500 (standard bladeRF sensor $1,825) |
 | Deployment per 3 sensors | $6,000 | ~$1,530 + $3,000 per facility (set-up + on-site hub) |
@@ -71,6 +87,13 @@ Exact figures and their basis: sections 2-10 of the assumptions file.
   of the time, located within 25 m, and the typical incoming drone first tracked at least 300 m outside the fence
   (DECISION: defaults; section 11 of the assumptions file). At Hays the typical drone is picked up ~440-500 m out, but
   drones from one direction (south-southwest) only ~50-300 m out, so do not promise a range for every drone.
+- **NEW. Stadiums (Clemson Memorial Stadium):** sensors alternate between the top of the stands and poles outside
+  (poles alone cannot see into the bowl). Needs 30 dB of interference removal (8 custom or 12 bladeRF sensors) or 40 dB
+  (6 of either); not possible at 20 dB. The FAA's 3-nautical-mile stadium restriction and the need to find the pilot are
+  better served by RF detectors, so position Tripwire as the bowl layer that also sees drones emitting nothing. The
+  stadium's own cell antennas, game-day load and the crowd are not modeled (assumptions file, section 12).
+- **NEW. Drone vs bird:** the twin cannot yet tell them apart (the rotor score separates nothing), so do not claim
+  classification; the replays often track the bird. Fix and measurement planned (assumptions file, section 13).
 - **Known model optimism:** full simulations track less than the fast estimate at Hancock and Fulton; treat those sensor
   counts as minimums.
 

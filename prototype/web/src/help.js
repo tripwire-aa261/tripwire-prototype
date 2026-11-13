@@ -6,7 +6,7 @@
 
 export const HELP = {
   // ------------------------------------------------------------------ the facility and the scenario
-  facility: ['Facility', 'One of three real Georgia facilities, with its real fence outline, buildings, terrain and registered cell towers. Each is labeled by the towers around it: sparse (Hancock: 2 within 5 km, nearest 4 km), moderate (Hays: 6 within 5 km, nearest 2 km) or dense (Fulton County Jail, Atlanta: 52 within 5 km, nearest 1 km).',
+  facility: ['Facility', 'Three real Georgia prisons and one stadium, each with its real outline, buildings, terrain and registered cell towers. The prisons are labeled by the towers around them: sparse (Hancock: 2 within 5 km, nearest 4 km), moderate (Hays: 6 within 5 km, nearest 2 km) or dense (Fulton County Jail, Atlanta: 52 within 5 km, nearest 1 km). Clemson Memorial Stadium (South Carolina) shows a different kind of customer; there "the fence" means the outside wall of the stands.',
     'Which towers are nearby and how far away they are, which decides how much signal and how much interference the sensors get.', 'OpenStreetMap, USGS terrain, FCC tower register'],
   drone: ['Drone', '5 kg drone: the size used in the Fraunhofer field trial (DJI Matrice 210 class). Mavic class: a small consumer drone (under 1 kg) that reflects about a tenth as much signal.',
     'Smaller drones are much harder to see: they need more sensors or better sensor types.', 'Radar size 0.1 vs 0.01 m² (ASSUMPTION; only the ratio matters after calibration)'],
@@ -29,12 +29,14 @@ export const HELP = {
     'More warning distance means more time to respond before the drop.', 'Simulated (scored flights, median)'],
   detection: ['Detection range', 'How far outside the fence an incoming drone is when guards get a confirmed track (held for 3 updates). The headline is the typical drone: half of incoming drones are tracked at least this far out. "8 in 10" is the distance most drones reach; weak directions are where drones are picked up late.',
     'More range means more time to respond before the drop. It depends on where the towers and sensors are: drones flying in along the line between a tower and the sensors are seen late, which better sensor placement could fix.', 'Simulated: 20 flights from random directions, starting 1.8 km from the drop point'],
+  bird_toggle: ['Bird', 'Shows or hides the crow-sized bird that circles near the facility, together with the tracks it causes. The replay was simulated with the bird either way; hiding it only clears the view. Telling birds from drones (rotor signature, flight behavior) is not reliable in the twin yet, so the bird often gets a track.',
+    'A bird is a real moving object, so the radar tracks it; the product must classify it, not alert on it.', 'Display option'],
   target_detection: ['Detection range the customer wants', 'How far outside the fence the typical incoming drone must be when it is first tracked. 0 = no requirement.',
     'Longer ranges need more sensors or a better radio. Ranges above ~1 km are rarely reached.', 'Customer choice; 300 m by default (DECISION)'],
   update: ['Position update', 'How often the drone\'s position is refreshed: every 1.5 s, from 0.8 s of listening per update.',
     'Faster updates would need shorter listening, which loses sensitivity.', 'Model setting'],
   // ------------------------------------------------------------------ the design
-  sensors: ['Number of sensors', 'How many sensor boxes are mounted on poles, spaced evenly along the fence. Each sensor contains its own antennas (see Sensor type).',
+  sensors: ['Number of sensors', 'How many sensor boxes are mounted on poles, spaced evenly along the fence. At the stadium they alternate between the top of the stands and 6 m poles in the plaza outside: poles alone cannot see into the bowl, and sensors on the stands alone pick up too much tower signal. Each sensor contains its own antennas (see Sensor type).',
     'More sensors cover more area and track better, at more hardware, installation and upkeep cost. Benefits level off.', 'Design choice'],
   sensortype: ['Sensor type', 'What is inside each sensor box: how many antennas and which kind, how the signal is processed, whether it has a microphone, and which radio it uses. It is not the number of sensors.',
     'Better sensor types see farther, so a facility needs fewer of them, but each one costs more.', 'Design choice; prices in Financials'],

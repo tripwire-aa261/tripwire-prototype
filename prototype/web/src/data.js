@@ -72,8 +72,8 @@ export async function loadData() {
 // Sites are named by the cell towers around them, which is what decides the result (Nov 12 feedback; explore.json
 // still carries the older rural / remote / dense urban labels from twin/scenarios.py). Shown in this order,
 // fewest towers first; Hays (the middle one) is the default site (state.site).
-const SITE_ORDER = ['hancock', 'hays', 'fulton'];
-const SITE_TYPES = { hancock: 'sparse towers', hays: 'moderate towers', fulton: 'dense towers' };
+const SITE_ORDER = ['hancock', 'hays', 'fulton', 'clemson'];
+const SITE_TYPES = { hancock: 'sparse towers', hays: 'moderate towers', fulton: 'dense towers', clemson: 'stadium' };
 function orderSites() {
   const keys = [...SITE_ORDER.filter((k) => X.sites[k]), ...Object.keys(X.sites).filter((k) => !SITE_ORDER.includes(k))];
   X.sites = Object.fromEntries(keys.map((k) => [k, { ...X.sites[k], type: SITE_TYPES[k] ?? X.sites[k].type }]));
@@ -250,4 +250,14 @@ export const INTERF_SHORT = { 20: 'Today (20 dB)', 30: 'With 30 dB removal', 40:
 export function fillSelect(el, items, value) {
   el.innerHTML = items.map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`).join('');
   if (value != null) el.value = String(value);
+}
+
+// Prisons have a fence; the stadium's perimeter is the outside of its stands (Nov 12).
+export const edgeWord = (k = state.site) => (X.sites[k]?.type === 'stadium' ? 'stadium' : 'fence');
+export function mountText(k = state.site) {
+  const sp = (X.site_params || {})[k] || {};
+  const m = sp.mount || 'pole';
+  if (m === 'structure') return 'On top of the stands, spaced evenly around the stadium.';
+  if (m === 'mixed') return 'Alternating: on top of the stands and on 6 m poles around the stadium.';
+  return X.sites[k]?.type === 'stadium' ? `On 6 m poles ${sp.setback_m ?? 0} m outside the stands, spaced evenly.` : 'Spaced evenly along the fence.';
 }
