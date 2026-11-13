@@ -2,6 +2,18 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Twin value-based price set to the plan price
+
+**Asked for:** "change it, if our new values are more realistic" (the twin's value-based price default).
+**Done:**
+- The twin's value-based pricing default is now the business plan's $25,000 + $25,000/yr. The new values are `FINANCE.pricing.set_install_usd` and `set_sub_usd` in `twin/cost.py`, used by `customer_price`, `web/src/data.js` and `tools/build_assumptions_doc.py`.
+- Saved browser settings reset (`LS_KEY` tripwire-fin-v05.2). Hints, help text and README updated.
+- Regenerated `web/runs/cost_model.json` and `Tripwire_Assumptions_and_Figures.md`. The figures doc notes the plan price is shown flat, while the plan charges larger sites by sensor count.
+- 43 tests pass, run in a scratch venv with requirements.txt.
+- Checked in the browser: the value-based view gives $25,471/yr gross profit per facility and 40 facilities to cover $1M/yr, matching Draft 5.
+**Decided:** keep `ZONE` (the data package's $50,000 + $18,000) only for the archived v0.3 viewer and its test.
+**Left open:** README's v0.4.x history still quotes the old prices as history (left as is).
+
 ## 2026-11-12 · Sid · Sales-speed levers in the model
 
 **Asked for:** put the sales-speed mechanisms in the model, "keep levers off in the plan", and check this does not contradict the twin's Financials tab.

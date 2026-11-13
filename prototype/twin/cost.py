@@ -180,7 +180,11 @@ FINANCE = {
         "margin_yearly_pct": 40.0,
         "model": "install_sub",
         "cost_of_capital_pct": 10.0,  # ASSUMPTION: what carrying the hardware costs us per year (all-in model)
-        "install_price_usd": 50000.0,  # data package
+        "install_price_usd": 50000.0,  # data package (kept for reference; the value-based model now uses set_*_usd)
+        # Value-based price per Hays-size facility (team decision Nov 12, the business plan's price): $25,000 to install
+        # + $25,000/yr. Below the Axon RF kit ($57,915, benchmarks) and inside AirSight's $9,071-42,143/yr range.
+        "set_install_usd": 25000.0,
+        "set_sub_usd": 25000.0,
         "tiers": {"80": 18000.0, "90": 30000.0, "95": 42000.0},  # $/yr: 80 % = data package; 90/95 % ASSUMPTION
         # anchored on the AirSight subscription range ($9,071-42,143/yr, data package ref [4])
         "years": 5,
@@ -214,8 +218,8 @@ def facility_costs(n: int, node_usd: float, f=FINANCE) -> dict:
 def customer_price(upfront: float, yearly: float, f=FINANCE) -> dict:
     """What the customer pays: our cost plus margin (installation price, yearly subscription, total over the contract)."""
     pr = f["pricing"]
-    if pr.get("model") == "set":  # value-based: our own price per facility (data package planning prices)
-        price, sub = ZONE["install_price_usd"], ZONE["subscription_usd_per_year"]
+    if pr.get("model") == "set":  # value-based: our own price per facility (the business plan's price)
+        price, sub = pr["set_install_usd"], pr["set_sub_usd"]
     elif pr.get("model") == "all_in":  # no upfront: the yearly fee repays the upfront cost over the contract
         r, y = pr.get("cost_of_capital_pct", 0.0) / 100, pr["years"]
         annuity = upfront * (r / (1 - (1 + r) ** -y) if r > 0 else 1 / y)

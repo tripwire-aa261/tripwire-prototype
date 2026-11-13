@@ -17,7 +17,7 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 ## Decisions in force
 
 - **Off-the-shelf radios until Series A** (bladeRF; B210 fallback), our own 8-channel receiver from 2031 Q2. Reason: prove the technology with buyable parts.
-- **Price per facility: $25,000 install + $25,000/yr**, set against the own-receiver cost (Hays floor $19,073 + $3,734/yr at cost + 40 %); larger sites quoted by sensor count. Reason: below every radar system, ~85 % gross margin.
+- **Price per facility: $25,000 install + $25,000/yr** (also the twin's value-based default since 2026-11-12: `FINANCE.pricing.set_*_usd` in `twin/cost.py`; `ZONE` keeps the data package's old $50,000 + $18,000 for the archived v0.3 viewer), set against the own-receiver cost (Hays floor $19,073 + $3,734/yr at cost + 40 %); larger sites quoted by sensor count. Reason: below every radar system, ~85 % gross margin.
 - **Margins 40 % / 40 % define the floor**; fixed subscription, not per alert. **NRE ($400k) is a company cost.**
 - **First customers:** Hays State Prison (GA) and Clemson Memorial Stadium (SC; chosen for its towers over Sanford and Atlanta venues). Clemson needs 30 dB, so the pre-seed live demo is at Hays only and Clemson gets recordings. Stadiums are a separate segment in the model (sellable from 40 dB). Stadium pitch: the bowl layer next to an RF detector.
 - **Western Europe is the first market abroad, from 2035**, after the company pays its own way, funded from its own cash (decision 2026-11-12; model slider "Sales abroad start"). Airports and bases stay at Series B (hardest requirements, FAA coordination).
@@ -34,7 +34,6 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 
 - **Venture returns** (decision 2026-11-12): investors exit by a sale. At median valuations, a sale at the end of 2034 at 4.5x sales returns Seed only about 4x and Series B under 1x; faster sales plus a strategic buyer (9x) gives Seed about 16x. Seed must prove sales speed; routes are statewide/cooperative contracts (Georgia bought RF detection off a Convergint statewide contract), department follow-on sales and pilot references. Aim for a strategic investor at Series B.
 - **Pipeline:** no customer contacted yet. Draft 5 has the class-format funnel (1 in 10 leads, 1 in 3 proposals, 1 in 2 negotiations); the pilots need 20 leads in 2027 Q2 from 6 Southeast prison systems and 33 SEC/ACC stadiums.
-- Twin Financials tab: value-based price default is still $50,000 + $18,000/yr (`ZONE` in `twin/cost.py`); the plan is $25,000 + $25,000/yr. Needs a twin change (Nimalan).
 - Product Prototype tab has 3 open teammate comments (classifier note; replace screenshot of the renamed "financials explorer" twin tab; profit-margin note).
 - Sid: business plan and hiring plan in the Google Doc. The "Product prototype" tab is now a walkthrough for the teaching team (the twin's four tabs, the financial model, the GPS-shadowing test at Lake Lagunita from the AA272 `gnss-drone-detection` repo, lessons table). Still to fill: the prototype link and recording (yellow placeholders) and the ESP32 test.
 - A teammate is deploying `prototype/` to Vercel (root directory `prototype`); then put the URL into the Product prototype tab and Draft 4's model link.

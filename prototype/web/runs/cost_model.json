@@ -913,6 +913,8 @@
    "model": "install_sub",
    "cost_of_capital_pct": 10.0,
    "install_price_usd": 50000.0,
+   "set_install_usd": 25000.0,
+   "set_sub_usd": 25000.0,
    "tiers": {
     "80": 18000.0,
     "90": 30000.0,

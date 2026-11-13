@@ -21,7 +21,7 @@ const listeners = [];
 export const onChange = (fn) => listeners.push(fn);
 export function emit(source) { for (const fn of listeners) fn(source); }
 
-const LS_KEY = 'tripwire-fin-v04.4'; // bumped when defaults change (Nov 12: re-priced parts, hub, 40/40 margins, pricing models)
+const LS_KEY = 'tripwire-fin-v05.2'; // bumped when defaults change (Nov 12: value-based default = business plan price $25,000 + $25,000/yr)
 export function finDefaults() {
   const f = COSTS.finance, n = COSTS.node, a = COSTS.antennas; // single source: runs/cost_model.json (twin/cost.py)
   return {
@@ -37,7 +37,7 @@ export function finDefaults() {
     backhaul_mo: f.maintenance.backhaul_usd_per_month ?? 0, cloud_yr: f.maintenance.cloud_usd_per_year ?? 0,
     margin_upfront: f.pricing.margin_upfront_pct, margin_yearly: f.pricing.margin_yearly_pct,
     model: f.pricing.model ?? 'install_sub', capital_pct: f.pricing.cost_of_capital_pct ?? 10, years: f.pricing.years,
-    set_install: COSTS.zone.install_price_usd, set_sub: COSTS.zone.subscription_usd_per_year, // data package planning prices
+    set_install: f.pricing.set_install_usd, set_sub: f.pricing.set_sub_usd, // business plan price (team decision Nov 12)
     // Today's options, for an apples-to-apples comparison (Nov 12). Radar-based system per prison:
     // count of compact radars (ASSUMPTION: 120 deg sensors, so 3 for 360 deg from one point, 5 with blind spots
     // filled), price per radar and installation share (CITED: AirSight radar and cost guides, 2026).

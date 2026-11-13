@@ -50,7 +50,7 @@ def node(design, radio):
 def priced(n, node_usd, model):
     fc = C.facility_costs(n, node_usd)
     if model == "set":
-        price, sub = Z["install_price_usd"], Z["subscription_usd_per_year"]
+        price, sub = F["pricing"]["set_install_usd"], F["pricing"]["set_sub_usd"]
     else:
         f = {**F, "pricing": {**F["pricing"], "model": model}}
         cp = C.customer_price(fc["upfront"], fc["yearly"], f)
@@ -272,8 +272,9 @@ def main():
     w(f"  2. *Cost + margin, all-in yearly fee*: nothing upfront; yearly fee = (upfront cost repaid over the contract at "
       f"{pr['cost_of_capital_pct']:g}%/yr cost of capital, ASSUMPTION + running cost) / 0.6. Fits an operating budget; we "
       "carry the hardware and wait longer to be repaid.")
-    w(f"  3. *Value-based*: our own price per facility, defaulting to the data package's planning prices: "
-      f"{usd(Z['install_price_usd'])} installation + {usd(Z['subscription_usd_per_year'])}/yr (CITED, Seed data package).")
+    w(f"  3. *Value-based*: our own price per facility, defaulting to the business plan's price for a Hays-size facility: "
+      f"{usd(pr['set_install_usd'])} installation + {usd(pr['set_sub_usd'])}/yr (DECISION Nov 12; the data package's "
+      f"planning price was {usd(Z['install_price_usd'])} + {usd(Z['subscription_usd_per_year'])}/yr).")
     b2 = F["benchmarks"]
     w(f"- **Today's alternatives (CITED, data package):** Axon hardware + installation {usd(b2['axon_hardware_install_usd'])} [3]; "
       f"AirSight subscription {usd(b2['airsight_subscription_low_usd'])}-{usd(b2['airsight_subscription_high_usd'])}/yr [4] "
@@ -295,7 +296,7 @@ def main():
     if rb["meets"]:
         a, s_ = priced(rb["n"], rb["node"], "install_sub"), priced(rb["n"], rb["node"], "set")
         w(f"  - *Tripwire at Hays* ({rb['n']} bladeRF sensors): {usd(a['revenue'])} at cost + 40%; {usd(s_['revenue'])} at the "
-          "data package's prices.")
+          "business plan's price ($25,000 + $25,000/yr).")
     w("- **Recommendation (reasoning, to test with design partners):** a fixed yearly subscription per facility, priced from "
       "value and anchored below the alternatives, with cost + 40% as the floor; offer the all-in fee for agencies that buy "
       "services more easily than equipment. Not on-demand or per-alert: protection must be on all the time, a per-alert bill "
@@ -338,7 +339,9 @@ def main():
                              f"{usd(s['gp'] / Y)} ({math.ceil(OVERHEAD / (s['gp'] / Y))})", f"{s['gm']:.0%}"])
     w(table(["Facility", "Interference removal", "Radio", "Sensors", "Area / tracked / caught / accuracy / detection range (typical; 8 in 10)", "Our cost (upfront + yearly)",
              "Price at cost + 40%", "Gross profit/yr at cost + 40% (facilities to cover $1M/yr)",
-             "Gross profit/yr at data-package prices (facilities)", "Gross margin at data-package prices"], rows))
+             "Gross profit/yr at the plan price, $25,000 + $25,000/yr (facilities)", "Gross margin at the plan price"], rows))
+    w("\nThe plan price is for a Hays-size facility and is shown flat here; the business plan charges larger sites in proportion "
+      "to the sensors they need, so the plan-price columns understate what larger sites pay.\n")
     w("\n20 dB of interference removal is today's assumption; 30 and 40 dB are unproven (section 11). The custom receiver "
       "is a Series A product.\n")
 
@@ -359,8 +362,8 @@ def main():
         ["Hardware per 3 sensors", usd(Z["hardware_target_usd"]), usd(3 * sb), "Parts priced bottom-up (section 2)"],
         ["Deployment per 3 sensors", usd(Z["deployment_usd"]), usd(3 * per_sensor_inst) + f" + {usd(i['site_setup_usd'] + i['hub_usd'])} per facility", "Labor and cabling re-estimated (section 4); hub added"],
         ["Maintenance per 3 sensors per year", usd(Z["maintenance_usd_per_year"]), usd(three["yearly"]), "Remote monitoring, one internet line per facility (section 5)"],
-        ["Installation price", usd(Z["install_price_usd"]), f"cost + 40% = {usd(three['price'])} (3 sensors)", "Cost + margin floor; value-based model keeps $50,000"],
-        ["Subscription per year", usd(Z["subscription_usd_per_year"]), f"cost + 40% = {usd(three['sub'])} (3 sensors)", "Same"],
+        ["Installation price", usd(Z["install_price_usd"]), f"cost + 40% = {usd(three['price'])} (3 sensors)", "Cost + margin floor; value-based model now $25,000 (business plan price, DECISION Nov 12)"],
+        ["Subscription per year", usd(Z["subscription_usd_per_year"]), f"cost + 40% = {usd(three['sub'])} (3 sensors)", "Cost + margin floor; value-based model now $25,000/yr (business plan price)"],
         ["Margins", "40% install / 72% subscription (implied)", "40% / 40%", "DECISION Nov 12"],
         ["Pricing unit", "per 3-node zone", "per facility, sized to the sensors it needs", "Zones made Hays ~4x the incumbent (v0.3)"],
     ]))

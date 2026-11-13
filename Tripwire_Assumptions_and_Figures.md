@@ -115,13 +115,13 @@ Architecture (ASSUMPTION): four 2-channel LMS7002M transceivers on one GNSS-disc
 - **Three pricing models** (the viewer's Financials tab has all three):
   1. *Cost + margin, installation + subscription* (default): installation price = upfront cost / 0.6; subscription = running cost / 0.6. This is the **floor**: the lowest price that keeps a 40% margin on every facility.
   2. *Cost + margin, all-in yearly fee*: nothing upfront; yearly fee = (upfront cost repaid over the contract at 10%/yr cost of capital, ASSUMPTION + running cost) / 0.6. Fits an operating budget; we carry the hardware and wait longer to be repaid.
-  3. *Value-based*: our own price per facility, defaulting to the data package's planning prices: $50,000 installation + $18,000/yr (CITED, Seed data package).
+  3. *Value-based*: our own price per facility, defaulting to the business plan's price for a Hays-size facility: $25,000 installation + $25,000/yr (DECISION Nov 12; the data package's planning price was $50,000 + $18,000/yr).
 - **Today's alternatives (CITED, data package):** Axon hardware + installation $57,915 [3]; AirSight subscription $9,071-$42,143/yr [4] ($45,355-$210,715 over 5 years).
 - **Like-for-like comparison: a customer's cost for one facility over the contract** (shown in the viewer's "Compared with today's options"):
   - *Radar-based system* (e.g. AirSight): 3-5 compact radars (ASSUMPTION; each sees ~120 deg, CITED Echodyne EchoGuard [12]) x $30,000-$80,000 each, hardware only (CITED AirSight radar guide, (c) 2026 [13]) x (1 + 30-60% installation, survey, calibration, training and integration, CITED AirSight cost guide [14]) = $117,000-$640,000 upfront, + 5 x the AirSight packages = **$162,355-$850,715**.
   - *One Robin IRIS 360 deg radar alone:* $396,000 (Dedrone price list on OMNIA Partners, AM9, 2025-02-04 [15]: seen in a search result; the file is no longer public, so confirm). The same list showed RF-160/RF-360 sensors at $14,850 and RF-560 at $29,700.
   - *RF-only Dedrone (Axon):* $57,915, hardware + installation, no software (data package ref [3]).
-  - *Tripwire at Hays* (6 bladeRF sensors): $51,915 at cost + 40%; $140,000 at the data package's prices.
+  - *Tripwire at Hays* (6 bladeRF sensors): $51,915 at cost + 40%; $150,000 at the business plan's price ($25,000 + $25,000/yr).
 - **Recommendation (reasoning, to test with design partners):** a fixed yearly subscription per facility, priced from value and anchored below the alternatives, with cost + 40% as the floor; offer the all-in fee for agencies that buy services more easily than equipment. Not on-demand or per-alert: protection must be on all the time, a per-alert bill rises exactly when the facility is under attack, and false alarms would become billing disputes. Per-use add-ons fit (evidence packages for prosecutions, short deployments for events).
 
 ## 7. Company-level costs
@@ -134,32 +134,35 @@ Architecture (ASSUMPTION): four 2-channel LMS7002M transceivers on one GNSS-disc
 
 Recommended setup = the radio and number of sensors with the lowest cost to us that covers 90% of the area within 150 m of the fence, tracks a drone 80% of the time, places it within 25 m and first tracks the typical incoming drone at least 300 m outside the fence (DECISION: viewer slider defaults), drones 60 m up, 5 kg drone. Results from `web/data/explore.json` (created 2026-11-12T06:38:19). Sensors spaced evenly on the fence.
 
-| Facility | Interference removal | Radio | Sensors | Area / tracked / caught / accuracy / detection range (typical; 8 in 10) | Our cost (upfront + yearly) | Price at cost + 40% | Gross profit/yr at cost + 40% (facilities to cover $1M/yr) | Gross profit/yr at data-package prices (facilities) | Gross margin at data-package prices |
+| Facility | Interference removal | Radio | Sensors | Area / tracked / caught / accuracy / detection range (typical; 8 in 10) | Our cost (upfront + yearly) | Price at cost + 40% | Gross profit/yr at cost + 40% (facilities to cover $1M/yr) | Gross profit/yr at the plan price, $25,000 + $25,000/yr (facilities) | Gross margin at the plan price |
 |---|---|---|---|---|---|---|---|---|---|
 | Hancock State Prison (sparse towers) | 20 dB | bladeRF 2.0 micro xA4 | not possible | best 0% / 7% (16 sensors) |  |  |  |  |  |
 | Hancock State Prison (sparse towers) | 20 dB | Custom multichannel receiver | not possible | best 2% / 11% (16 sensors) |  |  |  |  |  |
 | Hancock State Prison (sparse towers) | 30 dB | bladeRF 2.0 micro xA4 | not possible | best 50% / 55% (16 sensors) |  |  |  |  |  |
 | Hancock State Prison (sparse towers) | 30 dB | Custom multichannel receiver | not possible | best 84% / 84% (16 sensors) |  |  |  |  |  |
-| Hancock State Prison (sparse towers) | 40 dB | bladeRF 2.0 micro xA4 | 12 | 98% / 99% / 100% / 7 m / 1075 m; 550 m | $31,023 + $4,455/yr | $51,704 + $7,425/yr | $7,106 (141) | $17,340 (58) | 62% |
-| Hancock State Prison (sparse towers) | 40 dB | Custom multichannel receiver | 6 | 99% / 95% / 97% / 8 m / 418 m; 274 m | $15,666 + $2,760/yr | $26,110 + $4,601/yr | $3,929 (255) | $22,106 (46) | 79% |
-| Hays State Prison (moderate towers) | 20 dB | bladeRF 2.0 micro xA4 | 6 | 99% / 89% / 91% / 10 m / 442 m; 49 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
-| Hays State Prison (moderate towers) | 20 dB | Custom multichannel receiver | 4 | 100% / 85% / 89% / 11 m / 497 m; 31 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
-| Hays State Prison (moderate towers) | 30 dB | bladeRF 2.0 micro xA4 | 6 | 99% / 91% / 92% / 10 m / 442 m; 51 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
-| Hays State Prison (moderate towers) | 30 dB | Custom multichannel receiver | 4 | 100% / 87% / 90% / 11 m / 501 m; 33 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
-| Hays State Prison (moderate towers) | 40 dB | bladeRF 2.0 micro xA4 | 4 | 98% / 91% / 94% / 9 m / 313 m; 54 m | $12,341 + $2,285/yr | $20,568 + $3,808/yr | $3,169 (316) | $23,247 (44) | 83% |
-| Hays State Prison (moderate towers) | 40 dB | Custom multichannel receiver | 3 | 100% / 91% / 93% / 8 m / 433 m; 47 m | $9,333 + $1,980/yr | $15,555 + $3,300/yr | $2,565 (390) | $24,153 (42) | 86% |
+| Hancock State Prison (sparse towers) | 40 dB | bladeRF 2.0 micro xA4 | 12 | 98% / 99% / 100% / 7 m / 1075 m; 550 m | $31,023 + $4,455/yr | $51,704 + $7,425/yr | $7,106 (141) | $19,340 (52) | 64% |
+| Hancock State Prison (sparse towers) | 40 dB | Custom multichannel receiver | 6 | 99% / 95% / 97% / 8 m / 418 m; 274 m | $15,666 + $2,760/yr | $26,110 + $4,601/yr | $3,929 (255) | $24,106 (42) | 80% |
+| Hays State Prison (moderate towers) | 20 dB | bladeRF 2.0 micro xA4 | 6 | 99% / 89% / 91% / 10 m / 442 m; 49 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $23,770 (43) | 79% |
+| Hays State Prison (moderate towers) | 20 dB | Custom multichannel receiver | 4 | 100% / 85% / 89% / 11 m / 497 m; 31 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $25,471 (40) | 85% |
+| Hays State Prison (moderate towers) | 30 dB | bladeRF 2.0 micro xA4 | 6 | 99% / 91% / 92% / 10 m / 442 m; 51 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $23,770 (43) | 79% |
+| Hays State Prison (moderate towers) | 30 dB | Custom multichannel receiver | 4 | 100% / 87% / 90% / 11 m / 501 m; 33 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $25,471 (40) | 85% |
+| Hays State Prison (moderate towers) | 40 dB | bladeRF 2.0 micro xA4 | 4 | 98% / 91% / 94% / 9 m / 313 m; 54 m | $12,341 + $2,285/yr | $20,568 + $3,808/yr | $3,169 (316) | $25,247 (40) | 84% |
+| Hays State Prison (moderate towers) | 40 dB | Custom multichannel receiver | 3 | 100% / 91% / 93% / 8 m / 433 m; 47 m | $9,333 + $1,980/yr | $15,555 + $3,300/yr | $2,565 (390) | $26,153 (39) | 87% |
 | Fulton County Jail (dense towers) | 20 dB | bladeRF 2.0 micro xA4 | not possible | best 13% / 20% (16 sensors) |  |  |  |  |  |
 | Fulton County Jail (dense towers) | 20 dB | Custom multichannel receiver | not possible | best 33% / 36% (16 sensors) |  |  |  |  |  |
 | Fulton County Jail (dense towers) | 30 dB | bladeRF 2.0 micro xA4 | not possible | best 80% / 75% (16 sensors) |  |  |  |  |  |
-| Fulton County Jail (dense towers) | 30 dB | Custom multichannel receiver | 12 | 93% / 82% / 99% / 12 m / 1154 m; 502 m | $28,332 + $4,321/yr | $47,220 + $7,201/yr | $6,658 (151) | $18,013 (56) | 64% |
-| Fulton County Jail (dense towers) | 40 dB | bladeRF 2.0 micro xA4 | 6 | 100% / 97% / 100% / 8 m / 395 m; 194 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
-| Fulton County Jail (dense towers) | 40 dB | Custom multichannel receiver | 4 | 100% / 96% / 99% / 5 m / 382 m; 206 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $23,471 (43) | 84% |
+| Fulton County Jail (dense towers) | 30 dB | Custom multichannel receiver | 12 | 93% / 82% / 99% / 12 m / 1154 m; 502 m | $28,332 + $4,321/yr | $47,220 + $7,201/yr | $6,658 (151) | $20,013 (50) | 67% |
+| Fulton County Jail (dense towers) | 40 dB | bladeRF 2.0 micro xA4 | 6 | 100% / 97% / 100% / 8 m / 395 m; 194 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $23,770 (43) | 79% |
+| Fulton County Jail (dense towers) | 40 dB | Custom multichannel receiver | 4 | 100% / 96% / 99% / 5 m / 382 m; 206 m | $11,444 + $2,240/yr | $19,073 + $3,734/yr | $3,019 (332) | $25,471 (40) | 85% |
 | **NEW** Clemson Memorial Stadium (stadium) | 20 dB | bladeRF 2.0 micro xA4 | not possible | best 78% / 61% (16 sensors) |  |  |  |  |  |
 | **NEW** Clemson Memorial Stadium (stadium) | 20 dB | Custom multichannel receiver | not possible | best 91% / 78% (16 sensors) |  |  |  |  |  |
-| **NEW** Clemson Memorial Stadium (stadium) | 30 dB | bladeRF 2.0 micro xA4 | 12 | 99% / 89% / 100% / 7 m / 1166 m; 803 m | $31,023 + $4,455/yr | $51,704 + $7,425/yr | $7,106 (141) | $17,340 (58) | 62% |
-| **NEW** Clemson Memorial Stadium (stadium) | 30 dB | Custom multichannel receiver | 8 | 99% / 90% / 100% / 5 m / 1162 m; 619 m | $19,888 + $3,280/yr | $33,147 + $5,467/yr | $4,839 (207) | $20,742 (49) | 74% |
-| **NEW** Clemson Memorial Stadium (stadium) | 40 dB | bladeRF 2.0 micro xA4 | 6 | 100% / 94% / 95% / 6 m / 974 m; 361 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $21,770 (46) | 78% |
-| **NEW** Clemson Memorial Stadium (stadium) | 40 dB | Custom multichannel receiver | 6 | 100% / 96% / 96% / 4 m / 1088 m; 493 m | $15,666 + $2,760/yr | $26,110 + $4,601/yr | $3,929 (255) | $22,106 (46) | 79% |
+| **NEW** Clemson Memorial Stadium (stadium) | 30 dB | bladeRF 2.0 micro xA4 | 12 | 99% / 89% / 100% / 7 m / 1166 m; 803 m | $31,023 + $4,455/yr | $51,704 + $7,425/yr | $7,106 (141) | $19,340 (52) | 64% |
+| **NEW** Clemson Memorial Stadium (stadium) | 30 dB | Custom multichannel receiver | 8 | 99% / 90% / 100% / 5 m / 1162 m; 619 m | $19,888 + $3,280/yr | $33,147 + $5,467/yr | $4,839 (207) | $22,742 (44) | 76% |
+| **NEW** Clemson Memorial Stadium (stadium) | 40 dB | bladeRF 2.0 micro xA4 | 6 | 100% / 94% / 95% / 6 m / 974 m; 361 m | $17,011 + $2,828/yr | $28,352 + $4,713/yr | $4,153 (241) | $23,770 (43) | 79% |
+| **NEW** Clemson Memorial Stadium (stadium) | 40 dB | Custom multichannel receiver | 6 | 100% / 96% / 96% / 4 m / 1088 m; 493 m | $15,666 + $2,760/yr | $26,110 + $4,601/yr | $3,929 (255) | $24,106 (42) | 80% |
+
+The plan price is for a Hays-size facility and is shown flat here; the business plan charges larger sites in proportion to the sensors they need, so the plan-price columns understate what larger sites pay.
+
 
 20 dB of interference removal is today's assumption; 30 and 40 dB are unproven (section 11). The custom receiver is a Series A product.
 
@@ -175,8 +178,8 @@ Recommended setup = the radio and number of sensors with the lowest cost to us t
 | Hardware per 3 sensors | $24,000 | $5,476 | Parts priced bottom-up (section 2) |
 | Deployment per 3 sensors | $6,000 | $1,530 + $3,000 per facility | Labor and cabling re-estimated (section 4); hub added |
 | Maintenance per 3 sensors per year | $5,000 | $2,014 | Remote monitoring, one internet line per facility (section 5) |
-| Installation price | $50,000 | cost + 40% = $16,676 (3 sensors) | Cost + margin floor; value-based model keeps $50,000 |
-| Subscription per year | $18,000 | cost + 40% = $3,356 (3 sensors) | Same |
+| Installation price | $50,000 | cost + 40% = $16,676 (3 sensors) | Cost + margin floor; value-based model now $25,000 (business plan price, DECISION Nov 12) |
+| Subscription per year | $18,000 | cost + 40% = $3,356 (3 sensors) | Cost + margin floor; value-based model now $25,000/yr (business plan price) |
 | Margins | 40% install / 72% subscription (implied) | 40% / 40% | DECISION Nov 12 |
 | Pricing unit | per 3-node zone | per facility, sized to the sensors it needs | Zones made Hays ~4x the incumbent (v0.3) |
 

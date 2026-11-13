@@ -40,8 +40,8 @@ const GROUPS = [
   ['Pricing', 'What the customer pays. Cost + margin (both margins 40%, team decision Nov 12) is the floor; the value-based model sets our own price per facility.', [
     ['margin_upfront', 'Margin on installation', '%', 1, 'Share of the installation price left after our upfront cost.'],
     ['margin_yearly', 'Margin on the subscription', '%', 1, 'Share of the yearly fee left after our running cost (and, in the all-in model, the hardware repayment).'],
-    ['set_install', 'Our own installation price (value-based model)', '$', 1000, 'Price per facility when we set it from the value to the customer, not from our cost. Default: the data package\'s planning price, $50,000.'],
-    ['set_sub', 'Our own yearly subscription (value-based model)', '$', 500, 'Default: the data package\'s planning price, $18,000/yr (inside AirSight\'s $9,071-42,143/yr range, ref [4]).'],
+    ['set_install', 'Our own installation price (value-based model)', '$', 1000, 'Price per facility when we set it from the value to the customer, not from our cost. Default: the business plan\'s price for a Hays-size facility, $25,000 (team decision Nov 12; the data package used $50,000).'],
+    ['set_sub', 'Our own yearly subscription (value-based model)', '$', 500, 'Default: the business plan\'s price, $25,000/yr (the data package used $18,000/yr; inside AirSight\'s $9,071-42,143/yr range, ref [4]).'],
     ['capital_pct', 'Cost of capital (all-in model)', '%/yr', 1, 'What it costs us to carry the hardware when the customer pays nothing upfront. ASSUMPTION: 10%.'],
     ['years', 'Contract length', 'yrs', 1, 'Years of subscription in the customer\'s total; the memo uses five.']]],
   ['Today\'s options: radar-based system (for the comparison)', 'Sets the radar-based system in "Customer\'s five-year cost vs today\'s options" here and on the Overview, so both sides are a whole facility over the same contract.', [

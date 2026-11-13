@@ -62,7 +62,7 @@ takes ~78 min.
   the pole) and sends range-Doppler maps to one hub per facility (tracking, classifier, background history, alerts).
 - *Pricing:* both margins 40 %. Three models in Financials: cost + margin (installation + subscription), cost + margin
   all-in (nothing upfront; the fee repays the hardware at 10 %/yr), and value-based (own price per facility; default the
-  data package's $50,000 + $18,000/yr). The custom receiver's $400k NRE is no longer in the board price ($642 at the
+  business plan's $25,000 + $25,000/yr since Nov 12, was the data package's $50,000 + $18,000/yr). The custom receiver's $400k NRE is no longer in the board price ($642 at the
   1,000-board planning volume): it is a company cost, shown with the company's running cost ($1M/yr, ASSUMPTION) as
   "facilities needed" in a new Company panel. At cost + 40 % a facility earns ~$3-4k/yr gross profit (~250-330 facilities
   to cover $1M/yr); at the data package's prices ~$22-23k/yr (~43-47 facilities). Cost + 40 % is the floor, not the price.
