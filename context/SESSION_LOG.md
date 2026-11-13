@@ -2,6 +2,25 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Business plan Draft 4, financial model rebuild, Clemson and Atlanta decisions
+
+**Asked for:** clean up the team Google Doc ("fully clean up everything with the new company plan, numbers from the prototype"), address all of Sid's comments, fill in the funding, hiring, regulatory, go-to-market and technical plans, and redo the financial model ("not super long", "should not feel AI written", "specific about the claims"). Later: switch the stadium after a tower survey, implement Sid's 23 comments on Draft 3 plus PR #2's stadium results, fix the Google Doc formatting, commit and merge.
+**Done:**
+- Google Doc tabs "Draft Report 3" (with Sid's comments) and "Draft Report 4" (current), written in the Claude doc https://claude.ai/artifact/HxtL3TWcyArFEYFmxv95tE and pasted with Draft Report 2's styling, a roadmap, cash chart and pricing chart as images.
+- Financial model rebuilt per facility from the twin's costs (`prototype/web/financial-model.html`, also https://claude.ai/artifact/1AEzgXgBakzE4U8wNmUqwb v9): stadium segment, 12-sensor Clemson pilot ($77k fee), bladeRF vs own-receiver costs side by side, Atlanta salaries, regulatory lead at Series A; merged another session's drop-down layout.
+- FCC tower survey (file in `prototype/data/raw/fcc/`, git-ignored): within 5 km, Clemson 10 structures, Sanford 21, Atlanta Motor Speedway 17, Truist Park 28, Bobby Dodd 47 (Hays 6, Fulton 53).
+- Merged PR #2 (twin v0.5.1) into main.
+**Decided:**
+- Price $25,000 + $25,000/yr per facility, set against the own-receiver cost (Sid: "self developed cost estimates to be used after the seed round").
+- Stadium = Clemson Memorial Stadium (fewest towers among large venues; no Georgia venue close to Hays); the twin then showed it needs 30 dB, so the pre-seed live demo is at Hays and Clemson gets recordings.
+- Company in Atlanta (Sid chose it over Bay Area). Model hosted as an HTML file in the repo (artifact links need a claude.ai sign-in).
+- No full-time regulatory hire until Series A; hourly counsel ~$80k/yr and Taras until then (Sid agreed; saves ~$0.4M).
+- Replaced two unsourced competitor figures ("$40k/yr" and "$200k per SC prison") with South Carolina's $240k Dedrone purchase and AirSight's published ranges.
+**Left open:**
+- Draft 4's GitHub link to the model works only as source until the prototype is deployed.
+- Georgia HB 1230 signing and the SAFER SKIES contractor question are unconfirmed.
+- `Tripwire_Prototype_Feedback_Request_v2.docx` shows as modified locally but was not touched in this session; left out of the commit.
+
 ## 2026-11-12 · Nimalan · Twin v0.5–v0.5.1: stadium site, sensors on the structure, bird display option
 
 **Asked for:** "Clemson Memorial Stadium in South Carolina to know how it is like for stadium based customers ... We should place the nodes on top the stadium infrastructure itself. What do you think?" (then "commit and push first, then build the stadium"); version numbering (v0.5, then v0.5.1 for the bird change); "make the bird optional checkbox in the sim for now" after noticing the bird gets a track estimate; finally, update the handoff, the figures/financials md and the other docs with everything that changed, "and highlight it ... so that he can easily integrate it into his work".

@@ -1,0 +1,1003 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Tripwire Financial Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Martian+Mono:wght@400;500&display=swap">
+<style>
+/* Trasoro paper and ink (product/v7/tokens.css, the redesign brief of 2 Nov 2026): warm paper, ink, hairline rules,
+   2px corners, no shadows. Hanken Grotesk for statements, Martian Mono as the instrument voice for labels and figures.
+   One signal orange, kept for what needs the reader: cash below zero, a funding gap, a key or changed assumption.
+   Charts are drawn in tones of ink and hatching, never in extra hues. Light only, as the design language is.
+   Layout: assumptions stated first, then the summary, then sliders on the left and results on the right. */
+:root {
+  color-scheme: light;
+  --paper: #F4F2EE; --surface: #FBFAF8; --raised: #ECE9E3;
+  --ink: #141517; --ink-2: #4E5056; --muted: #66686D; --faint: #8E8C86;
+  --line: #E2DED6; --edge: #CBC6BC;
+  --signal: #D9480F;        /* marks only, never text */
+  --signal-text: #B3360B;   /* text and outlines, 5.45:1 on paper */
+  --pass: #2E6B45; --pass-bg: #EDF2EC; --pass-line: #C9D8CB;
+  --pending: #8A5A12; --pending-bg: #F5EFE4; --pending-line: #E3D3B5;
+  --action: #B3360B; --action-bg: #FAEDE6; --action-line: #EFC6B3;
+  --tone-1: #4E5056; --tone-2: #A29E96;   /* chart inks: dark and light */
+  --r: 2px;
+  --sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "Martian Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 400 14px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 20px; }
+h1 { font-size: 30px; font-weight: 600; margin: 0; letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; }
+h2 { font-size: 16px; font-weight: 600; margin: 0; letter-spacing: -0.005em; }
+h3, .eyebrow, .kpi .term { font: 500 9.5px/1.4 var(--mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 0; }
+p { margin: 0; }
+.muted { color: var(--ink-2); }
+.small { font-size: 13px; }
+
+.head { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: flex-end; justify-content: space-between; }
+.head > div:first-child { display: flex; flex-direction: column; gap: 6px; }
+.head p { color: var(--ink-2); max-width: 62ch; font-size: 16px; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.presets span { font: 500 9.5px var(--mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-right: 6px; }
+button { font: 500 13px var(--sans); color: var(--ink); background: var(--surface); border: 1px solid var(--edge); border-radius: var(--r);
+  padding: 7px 12px; cursor: pointer; }
+button:hover { border-color: var(--ink); }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+
+.assume { padding: 20px; display: flex; flex-direction: column; gap: 14px; border-color: var(--edge); }
+.assume-head { display: flex; flex-direction: column; gap: 6px; }
+.assume-head h2 { font-size: 20px; letter-spacing: -0.01em; }
+.assume-head p { color: var(--ink-2); max-width: 96ch; }
+.keymark { font: 500 9.5px var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--signal-text); white-space: nowrap; }
+.assume-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 28px; }
+@media (max-width: 1100px) { .assume-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .assume-grid { grid-template-columns: minmax(0, 1fr); } }
+.agroup { display: flex; flex-direction: column; min-width: 0; }
+.agroup h3 { padding-bottom: 7px; border-bottom: 1px solid var(--ink); color: var(--ink); }
+.arow { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.arow .k { min-width: 0; }
+.arow .v { font: 500 12px var(--mono); white-space: nowrap; text-align: right; }
+.arow.key .k { font-weight: 600; }
+.arow.changed .v { color: var(--signal-text); }
+.arow .was { display: block; font: 400 10px var(--mono); color: var(--muted); }
+
+.kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: var(--line);
+  border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.kpi { background: var(--surface); padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.kpi .label { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.kpi .value { font: 500 20px/1.2 var(--mono); letter-spacing: -0.03em; }
+.kpi .sub { font-size: 12.5px; color: var(--ink-2); }
+.pill { display: inline-flex; align-items: center; gap: 5px; font: 500 9.5px var(--mono); text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 2px 6px; border-radius: var(--r); border: 1px solid; margin-right: 4px; }
+.pill.good { color: var(--pass); background: var(--pass-bg); border-color: var(--pass-line); }
+.pill.warn { color: var(--pending); background: var(--pending-bg); border-color: var(--pending-line); }
+.pill.crit { color: var(--action); background: var(--action-bg); border-color: var(--action-line); }
+@media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kpi .value { font-size: 17px; } h1 { font-size: 26px; } }
+.banner { border: 1px solid var(--action-line); background: var(--action-bg); color: var(--ink); padding: 9px 12px; border-radius: var(--r); font-size: 13px; }
+
+.intro { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.intro h2 { font-size: 20px; letter-spacing: -0.01em; }
+.intro-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px 36px; }
+@media (max-width: 900px) { .intro-grid { grid-template-columns: minmax(0, 1fr); } }
+.intro-grid > div { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.intro-grid h3 { color: var(--ink); padding-bottom: 7px; border-bottom: 1px solid var(--ink); }
+.flow, .steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; counter-reset: n; }
+.flow li, .steps li { counter-increment: n; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.flow li::before, .steps li::before { content: counter(n); font: 500 10px/1.9 var(--mono); color: var(--muted); }
+.flow li.sum { border-bottom: 0; font-weight: 600; }
+.flow li.sum::before { content: "="; }
+.flow b, .steps b { font-weight: 600; }
+.flow .n { font: 500 12.5px var(--mono); white-space: nowrap; }
+a { color: var(--ink); text-decoration-color: var(--edge); text-underline-offset: 3px; }
+a:hover { text-decoration-color: currentColor; }
+.scen { display: flex; flex-direction: column; gap: 6px; }
+.answers { display: flex; flex-direction: column; gap: 10px; }
+.howto { color: var(--ink-2); font-size: 13px; max-width: 86ch; }
+.gloss { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; }
+@media (max-width: 760px) { .gloss { grid-template-columns: minmax(0, 1fr); } }
+.gloss div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.gloss dt { font-weight: 600; } .gloss dd { margin: 0; color: var(--ink-2); }
+
+.cols { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.inputs { position: sticky; top: calc(12px + env(safe-area-inset-top, 0px)); max-height: calc(100vh - 24px); overflow-y: auto; }
+@media (max-width: 900px) { .inputs { position: static; max-height: none; } }
+.inputs details { border-top: 1px solid var(--line); }
+.inputs details:first-of-type { border-top: 0; }
+.inputs summary { cursor: pointer; padding: 14px 16px 10px; list-style: none; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.inputs summary h3 { color: var(--ink); }
+.inputs summary h3 span { color: var(--muted); }
+.inputs summary::-webkit-details-marker { display: none; }
+.inputs summary::after { content: "+"; color: var(--muted); font: 500 12px var(--mono); }
+.inputs details[open] summary::after { content: "\2212"; }
+.plan { padding: 0 16px 6px; color: var(--ink-2); font-size: 13px; }
+.fields { padding: 6px 16px 16px; display: flex; flex-direction: column; gap: 13px; }
+.field { display: flex; flex-direction: column; gap: 2px; }
+.field .row { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.field label { font-size: 13px; }
+.field output { font: 500 12px var(--mono); white-space: nowrap; }
+.field .hint { font-size: 12px; color: var(--muted); }
+.field.changed output { color: var(--signal-text); }
+input[type="range"] { width: 100%; accent-color: var(--ink); margin: 2px 0 0; }
+
+.results { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.card { padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; }
+.card-head p { color: var(--ink-2); font-size: 13px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-2); align-items: center; }
+.legend i { display: inline-block; width: 11px; height: 11px; margin-right: 6px; vertical-align: -1px; border-radius: 1px; }
+.sw-1 { background: var(--tone-1); } .sw-2 { background: var(--tone-2); }
+.sw-hatch { background: repeating-linear-gradient(135deg, var(--ink) 0 1.2px, var(--surface) 1.2px 3.6px); outline: 1px solid var(--ink); outline-offset: -1px; }
+.sw-hollow { background: var(--surface); border: 1.5px solid var(--ink); } .sw-solid { background: var(--ink); }
+.legend i.ln { height: 2px; width: 16px; vertical-align: 3px; background: var(--ink); }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+.chart text { font: 400 9.5px var(--mono); fill: var(--muted); }
+.chart text.mark { font-weight: 500; fill: var(--ink); text-transform: uppercase; letter-spacing: 0.08em; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--edge); border-radius: var(--r);
+  padding: 9px 11px; font-size: 12.5px; min-width: 190px; z-index: 5; }
+.tip b { display: block; margin-bottom: 5px; font: 500 9.5px var(--mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.tip div { display: flex; justify-content: space-between; gap: 14px; }
+.tip div span:last-child { font: 500 11.5px var(--mono); }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 1100px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+.seg { display: inline-flex; border: 1px solid var(--edge); border-radius: var(--r); overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; border-radius: 0; padding: 5px 10px; font-size: 12.5px; background: transparent; }
+.seg button + button { border-left: 1px solid var(--edge); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+
+.tor { display: flex; flex-direction: column; gap: 8px; }
+.tor-row { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 4px 12px; align-items: center; }
+@media (max-width: 640px) { .tor-row { grid-template-columns: minmax(0, 1fr); } }
+.tor-label { font-size: 13px; }
+.tor-label span { color: var(--muted); font: 400 10px var(--mono); margin-left: 4px; }
+.tor-track { position: relative; height: 34px; }
+.tor-track::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 1px solid var(--edge); }
+.tor-bar { position: absolute; height: 12px; border-radius: 1px; min-width: 2px; }
+.tor-bar.lo { top: 3px; background: var(--surface); border: 1.5px solid var(--ink); }
+.tor-bar.hi { top: 19px; background: var(--ink); }
+.tor-val { position: absolute; font: 400 10px/12px var(--mono); color: var(--ink-2); white-space: nowrap; }
+.tor-val.lo { top: 3px; } .tor-val.hi { top: 19px; }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 5px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+td { font: 400 11px var(--mono); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; font: 400 13px var(--sans); position: sticky; left: 0; background: var(--surface); }
+thead th { font: 500 10px var(--mono); color: var(--muted); border-bottom: 1px solid var(--ink); }
+tr.sect td { font: 500 9.5px var(--mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); padding-top: 16px; border-bottom: 1px solid var(--edge); }
+tr.total td { font-weight: 500; border-top: 1px solid var(--edge); }
+tr.total td:first-child { font-weight: 600; }
+td.neg { color: var(--signal-text); }
+tr.sub td:first-child { padding-left: 22px; color: var(--ink-2); }
+.notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 32px; }
+@media (max-width: 760px) { .notes { grid-template-columns: minmax(0, 1fr); } }
+.notes ul { margin: 8px 0 0; padding-left: 18px; color: var(--ink-2); display: flex; flex-direction: column; gap: 5px; }
+.drop summary { cursor: pointer; list-style: none; padding: 16px 18px; display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: baseline; }
+.drop summary::-webkit-details-marker { display: none; }
+.drop summary h2 { margin-right: auto; }
+.drop summary .more { color: var(--muted); font-size: 13px; }
+.drop summary::after { content: "+"; color: var(--ink); font: 500 14px var(--mono); }
+.drop[open] summary::after { content: "\2212"; }
+.drop > .notes, .drop > .gloss { padding: 0 18px 18px; }
+.econ { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.econ h2 { font-size: 20px; letter-spacing: -0.01em; }
+.econ-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 32px; }
+#costTable td:nth-child(2), #costTable td:nth-child(3), #costTable th { white-space: nowrap; }
+@media (max-width: 1000px) { .econ-grid { grid-template-columns: minmax(0, 1fr); } }
+.econ-grid h3 { color: var(--ink); padding-bottom: 7px; border-bottom: 1px solid var(--ink); }
+td.l, th.l { text-align: left; white-space: normal; font: 400 13px var(--sans); }
+td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); text-align: left; }
+.roster td:first-child { white-space: normal; }
+.bars { display: flex; flex-direction: column; gap: 9px; margin-top: 10px; }
+.brow { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 3px 12px; align-items: center; font-size: 13px; }
+@media (max-width: 560px) { .brow { grid-template-columns: minmax(0, 1fr); } }
+.brow .lab span { display: block; font-size: 11.5px; color: var(--muted); }
+.btrack { position: relative; height: 18px; }
+.bbar { position: absolute; top: 3px; height: 12px; background: var(--tone-2); border-radius: 1px; }
+.bbar.us { background: var(--ink); }
+.bbar.cost { background: var(--surface); border: 1.5px solid var(--ink); }
+.bwhisk { position: absolute; top: 8px; height: 2px; background: var(--tone-1); }
+.bval { position: absolute; top: 1px; font: 400 10.5px/16px var(--mono); color: var(--ink-2); white-space: nowrap; }
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div>
+      <span class="eyebrow">Financial model &middot; every three months, 2027 to 2042 &middot; US dollars &middot; priced per facility</span>
+      <h1>Tripwire financial model</h1>
+      <p id="lead"></p>
+    </div>
+  </header>
+
+  <section class="panel intro" aria-labelledby="introTitle">
+    <h2 id="introTitle">Start here</h2>
+    <div class="intro-grid">
+      <div>
+        <h3>How Tripwire earns money</h3>
+        <ol class="flow" id="flow"></ol>
+      </div>
+      <div>
+        <h3>How to read this page</h3>
+        <ol class="steps">
+          <li><span><b>Check one facility first.</b> What it costs us, what we charge and what the customer pays today. These numbers come from our prototype and from public price lists.</span></li>
+          <li><span><b>Read the six answers.</b> How much money the plan needs, and when it pays its own way.</span></li>
+          <li><span><b>Try a scenario or move a slider.</b> Every answer, chart and table updates at once.</span></li>
+        </ol>
+        <p class="small muted">Dates are written by quarter: 2029 Q4 means October to December 2029. $5M means five million dollars. Each number is tagged: <b>prototype</b> (from our digital twin), <b>cited</b> (a public source), <b>assumption</b> (our estimate, to be replaced by quotes and customer data) or <b>decision</b> (a team choice).</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel econ" aria-labelledby="econTitle">
+    <h2 id="econTitle">One facility, bottom up and top down</h2>
+    <p class="howto" id="econLead"></p>
+    <div class="econ-grid">
+      <div>
+        <h3>Bottom up: what Hays State Prison costs us, by radio</h3>
+        <div class="tablewrap"><table id="costTable"></table></div>
+      </div>
+      <div>
+        <h3>Top down: what one facility costs the customer over 5 years</h3>
+        <div class="bars" id="priceBars"></div>
+        <p class="small muted" id="priceNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scen" aria-label="Scenarios">
+    <div class="presets" id="presets"><span>Try a scenario</span></div>
+    <p id="presetDesc" class="muted"></p>
+  </section>
+
+  <section class="panel assume" aria-labelledby="assumeTitle">
+    <div class="assume-head">
+      <h2 id="assumeTitle">Assumptions to question before trusting any number here</h2>
+      <p id="assumeLead"></p>
+    </div>
+    <div class="assume-grid" id="assume"></div>
+    <p class="small muted">Change any of them with the sliders further down; a changed value turns orange and shows the plan value beside it. Values with no slider are listed in the "How the model works" drop-down near the bottom.</p>
+  </section>
+
+  <section aria-labelledby="answersTitle" class="answers">
+    <h2 id="answersTitle">The six answers, with the assumptions as they are now</h2>
+    <div class="kpis" id="kpis"></div>
+    <div id="banner"></div>
+  </section>
+
+  <div class="cols">
+    <aside class="panel inputs" id="inputs" aria-label="Sliders for the assumptions"></aside>
+
+    <main class="results">
+      <section class="panel card">
+        <div class="card-head"><h2>Cash in the bank</h2></div>
+        <p class="howto">The line is the bank balance at the end of each quarter. It jumps when investors put money in (dots) and falls while the company spends more than it earns. Hardware is paid for a quarter before it ships and customers pay a quarter after installation. If the line enters the hatched band, the plan has run out of money.</p>
+        <div class="legend"><span><i class="ln"></i>Cash in the bank</span><span><i class="sw-solid" style="border-radius:50%"></i>Investment arrives</span><span><i class="sw-hatch" style="background:repeating-linear-gradient(135deg, var(--signal) 0 1.2px, var(--surface) 1.2px 3.6px);outline-color:var(--signal)"></i>Below zero: out of money</span></div>
+        <div class="chart" id="cashChart"></div>
+        <p class="small muted" id="cashCaption"></p>
+      </section>
+
+      <div class="two">
+        <section class="panel card">
+          <div class="card-head"><h2>Sales against costs, each quarter</h2></div>
+          <p class="howto">Bars are sales. The line is everything the company spends. Where the bars rise above the line, it makes a profit.</p>
+          <div class="legend"><span><i class="sw-1"></i>Installation fees</span><span><i class="sw-2"></i>Yearly subscriptions</span><span><i class="ln"></i>All costs</span></div>
+          <div class="chart" id="revChart"></div>
+        </section>
+        <section class="panel card">
+          <div class="card-head"><h2>What the costs are made of</h2></div>
+          <p class="howto">Hatched: costs that grow with every facility (hardware, installation, upkeep, field staff). Solid: costs paid whatever is sold, mostly salaries.</p>
+          <div class="legend"><span><i class="sw-hatch"></i>Grow with every facility</span><span><i class="sw-1"></i>Paid whatever is sold</span></div>
+          <div class="chart" id="costChart"></div>
+        </section>
+      </div>
+
+      <div class="two">
+        <section class="panel card">
+          <div class="card-head"><h2>Facilities protected</h2></div>
+          <p class="howto">Bars are facilities in service. The line is how many could buy: today one in three US prisons and jails has the right cell towers; all of them, plus about 200 large stadiums, once interference removal reaches 40 dB; airports, bases and sites abroad from Series B.</p>
+          <div class="legend"><span><i class="sw-1"></i>Facilities in service</span><span><i class="ln"></i>Facilities that could buy</span></div>
+          <div class="chart" id="facChart"></div>
+        </section>
+        <section class="panel card">
+          <div class="card-head"><h2>People, by team</h2></div>
+          <p class="howto">Named hires until Series A (table below). After that, salespeople and engineers are added each year, field staff grow with the facilities in service and administration with the team.</p>
+          <div class="legend"><span><i class="sw-1"></i>Engineering</span><span><i class="sw-2"></i>Sales</span><span><i class="sw-hatch"></i>Field and support</span><span><i class="sw-hollow"></i>Admin, regulatory</span></div>
+          <div class="chart" id="headChart"></div>
+        </section>
+      </div>
+
+      <section class="panel card">
+        <div class="card-head">
+          <h2>Which assumptions change the answer most</h2>
+          <div class="seg" id="sensMetric" role="group" aria-label="Answer to test"></div>
+        </div>
+        <p class="howto">Each row changes one assumption on its own, a little lower (outline) and a little higher (solid), and keeps everything else as it is now. The longer the bars, the more that assumption matters.</p>
+        <div class="legend"><span><i class="sw-hollow"></i>Assumption lower</span><span><i class="sw-solid"></i>Assumption higher</span><span id="sensBase"></span></div>
+        <div class="tor" id="tornado"></div>
+      </section>
+
+      <section class="panel card">
+        <div class="card-head">
+          <h2>The numbers, year by year</h2>
+          <div class="seg" id="period" role="group" aria-label="Table period"></div>
+        </div>
+        <p class="howto">In millions of dollars unless stated. A dash means zero; orange means negative.</p>
+        <div class="tablewrap" id="table"></div>
+      </section>
+
+      <section class="panel card">
+        <h2>Who we hire until Series A</h2>
+        <p class="howto">The company is based in Atlanta, a few hours from both pilots. Founders take no salary before Seed. Ashlynn, Adeline and Taras stay part-time advisors on equity and are not on the payroll. Regulatory counsel is hired by the hour until the regulatory lead starts.</p>
+        <div class="tablewrap"><table class="roster" id="roster"></table></div>
+      </section>
+
+      <details class="panel drop" id="how">
+        <summary><h2>How the model works</h2><span class="more">Steps, fixed values, what is left out</span></summary>
+        <div class="notes">
+          <div>
+            <h3>Step by step</h3>
+            <ul>
+              <li>Two design partners, Hays State Prison and Clemson Memorial Stadium, run paid one-year pilots from 2028 Q1. They become the first customers when the product is ready.</li>
+              <li>Each salesperson wins customers; a win becomes a signed contract one "time to close a sale" later, never before the product is ready. Until Series A the CEO sells half time and one account executive full time.</li>
+              <li>A customer (a state prison system, a county, a venue owner) installs its facilities one after another. A facility pays an installation fee once and a subscription every year.</li>
+              <li>Facilities installed can never exceed the facilities that could buy.</li>
+              <li>Hardware is paid for a quarter before it ships and customers pay a quarter after installation, so cash lags behind profit while the company grows.</li>
+              <li>Cash needed from investors is the most the business is ever short, added up from the start, before counting any investment.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Fixed values (no slider)</h3>
+            <ul id="fixedList"></ul>
+            <h3 style="margin-top:14px">Left out</h3>
+            <ul>
+              <li>Grants (SBIR, FEMA): upside, not counted.</li>
+              <li>Tax, interest, replacing old sensors, and how much of the company investors end up owning.</li>
+              <li>Hiring does not slow down if sales disappoint, so the weak scenarios overstate cost.</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+
+      <details class="panel drop" id="words">
+        <summary><h2>Words used on this page</h2><span class="more">Plain meanings of 14 terms</span></summary>
+        <dl class="gloss" id="gloss"></dl>
+      </details>
+    </main>
+  </div>
+</div>
+
+<script>
+const START_YEAR = 2027, T = 64;               // 2027 Q1 .. 2042 Q4
+// Costs per facility come from the prototype: Tripwire_Assumptions_and_Figures.md (twin v0.4.4, Nov 12 2026), sections 2-5 and 8.
+const FIXED = {
+  bladeCost: 1825.22, bladeSensors: 6,      // standard bladeRF sensor; Hays State Prison needs 6 (section 8)
+  customCost: 1601, customSensors: 4,    // sensor built on our own 8-channel receiver; Hays needs 4
+  installPerSensor: 510, setupPerFacility: 2500, hubPerFacility: 500,   // section 4
+  runPerSensor: 271.33, runPerSensorCustom: 260.1, runPerFacility: 1200,   // section 5 (custom: Hays 4 sensors $2,240/yr, section 8)
+  nre: 400000, nreQuarters: 6,           // design cost of our own receiver, spent in the 6 quarters before it ships (section 7)
+  churn: 0.05,                           // ASSUMPTION: share of facilities lost per year on 5-year contracts
+  pilots: 2, pilotQ: 4, pilotFee: 55000, // prison pilot fee: (Hays kit $17,011 + upkeep $2,828 + flights $8,000 + changes $12,000) x 1.4, rounded down
+  stadiumPilotFee: 77000,                // stadium pilot: Clemson needs 12 bladeRF sensors at 30 dB ($31,023 + $4,455/yr), same formula
+  stadiumPilotSensors: 12,
+  founderPay: 120,                       // $k a year each, from Seed; nothing before (team decision)
+  counselQ: 20, counselLaterQ: 6,        // $k a quarter of hourly regulatory counsel until the regulatory lead starts at Series A (decision Nov 12), then less
+  devPre: 12, devSeed: 30,               // $k a quarter: demo kits, travel, test drones and scored flights, until launch
+  overhead: 0.20,                        // rent, insurance, tools as a share of payroll (from Seed)
+  salesSupport: 0.5, sitesPerOps: 40, gaPer: 8,
+  segCore: 4277,                         // US prisons 1,161 + jails 3,116 (memo)
+  segStadium: 200, stadiumSize: 1.5,     // about 200 large US stadiums (ASSUMPTION); sellable once 30-40 dB works (Clemson: not possible at 20 dB); 6 custom sensors at 40 dB vs 4 at Hays
+  segLater: 1150,                        // airports 518 + military 450 + refineries 128 + nuclear 54 (memo), from Series B
+  laterSize: 4,                          // ASSUMPTION: an airport or base perimeter needs about 4x the sensors of Hays, priced and costed in proportion
+};
+// Named hires until Series A [role, team, first quarter, founder?]; formulas take over after Series A.
+const ROSTER = [
+  ['CEO: customers, pitching, fundraising (Sid)', 'ga', 0, true],
+  ['CTO: technology and the product (Nimalan)', 'eng', 0, true],
+  ['RF and electronics engineer: our own receiver', 'eng', 2],
+  ['Signal-processing software engineer', 'eng', 3],
+  ['Regulatory and compliance lead', 'ga', 11],
+  ['Field engineer: installs and scored flights', 'ops', 4],
+  ['Account executive, corrections', 'sales', 6],
+];
+const DEFAULTS = {
+  installPrice: 25000, subPrice: 25000, winsPerRep: 2, salesCycle: 3, facPerAccount: 6, rollout: 1,
+  workable: 33, abroad: 1500,
+  launch: 7, customQ: 17, q40: 15,
+  engAdds: 4, repsAdd: 5, costPerHead: 175,
+  r0: 0.25, r1: 4, r2: 12, r3: 9,
+};
+const ROUNDS = [
+  { key: 'r0', name: 'Pre-seed', q: 0 },
+  { key: 'r1', name: 'Seed', q: 2 },
+  { key: 'r2', name: 'Series A', q: 11 },
+  { key: 'r3', name: 'Series B', q: 19 },
+];
+const SEED_Q = 2, A_Q = 11, B_Q = 19, TARGET = 100e6;
+function qLabel(t) { return (START_YEAR + Math.floor(t / 4)) + ' Q' + (t % 4 + 1); }
+
+function runModel(a) {
+  const N = T + 1, z = () => new Array(N).fill(0), F = FIXED;
+  const launch = a.launch;
+  const reps = z(), accounts = z(), sites = z(), cumSites = z(), active = z(), addr = z();
+  const hwRev = z(), subRev = z(), rev = z();
+  const cHw = z(), cInstall = z(), cSupport = z(), cOps = z(), varCost = z();
+  const fEng = z(), fSales = z(), fGA = z(), fOver = z(), fDev = z(), fixCost = z();
+  const hEng = z(), hSales = z(), hOps = z(), hGA = z(), heads = z();
+  const gross = z(), opProfit = z(), ocf = z(), fin = z(), cash = z(), cumOcf = z();
+  const perHeadQ = a.costPerHead * 1000 / 4, founderQ = F.founderPay * 1000 / 4;
+  const extra4 = () => (F.stadiumPilotSensors - F.bladeSensors) * F.runPerSensor / 4;
+  const sensors = (t) => (t >= a.customQ ? F.customSensors : F.bladeSensors);
+  const sensorCost = (t) => (t >= a.customQ ? F.customCost : F.bladeCost);
+  const roster = (t, team) => ROSTER.filter((r) => r[1] === team && t >= r[2]);
+  const paid = (t, team) => roster(t, team).reduce((s, r) => s + (r[3] ? (t >= SEED_Q ? founderQ : 0) : perHeadQ), 0);
+
+  // who sells: the CEO part-time from Seed, the account executive, then salespeople added after Series A
+  for (let t = 0; t < N; t++) {
+    reps[t] = (t >= SEED_Q ? 0.5 : 0) + (t >= 6 ? 1 : 0) + (t >= A_Q ? Math.floor(a.repsAdd * (t - A_Q + 1) / 4) : 0);
+  }
+  for (let t = launch; t < N; t++) {
+    const src = t - a.salesCycle;
+    accounts[t] = (src >= 0 ? reps[src] * a.winsPerRep / 4 : 0) + (t === launch ? F.pilots : 0);
+  }
+  const size = z();   // average facility size against Hays: grows once airports and bases are sold (Series B)
+  for (let t = 0; t < N; t++) {
+    const share = t >= a.q40 ? 1 : a.workable / 100;
+    const nCore = (F.segCore + (t >= B_Q ? a.abroad : 0)) * share, nStad = t >= a.q40 ? F.segStadium : 0, nLater = t >= B_Q ? F.segLater * share : 0;
+    addr[t] = nCore + nStad + nLater;
+    size[t] = (nCore + nStad * F.stadiumSize + nLater * F.laterSize) / addr[t];
+    let planned = 0;
+    for (let s = 0; s < t; s++) {
+      if (!accounts[s]) continue;
+      const partners = s === launch ? Math.min(F.pilots, accounts[s]) : 0;
+      const fresh = accounts[s] - partners;
+      const doneF = Math.min(a.facPerAccount, a.rollout * (t - s - 1));
+      planned += fresh * Math.max(0, Math.min(a.rollout, a.facPerAccount - doneF));
+      const doneP = Math.min(a.facPerAccount - 1, a.rollout * (t - s - 1));      // partners already have their pilot facility
+      planned += partners * Math.max(0, Math.min(a.rollout, a.facPerAccount - 1 - doneP));
+    }
+    const prev = t ? cumSites[t - 1] : 0;
+    const pilot = t === F.pilotQ ? F.pilots : 0;
+    const sold = Math.max(0, Math.min(planned, addr[t] - prev - pilot));
+    sites[t] = sold + pilot;
+    cumSites[t] = prev + sites[t];
+    const prevActive = t ? active[t - 1] : 0;
+    active[t] = prevActive * (1 - F.churn / 4) + sites[t];
+    const billed = (prevActive + active[t]) / 2 - (t < F.pilotQ + 4 ? Math.min(F.pilots, active[t]) : 0);   // pilots pay the pilot fee for year one
+
+    hwRev[t] = sold * a.installPrice * size[t] + (pilot ? F.pilotFee + F.stadiumPilotFee : 0);
+    subRev[t] = Math.max(0, billed) * a.subPrice * size[t] / 4;
+    rev[t] = hwRev[t] + subRev[t];
+
+    const others = () => hEng[t] + hSales[t] + hOps[t];
+    hEng[t] = roster(t, 'eng').length + (t >= A_Q ? Math.floor(a.engAdds * (t - A_Q + 1) / 4) : 0);
+    hSales[t] = roster(t, 'sales').length + (t >= A_Q ? Math.floor(a.repsAdd * (t - A_Q + 1) / 4) * (1 + F.salesSupport) : 0);
+    hSales[t] = Math.ceil(hSales[t]);
+    hOps[t] = Math.max(roster(t, 'ops').length, t >= launch ? Math.ceil(active[t] / F.sitesPerOps) : 0);
+    hGA[t] = roster(t, 'ga').length + (t >= A_Q ? Math.floor(others() / F.gaPer) : 0);
+    heads[t] = hEng[t] + hSales[t] + hOps[t] + hGA[t];
+
+    const ns = sensors(t) * size[t];
+    const extra = pilot ? F.stadiumPilotSensors - F.bladeSensors : 0;   // the stadium pilot needs 12 bladeRF sensors, not 6
+    cHw[t] = sites[t] * (ns * sensorCost(t) + F.hubPerFacility) + extra * F.bladeCost;
+    cInstall[t] = sites[t] * (ns * F.installPerSensor + F.setupPerFacility) + extra * F.installPerSensor;
+    const runPer = t >= a.customQ ? F.runPerSensorCustom : F.runPerSensor;
+    cSupport[t] = (prevActive + active[t]) / 2 * (ns * runPer + F.runPerFacility) / 4 + (t >= F.pilotQ && t < F.pilotQ + 4 ? extra4(t) : 0);
+    cOps[t] = paid(t, 'ops') + Math.max(0, hOps[t] - roster(t, 'ops').length) * perHeadQ;
+    varCost[t] = cHw[t] + cInstall[t] + cSupport[t] + cOps[t];
+
+    fEng[t] = paid(t, 'eng') + (hEng[t] - roster(t, 'eng').length) * perHeadQ;
+    fSales[t] = paid(t, 'sales') + (hSales[t] - roster(t, 'sales').length) * perHeadQ;
+    fGA[t] = paid(t, 'ga') + (hGA[t] - roster(t, 'ga').length) * perHeadQ + (t < A_Q ? F.counselQ : F.counselLaterQ) * 1000;
+    const payroll = fEng[t] + fSales[t] + fGA[t] + cOps[t];
+    fOver[t] = t >= SEED_Q ? F.overhead * payroll : 0;
+    fDev[t] = (t < SEED_Q ? F.devPre : t < launch ? F.devSeed : 0) * 1000 +
+      (t >= a.customQ - F.nreQuarters && t < a.customQ ? F.nre / F.nreQuarters : 0);
+    fixCost[t] = fEng[t] + fSales[t] + fGA[t] + fOver[t] + fDev[t];
+
+    gross[t] = rev[t] - varCost[t];
+    opProfit[t] = gross[t] - fixCost[t];
+  }
+  for (const r of ROUNDS) fin[r.q] += (a[r.key] || 0) * 1e6;
+  // cash timing: hardware is paid for a quarter before it ships; customers pay a quarter after installation
+  for (let t = 0; t < T; t++) {
+    const receipts = (t ? hwRev[t - 1] : 0) + subRev[t];
+    const payments = cHw[t + 1] + cInstall[t] + cSupport[t] + cOps[t] + fixCost[t];
+    ocf[t] = receipts - payments;
+    cumOcf[t] = (t ? cumOcf[t - 1] : 0) + ocf[t];
+    cash[t] = (t ? cash[t - 1] : 0) + ocf[t] + fin[t];
+  }
+  let q100 = null, qCfp = null, minCash = Infinity, qMinCash = 0, peakNeed = 0, qPeak = 0;
+  const ttm = z();
+  for (let t = 0; t < T; t++) {
+    ttm[t] = rev[t] + (t > 0 ? rev[t - 1] : 0) + (t > 1 ? rev[t - 2] : 0) + (t > 2 ? rev[t - 3] : 0);
+    if (q100 === null && ttm[t] >= TARGET) q100 = t;
+    if (qCfp === null && t + 3 < T && ocf[t] > 0 && ocf[t + 1] > 0 && ocf[t + 2] > 0 && ocf[t + 3] > 0) qCfp = t;
+    if (cash[t] < minCash) { minCash = cash[t]; qMinCash = t; }
+    if (-cumOcf[t] > peakNeed) { peakNeed = -cumOcf[t]; qPeak = t; }
+  }
+  const raised = ROUNDS.reduce((s, r) => s + (a[r.key] || 0) * 1e6, 0);
+  return { size, launch, reps, accounts, sites, cumSites, active, addr, hwRev, subRev, rev, ttm,
+    cHw, cInstall, cSupport, cOps, varCost, fEng, fSales, fGA, fOver, fDev, fixCost,
+    hEng, hSales, hOps, hGA, heads, gross, opProfit, ocf, fin, cash, cumOcf,
+    q100, qCfp, minCash, qMinCash, peakNeed, qPeak, raised,
+    gap: Math.max(0, -minCash), marketFullQ: -1 };
+}
+
+/* ---------- words ---------- */
+const LEAD = 'Tripwire protects prisons and stadiums from drones with receive-only sensors on the fence that hear drone echoes of cell-tower signals. This page works out how much money the company needs, when it pays its own way and whether it can reach $100 million of sales a year. Costs come from our digital twin of Hays State Prison; prices are set against what facilities pay today.';
+const INPUTS = {
+  installPrice: ['Installation fee per facility', 'Paid once. Set below what the customer pays today; at least our cost + 40%.'],
+  subPrice: ['Subscription per facility, per year', 'Software, monitoring, upkeep and updates.'],
+  winsPerRep: ['Customers won per salesperson, per year', 'A customer is one buyer: a state prison system, a county, a venue owner.'],
+  salesCycle: ['Time to close a sale', 'Government buying is slow: budget cycles and procurement.'],
+  facPerAccount: ['Facilities per customer', 'Georgia alone runs 34 state prisons; a county has one jail.'],
+  rollout: ['Facilities a customer installs per quarter', 'After signing, until all its facilities are done.'],
+  workable: ['Share of facilities that work with today’s processing', 'One of our three simulated sites works at 20 dB interference removal.'],
+  abroad: ['Facilities abroad, from Series B', 'Prisons and airports in allied countries.'],
+  launch: ['Product ready to sell', 'After the design-partner pilots and scored flights.'],
+  customQ: ['Our own receiver in production', 'Cuts a Hays-size facility from 6 sensors to 4 and the cost per sensor.'],
+  q40: ['Interference removal reaches 40 dB', 'Unlocks dense-tower and sparse-tower sites. Unproven.'],
+  engAdds: ['Engineers added per year, after Series A', ''],
+  repsAdd: ['Salespeople added per year, after Series A', 'Each brings half a sales engineer.'],
+  costPerHead: ['Cost of one employee, per year', 'Atlanta: average wage about $125k plus about 40% for benefits and taxes.'],
+  r0: ['Pre-seed', 'Angels and friends; SBIR Phase I is upside.'], r1: ['Seed', ''], r2: ['Series A', ''], r3: ['Series B', ''],
+};
+const GROUPS_TXT = {
+  gtm: ['Go-to-market plan', 'How it sells', 'Corrections first, starting with Georgia; stadiums next; airports, bases and allies from Series B.'],
+  tech: ['Technical development plan', 'How it builds', 'Off-the-shelf bladeRF radios at Seed; our own 8-channel receiver after Series A.'],
+  hire: ['Hiring plan', 'Who it employs', 'Named hires until Series A; then sales, engineering and field teams scale with customers.'],
+  fund: ['Funding plan', 'Where the cash comes from', 'Four rounds on fixed dates. Set an amount to zero to remove it.'],
+};
+const SCENARIOS = [
+  ['Plan', 'The plan as written: every assumption at its starting value.', {}],
+  ['40 dB never comes', 'Interference removal stays at today’s 20 dB: only one facility in three can ever be protected.', { q40: 64 }],
+  ['Slower sales', 'Half as many wins per salesperson, sales take two quarters longer and customers are smaller.', { winsPerRep: 1, salesCycle: 5, facPerAccount: 4 }],
+  ['Price war', 'A competitor forces prices down to $15,000 + $15,000 a year.', { installPrice: 15000, subPrice: 15000 }],
+  ['Late hardware', 'The product is ready a year late and our own receiver 18 months late.', { launch: 11, customQ: 23 }],
+];
+const KPI = {
+  q100: ['Sales reach $100M a year', 'Revenue of $100M over four quarters'], cfp: ['The business pays its own way', 'Cash-flow positive'],
+  need: ['Cash needed from investors', 'Capital required'], raised: ['Cash the plan raises', 'Capital raised'],
+  share: ['Share of reachable facilities it must win', 'Market share needed'], gm: ['Left from each $1 of sales after direct costs', 'Gross margin'],
+};
+const ROWS = { hwRev: 'Installation fees', subRev: 'Subscriptions', rev: 'Total sales (revenue)', cHw: 'Sensors and hubs', cInstall: 'Installing facilities',
+  cSupport: 'Upkeep, internet and cloud', cOps: 'Field and support staff', varCost: 'Total of these costs', gross: 'Left after these costs (gross profit)',
+  gm: 'The same, as a share of sales (gross margin)', fEng: 'Engineering', fSales: 'Sales', fGA: 'Founders, admin, regulatory and counsel',
+  fOver: 'Overhead: rent, insurance, tools', fDev: 'Development: demo kits, pilots, scored flights, own receiver design', fixCost: 'Total of these costs',
+  opProfit: 'Profit after all costs (operating profit)', ocf: 'Cash in minus cash out (operating cash flow)', fin: 'Invested (capital raised)',
+  cash: 'Cash in the bank at period end', burn: 'Cash lost per month, average (burn rate)', runway: 'Months of cash left at that rate (runway)',
+  heads: 'Employees (end of period)', hEng: 'Engineering', hSales: 'Sales', hOps: 'Field and support', hGA: 'Founders, admin and regulatory',
+  accounts: 'Customers signed', sites: 'Facilities installed', active: 'Facilities in service (end of period)', share: 'Share of reachable facilities (end of period)' };
+const GLOSSARY = [
+  ['Sensor', 'One receive-only box on a pole at the fence: antennas, radio boards, an edge computer and GPS.'],
+  ['Facility', 'One place we protect: a prison, a jail, a stadium. Priced as a whole, sized to the sensors it needs.'],
+  ['Customer', 'One buyer that may own many facilities, such as the Georgia Department of Corrections.'],
+  ['Hub', 'One small computer per facility that tracks drones and raises alerts.'],
+  ['Design partner', 'An early customer that pays for a pilot and agrees the test criteria with us.'],
+  ['Interference removal', 'How much of the neighboring cell towers’ signal our processing cancels. 20 dB today; 40 dB lets every site work.'],
+  ['Floor price', 'Our cost + 40%: the lowest price that keeps a 40% margin.'],
+  ['Quarter', 'Three months. 2029 Q4 is October to December 2029.'],
+  ['Gross margin', 'The share of each sale left after the costs that grow with each facility.'],
+  ['Burn rate', 'Cash lost per month while costs are higher than income.'],
+  ['Runway', 'Months until the cash runs out at the current burn rate.'],
+  ['Capital required', 'The most the company is ever out of pocket: what investors must cover.'],
+  ['Funding round', 'A sale of shares to investors for cash: pre-seed, Seed, Series A, Series B.'],
+  ['Sensitivity', 'How much an answer changes when one assumption changes.'],
+];
+// What one facility costs the customer over a 5-year contract (top down). Sources: Tripwire_Assumptions_and_Figures.md section 6; Draft Report 2 ref [27].
+const COMPARE = [
+  { name: 'Axon / Dedrone, RF detectors', note: 'hardware + installation, no software; cited', lo: 57915, hi: 57915 },
+  { name: 'South Carolina, Dedrone RF (2023)', note: '$240,000 for 4 prisons + a mobile unit, up front only; cited', lo: 60000, hi: 60000 },
+  { name: 'Prison detection system, basic tier', note: 'AirSight published range, up front; cited', lo: 50000, hi: 150000 },
+  { name: 'Stadium layered system', note: 'AirSight published range, up front; cited', lo: 150000, hi: 500000 },
+  { name: 'Radar system: 3-5 radars, 5 years', note: 'our estimate from AirSight unit prices + 30-60% installation + subscriptions', lo: 162355, hi: 850715 },
+];
+
+/* ---------- inputs ---------- */
+const usd = (v) => '$' + Math.round(v).toLocaleString('en-US');
+const int = (v) => Math.round(v).toLocaleString('en-US');
+const qtrs = (v) => v + ' quarters (' + v * 3 + ' months)';
+const when = (v) => (v >= 64 ? 'never' : qLabel(v));
+const FIELDS = {
+  gtm: [
+    { key: 'installPrice', min: 5000, max: 80000, step: 1000, fmt: usd },
+    { key: 'subPrice', min: 5000, max: 80000, step: 1000, fmt: usd },
+    { key: 'winsPerRep', min: 0.5, max: 4, step: 0.25, fmt: (v) => v.toFixed(2) },
+    { key: 'salesCycle', min: 1, max: 8, step: 1, fmt: qtrs },
+    { key: 'facPerAccount', min: 2, max: 20, step: 1, fmt: int },
+    { key: 'rollout', min: 0.5, max: 4, step: 0.5, fmt: (v) => String(v) },
+    { key: 'workable', min: 10, max: 100, step: 1, fmt: (v) => v + '%' },
+    { key: 'abroad', min: 0, max: 6000, step: 250, fmt: int },
+  ],
+  tech: [
+    { key: 'launch', min: 5, max: 14, step: 1, fmt: qLabel },
+    { key: 'customQ', min: 12, max: 28, step: 1, fmt: qLabel },
+    { key: 'q40', min: 8, max: 64, step: 1, fmt: when },
+  ],
+  hire: [
+    { key: 'engAdds', min: 0, max: 15, step: 1, fmt: int },
+    { key: 'repsAdd', min: 0, max: 12, step: 1, fmt: int },
+    { key: 'costPerHead', min: 120, max: 300, step: 5, fmt: (v) => '$' + v + 'k' },
+  ],
+  fund: ROUNDS.map((r) => ({ key: r.key, min: 0, max: 60, step: r.key === 'r0' ? 0.25 : 1, fmt: (v) => '$' + v + 'M', when: qLabel(r.q) })),
+};
+const lab = (k) => INPUTS[k][0], hint = (k) => INPUTS[k][1];
+const GROUPS = ['gtm', 'tech', 'hire', 'fund'].map((id) => ({ id, title: GROUPS_TXT[id][0], plain: GROUPS_TXT[id][1], plan: GROUPS_TXT[id][2],
+  fields: FIELDS[id].map((f) => ({ ...f, label: lab(f.key) + (f.when ? ' · ' + f.when : ''), hint: hint(f.key) })) }));
+const PRESETS = SCENARIOS.map((s) => ({ name: s[0], desc: s[1], set: s[2] }));
+const SENS = [
+  { key: 'subPrice', note: '±20%', lo: (v) => v * 0.8, hi: (v) => v * 1.2 },
+  { key: 'installPrice', note: '±20%', lo: (v) => v * 0.8, hi: (v) => v * 1.2 },
+  { key: 'winsPerRep', note: '±30%', lo: (v) => v * 0.7, hi: (v) => v * 1.3 },
+  { key: 'salesCycle', note: '±2 quarters', lo: (v) => Math.max(1, v - 2), hi: (v) => v + 2 },
+  { key: 'facPerAccount', note: '±30%', lo: (v) => v * 0.7, hi: (v) => v * 1.3 },
+  { key: 'workable', note: '±10 points', lo: (v) => v - 10, hi: (v) => v + 10 },
+  { key: 'q40', note: '±4 quarters', lo: (v) => v - 4, hi: (v) => v + 4 },
+  { key: 'launch', note: '±2 quarters', lo: (v) => v - 2, hi: (v) => v + 2 },
+  { key: 'costPerHead', note: '±15%', lo: (v) => v * 0.85, hi: (v) => v * 1.15 },
+].map((x) => ({ ...x, label: lab(x.key) }));
+const METRICS = [
+  { id: 'need', name: 'Money needed', get: (m) => m.peakNeed / 1e6, fmt: (v) => '$' + v.toFixed(1) + 'M' },
+  { id: 'cfp', name: 'Pays-its-own-way date', get: (m) => (m.qCfp === null ? T : m.qCfp), fmt: (v) => (v >= T ? 'after 2042' : qLabel(v)) },
+  { id: 'q100', name: '$100M date', get: (m) => (m.q100 === null ? T : m.q100), fmt: (v) => (v >= T ? 'after 2042' : qLabel(v)) },
+];
+const KEY = ['subPrice', 'winsPerRep', 'workable', 'q40'];
+
+const state = { a: { ...DEFAULTS }, metric: 'need', period: 'year', preset: 'Plan' };
+const $ = (id) => document.getElementById(id);
+const money = (x) => { const v = Math.abs(x) / 1e6; return (x < 0 ? '−$' : '$') + (v >= 10 ? Math.round(v) : v.toFixed(1)) + 'M'; };
+
+function renderAssumptions() {
+  $('assume').innerHTML = GROUPS.map((g) => '<div class="agroup"><h3>' + g.title + '</h3>' + g.fields.map((f) => {
+    const v = state.a[f.key], changed = v !== DEFAULTS[f.key], key = KEY.includes(f.key);
+    return '<div class="arow' + (key ? ' key' : '') + (changed ? ' changed' : '') + '"><span class="k">' +
+      (key ? '<span class="keymark">◆ key</span> ' : '') + f.label + '</span><span class="v">' + f.fmt(v) +
+      (changed ? '<span class="was">plan: ' + f.fmt(DEFAULTS[f.key]) + '</span>' : '') + '</span></div>';
+  }).join('') + '</div>').join('');
+}
+
+function buildInputs() {
+  const host = $('inputs');
+  GROUPS.forEach((g, gi) => {
+    const d = document.createElement('details'); d.open = gi < 2 || window.innerWidth > 900;
+    d.innerHTML = '<summary><h3>' + g.title + ' <span>· ' + g.plain + '</span></h3></summary><p class="plan">' + g.plan + '</p>';
+    const box = document.createElement('div'); box.className = 'fields';
+    g.fields.forEach((f) => {
+      const w = document.createElement('div'); w.className = 'field'; w.id = 'f-' + f.key;
+      w.innerHTML = '<div class="row"><label for="in-' + f.key + '">' + f.label + '</label><output id="out-' + f.key + '"></output></div>' +
+        '<input type="range" id="in-' + f.key + '" min="' + f.min + '" max="' + f.max + '" step="' + f.step + '">' +
+        (f.hint ? '<span class="hint">' + f.hint + '</span>' : '');
+      box.appendChild(w);
+      const inp = w.querySelector('input');
+      inp.addEventListener('input', () => { state.a[f.key] = Number(inp.value); state.preset = null; render(); });
+    });
+    d.appendChild(box); host.appendChild(d);
+  });
+  const ps = $('presets');
+  PRESETS.forEach((p) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = p.name; b.dataset.preset = p.name;
+    b.addEventListener('click', () => { state.a = { ...DEFAULTS, ...p.set }; state.preset = p.name; render(); });
+    ps.appendChild(b);
+  });
+  const seg = (hostId, items, onPick) => items.forEach((it) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = it.name; b.dataset.v = it.id;
+    b.addEventListener('click', () => { onPick(it.id); render(); }); $(hostId).appendChild(b);
+  });
+  seg('sensMetric', METRICS, (v) => { state.metric = v; });
+  seg('period', [{ id: 'year', name: 'By year' }, { id: 'quarter', name: 'By quarter' }], (v) => { state.period = v; });
+  const F = FIXED;
+  $('fixedList').innerHTML = [
+    'Sensor (prototype): $' + int(F.bladeCost) + ' with two bladeRF radios, 6 per Hays-size facility; $' + int(F.customCost) + ' with our own receiver, 4 per facility. Hub $' + F.hubPerFacility + ' per facility.',
+    'Installation (prototype): $' + F.installPerSensor + ' per sensor + $' + int(F.setupPerFacility) + ' site set-up per facility.',
+    'Upkeep (prototype): $' + int(F.runPerSensor) + ' per bladeRF sensor or $' + int(F.runPerSensorCustom) + ' per own-receiver sensor, + $' + int(F.runPerFacility) + ' per facility per year (service visit, spares, software, internet line, cloud).',
+    'Own receiver design: $' + int(F.nre) + ', spent over the ' + F.nreQuarters + ' quarters before it ships (assumption, prototype section 7).',
+    'Two design-partner pilots from ' + qLabel(F.pilotQ) + ' for one year (pilot cost + 40%, credited if they buy): Hays State Prison $' + int(F.pilotFee) + ' with 6 bladeRF sensors; Clemson Memorial Stadium $' + int(F.stadiumPilotFee) + ' with ' + F.stadiumPilotSensors + ', because the stadium needs 30 dB of interference removal and sensors on the stands as well as outside (prototype v0.5).',
+    'Based in Atlanta, near both pilots. $175k per hire = an average wage of about $125k (BLS May 2025 Atlanta means: electronics engineers $146k, software developers $136k, technical sales $126k; field and admin staff less) + about 40% for benefits and taxes (BLS employer costs: benefits are 30% of total pay). The same team in San Jose would cost about $240k a head. Founders: no salary before Seed, then $' + F.founderPay + 'k each (loaded). Hourly regulatory counsel $' + F.counselQ + 'k a quarter, $' + F.counselLaterQ + 'k once the regulatory lead starts.',
+    'Development: $' + F.devPre + 'k a quarter before Seed (two demo kits, travel), $' + F.devSeed + 'k a quarter until launch (pilots, test drones, scored flights).',
+    'One field person per ' + F.sitesPerOps + ' facilities in service; one administrator per ' + F.gaPer + ' other staff after Series A; overhead ' + Math.round(F.overhead * 100) + '% of payroll from Seed.',
+    'Market: ' + int(F.segCore) + ' US prisons and jails; about ' + int(F.segStadium) + ' large stadiums once interference removal reaches 40 dB (none work at 20 dB), each needing ' + F.stadiumSize + '× the sensors of Hays; ' + int(F.segLater) + ' airports, bases, refineries and nuclear plants from Series B, each about ' + F.laterSize + '× the size of Hays. ' + Math.round(F.churn * 100) + '% of facilities lost per year.',
+  ].map((s) => '<li>' + s + '</li>').join('');
+  $('lead').textContent = LEAD;
+  $('gloss').innerHTML = GLOSSARY.map((g) => '<div><dt>' + g[0] + '</dt><dd>' + g[1] + '</dd></div>').join('');
+  $('roster').innerHTML = '<thead><tr><th class="l">Role</th><th>Starts</th><th>Cost per year</th><th class="l">Why then</th></tr></thead><tbody>' + [
+    [ROSTER[0][0], ROSTER[0][2], 'founder', 'Sells to the first prisons and venues; raises each round.'],
+    [ROSTER[1][0], ROSTER[1][2], 'founder', 'Owns the processing chain and the live demo.'],
+    ['Regulatory counsel, by the hour', 0, 'counsel', 'Confirms receive-only operation is lawful before the first demo.'],
+    [ROSTER[2][0], ROSTER[2][2], 'staff', 'Makes two bladeRF boards run as one 4-channel radio, then designs our own receiver.'],
+    [ROSTER[3][0], ROSTER[3][2], 'staff', 'Turns the twin’s processing into a real-time chain on the edge computer.'],
+    [ROSTER[4][0], ROSTER[4][2], 'staff', 'Until Series A hourly counsel and Taras cover the few legal pieces; selling in several states and export work make it a full-time job.'],
+    [ROSTER[5][0], ROSTER[5][2], 'staff', 'Installs the two pilots and runs the scored flights.'],
+    [ROSTER[6][0], ROSTER[6][2], 'staff', 'Takes over selling so the CEO can raise Series A.'],
+  ].map((r) => '<tr><td>' + r[0] + '</td><td>' + qLabel(r[1]) + '</td><td>' + (r[2] === 'founder' ? '$0 before Seed, then $' + FIXED.founderPay + 'k' : r[2] === 'counsel' ? '$' + FIXED.counselQ * 4 + 'k' : '$' + state.a.costPerHead + 'k') + '</td><td class="l">' + r[3] + '</td></tr>').join('') + '</tbody>';
+}
+function syncInputs() {
+  GROUPS.forEach((g) => g.fields.forEach((f) => {
+    const v = state.a[f.key];
+    $('in-' + f.key).value = v; $('out-' + f.key).textContent = f.fmt(v);
+    $('f-' + f.key).classList.toggle('changed', v !== DEFAULTS[f.key]);
+  }));
+  document.querySelectorAll('#presets button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.preset === state.preset)));
+  const cur = PRESETS.find((p) => p.name === state.preset);
+  $('presetDesc').textContent = cur ? cur.name + ': ' + cur.desc : 'Your own settings: one or more sliders moved from the plan.';
+  document.querySelectorAll('#sensMetric button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === state.metric)));
+  document.querySelectorAll('#period button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === state.period)));
+}
+
+/* ---------- one facility ---------- */
+function facilityEcon(a, own) {
+  const F = FIXED, n = own ? F.customSensors : F.bladeSensors, unit = own ? F.customCost : F.bladeCost;
+  const hw = n * unit + F.hubPerFacility, inst = n * F.installPerSensor + F.setupPerFacility;
+  const run = n * (own ? F.runPerSensorCustom : F.runPerSensor) + F.runPerFacility, up = hw + inst;
+  return { n, unit, hw, inst, up, run, floorUp: up / 0.6, floorRun: run / 0.6, five: up + 5 * run, ours: a.installPrice + 5 * a.subPrice };
+}
+function renderEcon(a) {
+  const b = facilityEcon(a, false), e = facilityEcon(a, true);
+  const gm = 1 - e.five / e.ours, gp = (e.ours - e.five) / 5;
+  $('econLead').innerHTML = 'Hays State Prison is our first customer because our simulator found it works with today’s processing: enough towers for strong echoes, few enough that neighbors do not drown them. Pilots and the first sales use off-the-shelf bladeRF radios (' + b.n + ' sensors). From ' + qLabel(a.customQ) + ' every new facility gets our own receiver (' + e.n + ' sensors), so the price is set against that cost. At <b>' + usd(a.installPrice) + ' + ' + usd(a.subPrice) + ' a year</b> a facility pays ' + usd(e.ours) + ' over 5 years, leaves us a ' + Math.round(gm * 100) + '% gross margin (' + usd(gp) + ' a year) and costs the customer less than any option that also sees drones that send no radio signal.';
+  const row = (k, v1, v2, tag, cls) => '<tr class="' + (cls || '') + '"><td>' + k + '</td><td>' + v1 + '</td><td>' + v2 + '</td><td class="tag">' + tag + '</td></tr>';
+  $('costTable').innerHTML = '<thead><tr><th class="l"></th><th>bladeRF</th><th>Own receiver</th><th></th></tr></thead><tbody>' + [
+    row('Sensors', b.n + ' × ' + usd(b.unit), e.n + ' × ' + usd(e.unit), 'prototype'),
+    row('Hardware with the hub', usd(b.hw), usd(e.hw), 'prototype'),
+    row('Installation and site set-up', usd(b.inst), usd(e.inst), 'prototype'),
+    row('Our cost up front', usd(b.up), usd(e.up), '', 'total'),
+    row('Upkeep, internet and cloud, per year', usd(b.run), usd(e.run), 'prototype'),
+    row('Our cost over 5 years', usd(b.five), usd(e.five), ''),
+    row('Floor price (cost + 40%)', usd(b.floorUp) + ' + ' + usd(b.floorRun) + '/yr', usd(e.floorUp) + ' + ' + usd(e.floorRun) + '/yr', 'decision'),
+    row('Our price', usd(a.installPrice) + ' + ' + usd(a.subPrice) + '/yr', usd(a.installPrice) + ' + ' + usd(a.subPrice) + '/yr', 'decision', 'total'),
+    row('Gross margin over 5 years', Math.round((1 - b.five / b.ours) * 100) + '%', Math.round(gm * 100) + '%', '', 'total'),
+  ].join('') + '</tbody>';
+  const items = [{ name: 'Tripwire: our cost', note: 'own receiver, 5 years', lo: e.five, hi: e.five, cls: 'cost' },
+    { name: 'Tripwire: floor price', note: 'our cost + 40% margin', lo: e.floorUp + 5 * e.floorRun, hi: e.floorUp + 5 * e.floorRun, cls: 'cost' },
+    { name: 'Tripwire: our price', note: 'installation + 5 years', lo: e.ours, hi: e.ours, cls: 'us' }].concat(COMPARE);
+  const max = 1150000, pct = (v) => (v / max * 100).toFixed(2) + '%';
+  $('priceBars').innerHTML = items.map((it) => {
+    const range = it.hi > it.lo;
+    const bar = range ? '<div class="bwhisk" style="left:' + pct(it.lo) + ';width:calc(' + pct(it.hi) + ' - ' + pct(it.lo) + ')"></div><div class="bbar" style="left:0;width:' + pct(it.lo) + ';opacity:.45"></div>'
+      : '<div class="bbar ' + (it.cls || '') + '" style="left:0;width:' + pct(it.lo) + '"></div>';
+    const label = range ? '$' + Math.round(it.lo / 1000) + 'k–$' + Math.round(it.hi / 1000) + 'k' : '$' + Math.round(it.lo / 1000) + 'k';
+    return '<div class="brow"><div class="lab">' + it.name + '<span>' + it.note + '</span></div><div class="btrack">' + bar +
+      '<span class="bval" style="left:calc(' + pct(it.hi) + ' + 6px)">' + label + '</span></div></div>';
+  }).join('');
+  $('priceNote').textContent = 'RF detectors cannot see drones that send no radio signal (pre-programmed or fiber-optic); radar and Tripwire can. Upkeep of competitors’ systems is not public and left out, which flatters them.';
+}
+
+function renderFlow(a) {
+  const n = (t) => '<span class="n">' + t + '</span>', e = facilityEcon(a, true);
+  $('flow').innerHTML = [
+    '<li><span>A <b>salesperson</b> wins ' + n(a.winsPerRep + ' customers') + ' a year. Each sale takes ' + n(a.salesCycle + ' quarters') + ' to close.</span></li>',
+    '<li><span>A <b>customer</b>, such as a state prison system, has ' + n(int(a.facPerAccount) + ' facilities') + ' and installs ' + n(a.rollout) + ' a quarter.</span></li>',
+    '<li><span>A <b>facility</b> like Hays State Prison needs ' + n(e.n + ' sensors') + ' with our own receiver. It costs us ' + n(usd(e.up)) + ' to equip and ' + n(usd(e.run)) + ' a year to run.</span></li>',
+    '<li><span>It pays ' + n(usd(a.installPrice)) + ' to install and ' + n(usd(a.subPrice)) + ' a year, on a 5-year contract.</span></li>',
+    '<li class="sum"><span>So one facility leaves ' + n(usd((e.ours - e.five) / 5)) + ' a year of gross profit toward salaries.</span></li>',
+  ].join('');
+}
+
+/* ---------- results ---------- */
+function displayEnd(m) { return T; }
+function sumRange(arr, from, to) { let s = 0; for (let i = from; i < to; i++) s += arr[i]; return s; }
+function renderKpis(m, a) {
+  const pill = (cls, icon, text) => '<span class="pill ' + cls + '">' + icon + ' ' + text + '</span>';
+  const firstNeg = m.cash.findIndex((c, t) => t < T && c < 0);
+  const yEnd = m.q100 !== null ? m.q100 + 1 : T, yStart = Math.max(0, yEnd - 4);
+  const gm = sumRange(m.rev, yStart, yEnd) ? sumRange(m.gross, yStart, yEnd) / sumRange(m.rev, yStart, yEnd) : 0;
+  const shareQ = m.q100 !== null ? m.q100 : T - 1, share = m.active[shareQ] / m.addr[shareQ];
+  let burnMax = 0; for (let t = 0; t < T; t++) burnMax = Math.max(burnMax, -m.ocf[t]);
+  const tiles = [
+    { k: 'q100', value: m.q100 === null ? 'Not by 2042' : qLabel(m.q100),
+      sub: m.q100 === null ? pill('crit', '✕', 'Never reached') + ' Sales peak at ' + money(Math.max(...m.ttm)) + ' a year.'
+        : 'Counting this quarter and the three before it. ' + int(m.active[m.q100]) + ' facilities in service then.' },
+    { k: 'cfp', value: m.qCfp === null ? 'Not by 2042' : qLabel(m.qCfp),
+      sub: m.qCfp === null ? pill('crit', '✕', 'Never reached') + ' It keeps needing investors’ money.'
+        : 'From this quarter, customers’ payments cover all spending for at least a year.' },
+    { k: 'need', value: money(m.peakNeed), sub: 'The most the business is ever short, reached in ' + qLabel(m.qPeak) + '. At worst it loses ' + money(burnMax / 3) + ' a month.' },
+    { k: 'raised', value: money(m.raised),
+      sub: m.gap > 0 ? pill('crit', '✕', 'Short by ' + money(m.gap)) + ' The bank account runs dry in ' + qLabel(firstNeg) + '.'
+        : pill('good', '✓', 'Enough') + ' The balance never drops below ' + money(m.minCash) + ' (' + qLabel(m.qMinCash) + ').' },
+    { k: 'share', value: Math.round(share * 100) + '%',
+      sub: (share > 0.35 ? pill('crit', '✕', 'Not credible') : share > 0.15 ? pill('warn', '!', 'High') : pill('good', '✓', 'Plausible')) +
+        ' ' + int(m.active[shareQ]) + ' of ' + int(m.addr[shareQ]) + ' facilities that could buy, by ' + (m.q100 !== null ? 'then' : '2042') + '.' },
+    { k: 'gm', value: Math.round(gm * 100) + '¢', sub: 'After hardware, installation, upkeep and field staff. Salaries and overhead come out of this.' },
+  ];
+  $('kpis').innerHTML = tiles.map((t) => '<div class="kpi"><span class="label">' + KPI[t.k][0] + '</span><span class="value">' + t.value +
+    '</span><span class="sub">' + t.sub + '</span><span class="term">' + KPI[t.k][1] + '</span></div>').join('');
+  const gate = (q, lab) => lab + ' (' + qLabel(q) + '): ' + int(m.active[q - 1]) + ' facilities in service, ' + money(sumRange(m.rev, q - 4, q)) + ' of sales in the year before.';
+  $('banner').innerHTML = '<p class="small muted">' + gate(A_Q, 'At Series A') + ' ' + gate(B_Q, 'At Series B') + '</p>';
+}
+
+/* ---------- charts ---------- */
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function niceTicks(lo, hi, n) {
+  const span = hi - lo || 1, raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map((k) => k * mag).find((s) => s >= raw);
+  const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(Math.round(v / step) * step);
+  return out;
+}
+const axisMoney = (v) => (v < 0 ? '−' : '') + '$' + (Math.abs(v) / 1e6).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'M';
+function frame(host, end, lo, hi, H, fmt) {
+  const W = Math.max(280, host.clientWidth), L = 56, R = 10, Tp = 26, B = 24;
+  host.innerHTML = '';
+  const svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, width: W, height: H, role: 'img' }, host);
+  const defs = el('defs', {}, svg), hatch = (id, color) => {
+    const p = el('pattern', { id, width: 5, height: 5, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
+    el('rect', { width: 5, height: 5, fill: 'var(--surface)' }, p); el('rect', { width: 1.6, height: 5, fill: color }, p);
+  };
+  hatch(host.id + '-hi', 'var(--ink)'); hatch(host.id + '-hs', 'var(--signal)');
+  const bw = (W - L - R) / end, x = (i) => L + (i + 0.5) * bw;
+  const ticks = niceTicks(lo, hi, 4); lo = Math.min(lo, ticks[0]); hi = Math.max(hi, ticks[ticks.length - 1]);
+  const y = (v) => Tp + (H - Tp - B) * (1 - (v - lo) / (hi - lo));
+  ticks.forEach((v) => {
+    el('line', { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: v === 0 ? 'var(--faint)' : 'var(--line)', 'stroke-width': 1 }, svg);
+    el('text', { x: L - 6, y: y(v) + 4, 'text-anchor': 'end' }, svg, (fmt || axisMoney)(v));
+  });
+  const every = bw * 4 < 34 ? 2 : 1;
+  for (let i = 0; i < end; i += 4) {
+    if ((i / 4) % every) continue;
+    el('text', { x: L + i * bw + 2, y: H - 6, 'text-anchor': 'start' }, svg, String(START_YEAR + i / 4).slice(every > 1 ? 2 : 0));
+    el('line', { x1: L + i * bw, x2: L + i * bw, y1: H - B, y2: H - B + 4, stroke: 'var(--edge)' }, svg);
+  }
+  return { svg, W, H, L, R, Tp, B, bw, x, y, lo, hi };
+}
+function hover(host, f, end, rows) {
+  const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; host.appendChild(tip);
+  const cross = el('line', { y1: f.Tp, y2: f.H - f.B, stroke: 'var(--ink)', 'stroke-width': 1, visibility: 'hidden' }, f.svg);
+  const hit = el('rect', { x: f.L, y: 0, width: f.W - f.L - f.R, height: f.H, fill: 'transparent' }, f.svg);
+  const show = (ev) => {
+    const box = f.svg.getBoundingClientRect(), px = (ev.clientX - box.left) * (f.W / box.width);
+    const i = Math.max(0, Math.min(end - 1, Math.floor((px - f.L) / f.bw)));
+    cross.setAttribute('x1', f.x(i)); cross.setAttribute('x2', f.x(i)); cross.setAttribute('visibility', 'visible');
+    tip.innerHTML = '<b>' + qLabel(i) + '</b>' + rows(i).map((r) => '<div><span>' + r[0] + '</span><span>' + r[1] + '</span></div>').join('');
+    tip.hidden = false;
+    const left = f.x(i) * (box.width / f.W) + 12, tw = tip.offsetWidth;
+    tip.style.left = (left + tw > box.width ? Math.max(0, left - tw - 24) : left) + 'px'; tip.style.top = '8px';
+  };
+  hit.addEventListener('pointermove', show); hit.addEventListener('pointerdown', show);
+  hit.addEventListener('pointerleave', () => { tip.hidden = true; cross.setAttribute('visibility', 'hidden'); });
+}
+function drawCash(m, a, end) {
+  const host = $('cashChart'), c = m.cash.slice(0, end);
+  const lo = Math.min(0, Math.min(...c)), hi = Math.max(1e6, Math.max(...c));
+  const f = frame(host, end, lo * 1.08, hi * 1.08, 300);
+  f.svg.setAttribute('aria-label', 'Cash in the bank at the end of each quarter');
+  if (f.lo < 0) el('rect', { x: f.L, y: f.y(0), width: f.W - f.L - f.R, height: f.y(f.lo) - f.y(0), fill: 'url(#cashChart-hs)', opacity: 0.5 }, f.svg);
+  let line = '', area = 'M' + f.x(0) + ' ' + f.y(0);
+  c.forEach((v, i) => { line += (i ? 'L' : 'M') + f.x(i).toFixed(1) + ' ' + f.y(v).toFixed(1); area += 'L' + f.x(i).toFixed(1) + ' ' + f.y(v).toFixed(1); });
+  area += 'L' + f.x(end - 1) + ' ' + f.y(0) + 'Z';
+  el('path', { d: area, fill: 'var(--ink)', opacity: 0.06 }, f.svg);
+  el('path', { d: line, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linejoin': 'round' }, f.svg);
+  const marks = [[m.launch, 'Product ready'], [a.q40 < T ? a.q40 : null, '40 dB'], [a.customQ, 'Own receiver'], [m.qCfp, 'Pays its own way'], [m.q100, '$100M a year']]
+    .filter((k) => k[0] !== null && k[0] < end).sort((p, q) => p[0] - q[0]);
+  let lastX = -999, row = 0;
+  marks.forEach(([q, name]) => {
+    const px = f.x(q), w = name.length * 7.4 + 10;
+    row = px - lastX < w ? row + 1 : 0; lastX = px;
+    const anchor = px + w > f.W - f.R ? 'end' : 'start';
+    el('line', { x1: px, x2: px, y1: 10 + row * 13, y2: f.H - f.B, stroke: 'var(--muted)', 'stroke-dasharray': '2 3', 'stroke-width': 1 }, f.svg);
+    el('text', { x: px + (anchor === 'end' ? -4 : 4), y: 10 + row * 13, 'text-anchor': anchor, class: 'mark' }, f.svg, name);
+  });
+  ROUNDS.forEach((r) => { if (a[r.key] > 0 && r.q < end) el('circle', { cx: f.x(r.q), cy: f.y(c[r.q]), r: 4.5, fill: 'var(--ink)', stroke: 'var(--surface)', 'stroke-width': 2 }, f.svg); });
+  hover(host, f, end, (i) => {
+    const burn = -m.ocf[i], rows = [['Cash in the bank', money(m.cash[i])], ['Cash in minus cash out', money(m.ocf[i])]];
+    if (m.fin[i]) rows.push(['Investment arrives', money(m.fin[i])]);
+    rows.push(['Cash lost per month', burn > 0 ? money(burn / 3) : 'none']);
+    const rw = m.cash[i] / (burn / 3);
+    rows.push(['Months of cash left', burn <= 0 ? 'pays its own way' : m.cash[i] <= 0 ? 'out of money' : (rw > 60 ? '60+' : Math.round(rw))]);
+    rows.push(['Facilities in service', int(m.active[i])], ['Employees', int(m.heads[i])]);
+    return rows;
+  });
+  const rounds = ROUNDS.filter((r) => a[r.key] > 0).map((r) => r.name + ' $' + a[r.key] + 'M in ' + qLabel(r.q));
+  $('cashCaption').textContent = rounds.length ? 'Investments in the plan: ' + rounds.join('; ') + '.' : 'No investment in the plan.';
+}
+function topRound(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h);
+  return 'M' + x + ' ' + (y + h) + 'V' + (y + r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'H' + (x + w - r) + 'Q' + (x + w) + ' ' + y + ' ' + (x + w) + ' ' + (y + r) + 'V' + (y + h) + 'Z';
+}
+function drawStack(hostId, end, series, lineVals, tipRows, label, fmt) {
+  const host = $(hostId);
+  let hi = fmt ? 1 : 1e6; for (let i = 0; i < end; i++) hi = Math.max(hi, series.reduce((s, sr) => s + sr.v[i], 0), lineVals ? lineVals[i] : 0);
+  const f = frame(host, end, 0, hi * 1.05, 240, fmt);
+  f.svg.setAttribute('aria-label', label);
+  const w = Math.max(1.5, f.bw - (f.bw > 6 ? 2 : 1));
+  for (let i = 0; i < end; i++) {
+    let base = 0;
+    series.forEach((sr, k) => {
+      const v = sr.v[i]; if (v <= 0) return;
+      const y1 = f.y(base + v), h = f.y(base) - y1 - (k ? 1.5 : 0);
+      if (h > 0.3) el('path', { d: topRound(f.x(i) - w / 2, y1, w, h, k === series.length - 1 ? 1.5 : 0), fill: sr.color, stroke: sr.stroke || 'none', 'stroke-width': sr.stroke ? 0.75 : 0 }, f.svg);
+      base += v;
+    });
+  }
+  if (lineVals) {
+    let d = ''; for (let i = 0; i < end; i++) d += (i ? 'L' : 'M') + f.x(i).toFixed(1) + ' ' + f.y(lineVals[i]).toFixed(1);
+    el('path', { d, fill: 'none', stroke: 'var(--surface)', 'stroke-width': 5, 'stroke-linejoin': 'round' }, f.svg);
+    el('path', { d, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linejoin': 'round' }, f.svg);
+  }
+  hover(host, f, end, tipRows);
+}
+
+/* ---------- sensitivity ---------- */
+function renderTornado(base, a) {
+  const M = METRICS.find((k) => k.id === state.metric), b = M.get(base);
+  const rows = SENS.map((s) => {
+    const lo = M.get(runModel({ ...a, [s.key]: s.lo(a[s.key]) })), hi = M.get(runModel({ ...a, [s.key]: s.hi(a[s.key]) }));
+    return { s, lo, hi, span: Math.max(Math.abs(lo - b), Math.abs(hi - b)) };
+  }).sort((p, q) => q.span - p.span);
+  const max = Math.max(1e-9, ...rows.map((r) => r.span));
+  const bar = (cls, v) => {
+    const pct = (v - b) / max * 34, left = pct >= 0 ? 50 : 50 + pct, width = Math.abs(pct);
+    const lb = pct >= 0 ? 'left:calc(' + (50 + width) + '% + 5px)' : 'right:calc(' + (50 + width) + '% + 5px)';
+    return '<div class="tor-bar ' + cls + '" style="left:' + left + '%;width:' + width + '%"></div><span class="tor-val ' + cls + '" style="' + lb + '">' + M.fmt(v) + '</span>';
+  };
+  $('tornado').innerHTML = rows.map((r) => '<div class="tor-row"><div class="tor-label">' + r.s.label + ' <span>' + r.s.note +
+    '</span></div><div class="tor-track">' + bar('lo', r.lo) + bar('hi', r.hi) + '</div></div>').join('');
+  $('sensBase').textContent = 'Centre line: ' + M.fmt(b) + ', the answer with the current settings';
+}
+
+/* ---------- table ---------- */
+function renderTable(m, end) {
+  const step = state.period === 'year' ? 4 : 1, cols = [];
+  for (let s = 0; s < end; s += step) cols.push([s, Math.min(end, s + step)]);
+  const head = cols.map((c) => '<th>' + (step === 4 ? START_YEAR + c[0] / 4 : qLabel(c[0])) + '</th>').join('');
+  const mm = (v) => (Math.abs(v) < 5e3 ? '–' : (v < 0 ? '−' : '') + (Math.abs(v) / 1e6).toFixed(2));
+  const flow = (name, arr, cls) => '<tr class="' + (cls || '') + '"><td>' + name + '</td>' + cols.map((c) => { const v = sumRange(arr, c[0], c[1]); return '<td class="' + (v < -5e3 ? 'neg' : '') + '">' + mm(v) + '</td>'; }).join('') + '</tr>';
+  const stock = (name, arr, f, cls) => '<tr class="' + (cls || '') + '"><td>' + name + '</td>' + cols.map((c) => { const v = arr[c[1] - 1]; return '<td class="' + (v < 0 ? 'neg' : '') + '">' + f(v) + '</td>'; }).join('') + '</tr>';
+  const calc = (name, fn) => '<tr><td>' + name + '</td>' + cols.map((c) => '<td>' + fn(c) + '</td>').join('') + '</tr>';
+  const sect = (name) => '<tr class="sect"><td colspan="' + (cols.length + 1) + '">' + name + '</td></tr>';
+  const months = (c) => (c[1] - c[0]) * 3, R = ROWS, sub = 'sub';
+  const body = [
+    sect('Sales (revenue): what customers are billed'), flow(R.hwRev, m.hwRev), flow(R.subRev, m.subRev), flow(R.rev, m.rev, 'total'),
+    sect('Costs that grow with every facility'), flow(R.cHw, m.cHw), flow(R.cInstall, m.cInstall), flow(R.cSupport, m.cSupport), flow(R.cOps, m.cOps),
+    flow(R.gross, m.gross, 'total'),
+    calc(R.gm, (c) => { const r = sumRange(m.rev, c[0], c[1]); return r > 5e4 ? Math.round(100 * sumRange(m.gross, c[0], c[1]) / r) + '%' : '–'; }),
+    sect('Costs paid whatever is sold'), flow(R.fEng, m.fEng), flow(R.fSales, m.fSales), flow(R.fGA, m.fGA), flow(R.fOver, m.fOver), flow(R.fDev, m.fDev),
+    flow(R.opProfit, m.opProfit, 'total'),
+    sect('Cash: money actually in the bank'), flow(R.ocf, m.ocf), flow(R.fin, m.fin), stock(R.cash, m.cash, mm, 'total'),
+    calc(R.burn, (c) => { const o = sumRange(m.ocf, c[0], c[1]); return o < 0 ? (-o / months(c) / 1e6).toFixed(2) : '–'; }),
+    calc(R.runway, (c) => { const o = sumRange(m.ocf, c[0], c[1]), cash = m.cash[c[1] - 1]; if (o >= 0) return 'pays its own way'; if (cash <= 0) return 'out of money'; const r = cash / (-o / months(c)); return r > 60 ? '60+' : Math.round(r); }),
+    sect('People and facilities'), stock(R.heads, m.heads, int, 'total'),
+    stock(R.hEng, m.hEng, int, sub), stock(R.hSales, m.hSales, int, sub), stock(R.hOps, m.hOps, int, sub), stock(R.hGA, m.hGA, int, sub),
+    calc(R.accounts, (c) => sumRange(m.accounts, c[0], c[1]).toFixed(1)),
+    calc(R.sites, (c) => int(sumRange(m.sites, c[0], c[1]))), stock(R.active, m.active, int),
+    calc(R.share, (c) => Math.round(100 * m.active[c[1] - 1] / m.addr[c[1] - 1]) + '%'),
+  ].join('');
+  $('table').innerHTML = '<table><thead><tr><th></th>' + head + '</tr></thead><tbody>' + body + '</tbody></table>';
+}
+
+/* ---------- render ---------- */
+function render() {
+  const a = state.a, m = runModel(a), end = displayEnd(m);
+  syncInputs(); renderFlow(a); renderEcon(a); renderAssumptions(); renderKpis(m, a);
+  $('assumeLead').innerHTML = 'Every result on this page follows from the ' + GROUPS.reduce((s, g) => s + g.fields.length, 0) + ' values below and the fixed values listed further down. Costs per facility come from our prototype; prices from public competitor figures; sales speed, market share and timing are our estimates, untested against a customer contract. Start with the four marked <span class="keymark">◆ key</span>: they change the answers most.';
+  drawCash(m, a, end);
+  const total = m.varCost.map((v, i) => v + m.fixCost[i]);
+  drawStack('revChart', end, [{ color: 'var(--tone-1)', v: m.hwRev }, { color: 'var(--tone-2)', v: m.subRev }], total, (i) => [
+    [ROWS.hwRev, money(m.hwRev[i])], [ROWS.subRev, money(m.subRev[i])], ['Total sales', money(m.rev[i])],
+    ['All costs', money(total[i])], ['Profit after all costs', money(m.opProfit[i])]], 'Sales and all costs, by quarter');
+  drawStack('costChart', end, [{ color: 'url(#costChart-hi)', stroke: 'var(--ink)', v: m.varCost }, { color: 'var(--tone-1)', v: m.fixCost }], null, (i) => [
+    ['Grow with every facility', money(m.varCost[i])], ['Paid whatever is sold', money(m.fixCost[i])], ['Employees', int(m.heads[i])],
+    ['Left from each $1 of sales', m.rev[i] > 5e4 ? Math.round(100 * m.gross[i] / m.rev[i]) + '¢' : '–']], 'Costs by quarter');
+  drawStack('facChart', end, [{ color: 'var(--tone-1)', v: m.active }], m.addr, (i) => [
+    ['Facilities in service', int(m.active[i])], ['Installed this quarter', int(m.sites[i])], ['Could buy', int(m.addr[i])]], 'Facilities in service and facilities that could buy', int);
+  drawStack('headChart', end, [{ color: 'var(--tone-1)', v: m.hEng }, { color: 'var(--tone-2)', v: m.hSales }, { color: 'url(#headChart-hi)', stroke: 'var(--ink)', v: m.hOps },
+    { color: 'var(--surface)', stroke: 'var(--ink)', v: m.hGA }], null, (i) => [
+    ['Engineering', int(m.hEng[i])], ['Sales', int(m.hSales[i])], ['Field and support', int(m.hOps[i])], ['Admin, regulatory', int(m.hGA[i])], ['Total', int(m.heads[i])]], 'Employees by team', int);
+  renderTornado(m, a); renderTable(m, end);
+}
+buildInputs(); render();
+let rz; new ResizeObserver(() => { clearTimeout(rz); rz = setTimeout(render, 80); }).observe($('cashChart'));
+</script>
+
+</body></html>
