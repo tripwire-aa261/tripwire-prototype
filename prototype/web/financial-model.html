@@ -1077,9 +1077,9 @@ function renderFunnel(m, a) {
     row('Contract value per customer, $M', (y) => (tcv(y) / 1e6).toFixed(2)) +
     row('Weighted value at each stage, $M', (y) => (wins(y) * tcv(y) / 1e6).toFixed(1), 'total');
   $('funnel').innerHTML = '<table><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table>';
-  let leads = 0; for (let t = 0; t < T; t++) leads += (m.accounts[t] - m.accP[t]) / FUNNEL[0][1];
-  const fac = Math.max(...m.addr);
-  $('funnelNote').textContent = 'Weighted value is each stage count times contract value times its chance of signing, so every stage carries the same value. Check against the market: by ' + (START_YEAR + T / 4 - 1) + ' the plan needs about ' + Math.round(leads).toLocaleString('en-US') + ' leads at 1 in 10, more than the ' + Math.round(fac).toLocaleString('en-US') + ' facilities that could buy, even if each were its own buyer. The buyers are few and public, so after the first years we must sign far more than 1 lead in 10: reference sites and statewide or cooperative contracts have to do that work.';
+  let custs = 0; for (let t = 0; t < T; t++) custs += m.accounts[t];
+  const fac = m.addr[T - 1], act = m.active[T - 1], yEnd = START_YEAR + T / 4 - 1;
+  $('funnelNote').textContent = 'Weighted value is each stage count times contract value times its chance of signing, so every stage carries the same value. Leads count approaches, and one organization can be approached more than once. Check against the market: by ' + yEnd + ' the plan signs about ' + (Math.round(custs / 10) * 10).toLocaleString('en-US') + ' customers with ' + int(act) + ' facilities in service, ' + Math.round(100 * act / fac) + '% of the ' + int(fac) + ' facilities that could buy (US prisons, jails and stadiums, then airports, bases and sites abroad). Winning that share is the hard part of the plan.';
 }
 
 /* ---------- investor returns at a sale ---------- */

@@ -2,6 +2,31 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · ESP32 as next week's plan, market check rewritten, international and $1B
+
+**Asked for:**
+- "you can remove ESP32 test ... or you can mention it as a future plan (for next week)"
+- why the plan "needs 8,400 customers"
+- "would this company be able to reach billion dollars"
+- whether international expansion would get us there "if we scale fast enough"
+- rewrite the market check to "about 830 customers, half of all facilities that could buy"
+- commit the ESP32 builder change
+
+**Done:**
+- Product Prototype tab: ESP32 is now "Next week: ESP32 Wi-Fi motion test" (code written, hardware delayed). The yellow placeholder is gone.
+- The tab's builder is now in the repo: `prototype/tools/gdoc/build_prototype_tab.py`, with screenshots in `prototype_tab_images/` and `body_check.py`; see its README.
+- Market check, rewritten in Draft 5 and in model v18 (funnel note): by 2042 the plan signs about 830 customers with 3,597 facilities in service, 50% of the 7,127 that could buy. That pool already includes stadiums, airports, bases and sites abroad. The 8,300 figure was leads (approaches), not customers.
+- Model runs for the $1B and international questions (not in the doc yet):
+  - Even at 100% of today's 7,127 facilities, sales cap near $270M/yr (my arithmetic, 1.5 average size).
+  - At 9x sales, a $1B company comes in 2041 Q1 on the plan and 2038 Q2 with faster sales.
+  - Abroad at 6,000 facilities, instead of 1,500, adds no sales by itself, because sales are limited by salespeople, not market. In the model, sales even dip slightly, because the average facility size is taken over the whole market.
+  - Faster sales, with 6,000 abroad from Series B and 10 salespeople a year, gives $64M in 2034 and a $1B company at 9x in 2036 Q3.
+
+**Decided:** the market-expansion levers and the "Path to $1B" section wait for the user.
+**Left open:**
+- The model's facility-size averaging over the whole market, rather than over facilities sold.
+- The prototype link and recording placeholders.
+
 ## 2026-11-12 · Sid · Product Prototype tab comments answered
 
 **Asked for:** "now fix the prototype tab comments". The three comments were:
