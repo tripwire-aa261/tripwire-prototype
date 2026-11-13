@@ -30,12 +30,13 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 
 ## In progress
 
-- Sid: business plan and hiring plan in the Google Doc; next, the "Product prototype" tab as a walkthrough for the teaching team (software prototype, financial model, GPS-shadowing hardware test at Lake Lagunita, ESP32 placeholder).
+- Sid: business plan and hiring plan in the Google Doc. The "Product prototype" tab is now a walkthrough for the teaching team (the twin's four tabs, the financial model, the GPS-shadowing test at Lake Lagunita from the AA272 `gnss-drone-detection` repo, lessons table). Still to fill: the prototype link and recording (yellow placeholders) and the ESP32 test.
+- A teammate is deploying `prototype/` to Vercel (root directory `prototype`); then put the URL into the Product prototype tab and Draft 4's model link.
 - Nimalan: twin follow-ups below.
 
 ## Next steps
 
-1. Deploy the prototype (Vercel) so the teaching team and the Draft 4 model link work without a local server.
+1. Deploy the prototype (Vercel, teammate) so the teaching team and the Draft 4 model link work without a local server.
 2. Drone-vs-bird classifier in the twin (rotor evidence over a track + flight behavior; re-score saved replays).
 3. Stadium follow-ups: bowl-specific area target; real stand heights and mounting points; DAS layout; game-day network load.
 4. `Iterations.docx`: fix stale receiver figures in the lessons; add the new lessons.

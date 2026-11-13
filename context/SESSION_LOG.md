@@ -19,7 +19,8 @@ One entry per Claude Code session, newest first. Written by the `/handoff` skill
 **Left open:**
 - Draft 4's GitHub link to the model works only as source until the prototype is deployed.
 - Georgia HB 1230 signing and the SAFER SKIES contractor question are unconfirmed.
-- `Tripwire_Prototype_Feedback_Request_v2.docx` shows as modified locally but was not touched in this session; left out of the commit.
+- `Tripwire_Prototype_Feedback_Request_v2.docx`: local wording edits from 2026-11-04 (not this session) committed later at Sid's request to bring GitHub up to date.
+- Later in the session: Google Doc "Product prototype" tab rewritten as a walkthrough (screenshots of the four twin tabs and the model, GPS test figures, lessons table); prototype link, recording and ESP32 test left as placeholders. Sid chose to have a teammate do the Vercel deploy.
 
 ## 2026-11-12 · Nimalan · Twin v0.5–v0.5.1: stadium site, sensors on the structure, bird display option
 
