@@ -2,6 +2,35 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Seven teammate comments on Draft 5, investor timeline, Europe costs
+
+**Asked for:** look up Zerina ("Zerina advises on the technical stuff ... she is a prof"); "the cash in the bank graph goes up after 7 years, but usually vc cycles are less than 6. What is our solution"; then the seven new teammate comments on the Draft 5 tab.
+**Done:**
+- Model v15:
+  - "Faster sales" scenario (3 wins per salesperson, 6-month cycle): cash-flow positive 2032 Q4, needs $11.9M.
+  - Team abroad from the first quarter of sales there (2 field engineers + 1 salesperson at $175k) plus $25k CE marking.
+  - Plan unchanged: $18.6M, 2034 Q2, 2040 Q3. Slower sales now needs $101M (was $95M), price war $60M (was $57M).
+- Draft 5:
+  - "Investor timeline and exit" (sale of the company, Axon-Dedrone precedent; sales speed decides the date; strategic investor).
+  - Zerina listed as technical advisor (Stanford Assistant Professor of EE).
+  - Comments answered:
+    - Clemson paragraph explains RF detection (Alabama chose D-Fend) and why we complement it.
+    - Europe costs priced: no BIS fee, ITAR $3,000/yr, CE EUR 8-25k, UK team about GBP 167k/yr.
+    - 4x airport sensors justified by acreage: Hays 191 acres vs CHA 950, SAV 3,650, ATL 4,700.
+    - New "Later: an airspace map" subsection (UTM/UAM ConOps, Part 108 NPRM, NASA low-altitude gap).
+    - Yearly sales/backlog table plus a pipeline table in the course template. Both sites are "Target, not yet contacted" at 5%; backlog $0; weighted pipeline $6,600.
+    - Integrators named: Vision Security Technologies, Convergint, Johnson Controls.
+  - Kept a teammate's direct Google-tab edits to the team and regulatory paragraphs.
+  - Re-pasted the tab; the 7 comment threads now show as detached.
+- Product Prototype tab: only $95M changed to $101M (Find and replace), so its 3 open comments stay.
+**Decided:**
+- Venture answer: exit by acquisition plus proving sales speed at Seed, not a faster technology timeline (40 dB or receiver dates barely move cash-flow positive).
+- Pipeline probabilities follow the course template's stages; no customer contacted yet (user confirmed).
+**Left open:**
+- Prototype tab comments: classifier note; replace the screenshot of the renamed "financials explorer" twin tab; profit-margin note.
+- Empty bullet at the end of the Draft 5 tab.
+- UK salary medians came via third-party ONS reproductions; the Hays 191 acres came from a search snippet of the GDC audit PDF.
+
 ## 2026-11-12 · Sid · Europe timing, ITAR, team names, teammate comments, round lines
 
 **Asked for:** when to expand to Western Europe ("our business has to be at a sustainable scale to expand internationally") and whether airports are in the plan; why the facilities-per-customer slider tapers; Zerina Kapetanovic plus Ashlynn, Adeline and Taras as "part time workers/advisors till seed"; funding-round boundaries on the model's charts; keep Google Doc, model and prototype tab in step.

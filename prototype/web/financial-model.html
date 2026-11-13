@@ -343,7 +343,7 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
 
       <section class="panel card">
         <h2>Who we hire until Series A</h2>
-        <p class="howto">The company is based in Atlanta, a few hours from both pilots. Founders take no salary before Seed. Until Seed, Ashlynn, Adeline, Taras and Zerina Kapetanovic work part time and are not on the payroll. Regulatory counsel is hired by the hour until the regulatory lead starts.</p>
+        <p class="howto">The company is based in Atlanta, a few hours from both pilots. Founders take no salary before Seed. Until Seed, Ashlynn, Adeline and Taras work part time and Zerina Kapetanovic (Assistant Professor of Electrical Engineering, Stanford) advises on the technology; none are on the payroll. Regulatory counsel is hired by the hour until the regulatory lead starts.</p>
         <div class="tablewrap"><table class="roster" id="roster"></table></div>
       </section>
 
@@ -403,6 +403,8 @@ const FIXED = {
   segCore: 4277,                         // US prisons 1,161 + jails 3,116 (memo)
   segStadium: 200, stadiumSize: 1.5,     // about 200 large US stadiums (ASSUMPTION); sellable once 30-40 dB works (Clemson: not possible at 20 dB); 6 custom sensors at 40 dB vs 4 at Hays
   segLater: 1150,                        // airports 518 + military 450 + refineries 128 + nuclear 54 (memo), from Series B
+  abroadOps: 2, abroadSales: 1,          // ASSUMPTION: team abroad from the first quarter of sales there (2 field engineers + 1 salesperson); UK median pay + 15% employer NI is about GBP 167k a year for the three (ONS ASHE 2025, GOV.UK), below 3 x $175k
+  abroadCert: 25000,                     // ASSUMPTION: CE marking under the Radio Equipment Directive, top of the EUR 8,000-25,000 notified-body estimate, paid the quarter before sales abroad
   laterSize: 4,                          // ASSUMPTION: an airport or base perimeter needs about 4x the sensors of Hays, priced and costed in proportion
 };
 // Named hires until Series A [role, team, first quarter, founder?]; formulas take over after Series A.
@@ -487,8 +489,9 @@ function runModel(a) {
     const others = () => hEng[t] + hSales[t] + hOps[t];
     hEng[t] = roster(t, 'eng').length + (t >= A_Q ? Math.floor(a.engAdds * (t - A_Q + 1) / 4) : 0);
     hSales[t] = roster(t, 'sales').length + (t >= A_Q ? Math.floor(a.repsAdd * (t - A_Q + 1) / 4) * (1 + F.salesSupport) : 0);
-    hSales[t] = Math.ceil(hSales[t]);
-    hOps[t] = Math.max(roster(t, 'ops').length, t >= launch ? Math.ceil(active[t] / F.sitesPerOps) : 0);
+    const abroadOn = a.abroad > 0 && t >= a.abroadQ;
+    hSales[t] = Math.ceil(hSales[t]) + (abroadOn ? F.abroadSales : 0);
+    hOps[t] = Math.max(roster(t, 'ops').length, t >= launch ? Math.ceil(active[t] / F.sitesPerOps) : 0) + (abroadOn ? F.abroadOps : 0);
     hGA[t] = roster(t, 'ga').length + (t >= A_Q ? Math.floor(others() / F.gaPer) : 0);
     heads[t] = hEng[t] + hSales[t] + hOps[t] + hGA[t];
 
@@ -507,7 +510,8 @@ function runModel(a) {
     const payroll = fEng[t] + fSales[t] + fGA[t] + cOps[t];
     fOver[t] = t >= SEED_Q ? F.overhead * payroll : 0;
     fDev[t] = (t < SEED_Q ? F.devPre : t < launch ? F.devSeed : 0) * 1000 +
-      (t >= a.customQ - F.nreQuarters && t < a.customQ ? F.nre / F.nreQuarters : 0);
+      (t >= a.customQ - F.nreQuarters && t < a.customQ ? F.nre / F.nreQuarters : 0) +
+      (a.abroad > 0 && t === a.abroadQ - 1 ? F.abroadCert : 0);
     fixCost[t] = fEng[t] + fSales[t] + fGA[t] + fOver[t] + fDev[t];
 
     gross[t] = rev[t] - varCost[t];
@@ -569,7 +573,7 @@ const INPUTS = {
   rollout: ['Facilities a customer installs per quarter', 'After signing, until all its facilities are done.'],
   workable: ['Share of facilities that work with today’s processing', 'One of our three simulated sites works at 20 dB interference removal.'],
   abroad: ['Facilities abroad', 'Prisons, stadiums and airports in allied countries, Western Europe first.'],
-  abroadQ: ['Sales abroad start', 'Plan: once the company pays its own way, funded from its own cash. Needs export licenses first.'],
+  abroadQ: ['Sales abroad start', 'Plan: once the company pays its own way, funded from its own cash. Adds 2 field engineers and 1 salesperson there and CE marking; needs export licenses first.'],
   launch: ['Product ready to sell', 'After the design-partner pilots and scored flights.'],
   customQ: ['Our own receiver in production', 'Cuts a Hays-size facility from 6 sensors to 4 and the cost per sensor.'],
   q40: ['Interference removal reaches 40 dB', 'Unlocks dense-tower and sparse-tower sites. Unproven.'],
@@ -590,6 +594,7 @@ const SCENARIOS = [
   ['40 dB never comes', 'Interference removal stays at today’s 20 dB: only one facility in three can ever be protected.', { q40: 64 }],
   ['Slower sales', 'Half as many wins per salesperson, sales take two quarters longer and customers are smaller.', { winsPerRep: 1, salesCycle: 5, facPerAccount: 4 }],
   ['Price war', 'A competitor forces prices down to $15,000 + $15,000 a year.', { installPrice: 15000, subPrice: 15000 }],
+  ['Faster sales', 'Each salesperson wins 3 customers a year instead of 2, and a sale takes 6 months instead of 9: what Seed has to prove for investors to see cash flow within about 6 years.', { winsPerRep: 3, salesCycle: 2 }],
   ['Late hardware', 'The product is ready a year late and our own receiver 18 months late.', { launch: 11, customQ: 23 }],
 ];
 const KPI = {
