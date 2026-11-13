@@ -186,7 +186,8 @@ tr.sub td:first-child { padding-left: 22px; color: var(--ink-2); }
 .drop summary::after { content: "+"; color: var(--ink); font: 500 14px var(--mono); }
 .drop[open] summary::after { content: "\2212"; }
 .drop > .notes, .drop > .gloss { padding: 0 18px 18px; }
-.chart text.round { font: 500 9px var(--mono); fill: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.notmodeled { margin-top: 16px; } .notmodeled h3 { font-size: 15px; margin: 0 0 6px; } .notmodeled ul { margin: 0; padding-left: 18px; } .notmodeled li { margin: 4px 0; line-height: 1.45; }
+    .chart text.round { font: 500 9px var(--mono); fill: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .econ { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
 .econ h2 { font-size: 20px; letter-spacing: -0.01em; }
 .econ-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 32px; }
@@ -264,6 +265,14 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
       <p id="assumeLead"></p>
     </div>
     <div class="assume-grid" id="assume"></div>
+        <div class="notmodeled">
+          <h3>Not in the model (assumptions to keep working on)</h3>
+          <ul>
+            <li><b>Every customer of a type is the same.</b> A facility pays in proportion to the sensors it needs against Hays: prisons and jails 1×, large stadiums 1.5×, airports and bases 4×. Within a type, every site is the same size and willing to pay the same. In reality stadiums need different numbers of sensors, and venues with big concerts, playoffs or other large events would likely pay more (pricing per event or by tier). We test this with design partners.</li>
+            <li><b>No defense programs.</b> Military bases (450, Big Idea Memo) are counted only as fixed sites like airports, from Series B. Defense procurement of counter-drone systems, kits that troops carry, and sales to allied militaries are not in the model.</li>
+            <li><b>One product only: the facility subscription.</b> Not counted: the airspace-map data feed, selling sensors or software to integrators or other vendors, installation and consulting services, taking down drones (which we do not do and which needs legal authority), and other site types such as data centers (3,068 sites, Big Idea Memo).</li>
+          </ul>
+        </div>
     <p class="small muted">Change any of them with the sliders further down; a changed value turns orange and shows the plan value beside it. Values with no slider are listed in the "How the model works" drop-down near the bottom.</p>
   </section>
 
@@ -375,7 +384,7 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
               <li>Two design partners, Hays State Prison and Clemson Memorial Stadium, run paid one-year pilots from 2028 Q1. They become the first customers when the product is ready.</li>
               <li>Each salesperson wins customers; a win becomes a signed contract one "time to close a sale" later, never before the product is ready. Until Series A the CEO sells half time and one account executive full time.</li>
               <li>A customer (a state prison system, a county, a venue owner) installs its facilities one after another. A facility pays an installation fee once and a subscription every year.</li>
-              <li>Facilities installed can never exceed the facilities that could buy.</li>
+              <li>Facilities installed can never exceed the facilities that could buy. Each quarter's sales are split across site types (prisons and jails, stadiums, airports and bases) in proportion to what each type still has unsold, and each facility keeps its own type's size and price for as long as it is a customer.</li>
               <li>Hardware is paid for a quarter before it ships and customers pay a quarter after installation, so cash lags behind profit while the company grows.</li>
               <li>Cash needed from investors is the most the business is ever short, added up from the start, before counting any investment.</li>
             </ul>
@@ -388,6 +397,7 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
               <li>Grants (SBIR, FEMA): upside, not counted.</li>
               <li>Tax, interest, replacing old sensors, and how much of the company investors end up owning.</li>
               <li>Hiring does not slow down if sales disappoint, so the weak scenarios overstate cost.</li>
+              <li>Differences in size and willingness to pay within a customer type, defense programs, and any product other than the facility subscription (see "Not in the model" above).</li>
             </ul>
           </div>
         </div>
@@ -426,7 +436,8 @@ const FIXED = {
   abroadCert: 25000,                     // ASSUMPTION: CE marking under the Radio Equipment Directive, top of the EUR 8,000-25,000 notified-body estimate, paid the quarter before sales abroad
   partnerShare: 0.375,                   // share of a customer's payments an integrator keeps: 37.5% average integrator gross margin on video surveillance projects (Security Sales & Integration, 2020)
   contractCut: 1,                        // ASSUMPTION: buying off an existing contract saves one quarter of the sale
-  laterSize: 4,                          // ASSUMPTION: an airport or base perimeter needs about 4x the sensors of Hays, priced and costed in proportion
+  laterSize: 4,
+  coreSize: 1,                           // ASSUMPTION: average prison or jail against Hays (1 = every one is Hays-size)                          // ASSUMPTION: an airport or base perimeter needs about 4x the sensors of Hays, priced and costed in proportion
 };
 // Named hires until Series A [role, team, first quarter, founder?]; formulas take over after Series A.
 const ROSTER = [
@@ -487,12 +498,14 @@ function runModel(a) {
     accC[t] = onContract ? direct : 0;
   }
   let cumA = 0, cumP = 0, cumC = 0;
-  const size = z();   // average facility size against Hays: grows once airports and bases are sold (Series B)
+  const size = z();   // average size against Hays of the facilities sold this quarter (each site type keeps its own size)
+  const SEG = [() => F.coreSize, () => F.stadiumSize, () => F.laterSize];
+  const actS = [z(), z(), z()], units = z();   // facilities in service by type: prisons/jails (+ abroad), stadiums, airports/bases; units = size-weighted
   for (let t = 0; t < N; t++) {
     const share = t >= a.q40 ? 1 : a.workable / 100;
     const nCore = (F.segCore + (t >= a.abroadQ ? a.abroad : 0)) * share, nStad = t >= a.q40 ? F.segStadium : 0, nLater = t >= B_Q ? F.segLater * share : 0;
     addr[t] = nCore + nStad + nLater;
-    size[t] = (nCore + nStad * F.stadiumSize + nLater * F.laterSize) / addr[t];
+    const segAddr = [nCore, nStad, nLater];
     let planned = 0;
     for (let s = 0; s < t; s++) {
       if (!accounts[s]) continue;
@@ -510,10 +523,22 @@ function runModel(a) {
     cumSites[t] = prev + sites[t];
     const prevActive = t ? active[t - 1] : 0;
     active[t] = prevActive * (1 - F.churn / 4) + sites[t];
-    const billed = (prevActive + active[t]) / 2 - (t < F.pilotQ + 4 ? Math.min(F.pilots, active[t]) : 0);   // pilots pay the pilot fee for year one
+    // split this quarter's sales across site types in proportion to what each type still has unsold
+    const rem = segAddr.map((n, k) => Math.max(0, n - (t ? actS[k][t - 1] : 0)));
+    const remT = rem.reduce((x, y) => x + y, 0) || 1;
+    let newUnits = pilot * F.coreSize;
+    for (let k = 0; k < 3; k++) {
+      const add = sold * rem[k] / remT + (k === 0 ? pilot : 0);
+      actS[k][t] = (t ? actS[k][t - 1] : 0) * (1 - F.churn / 4) + add;
+      newUnits += sold * rem[k] / remT * SEG[k]();
+    }
+    units[t] = actS.reduce((x, arr, k) => x + arr[t] * SEG[k](), 0);
+    size[t] = sites[t] ? newUnits / sites[t] : (t ? size[t - 1] : F.coreSize);
+    const prevUnits = t ? units[t - 1] : 0;
+    const billed = (prevUnits + units[t]) / 2 - (t < F.pilotQ + 4 ? Math.min(F.pilots, active[t]) * F.coreSize : 0);   // size-weighted; pilots pay the pilot fee for year one
 
-    hwRev[t] = sold * a.installPrice * size[t] + (pilot ? F.pilotFee + F.stadiumPilotFee : 0);
-    subRev[t] = Math.max(0, billed) * a.subPrice * size[t] / 4;
+    hwRev[t] = (newUnits - pilot * F.coreSize) * a.installPrice + (pilot ? F.pilotFee + F.stadiumPilotFee : 0);
+    subRev[t] = Math.max(0, billed) * a.subPrice / 4;
     rev[t] = hwRev[t] + subRev[t];
 
     const others = () => hEng[t] + hSales[t] + hOps[t];
@@ -525,12 +550,12 @@ function runModel(a) {
     hGA[t] = roster(t, 'ga').length + (t >= A_Q ? Math.floor(others() / F.gaPer) : 0);
     heads[t] = hEng[t] + hSales[t] + hOps[t] + hGA[t];
 
-    const ns = sensors(t) * size[t];
+    const ns = sensors(t) * size[t], nsAct = sensors(t) * (active[t] ? units[t] / active[t] : 1);
     const extra = pilot ? F.stadiumPilotSensors - F.bladeSensors : 0;   // the stadium pilot needs 12 bladeRF sensors, not 6
     cHw[t] = sites[t] * (ns * sensorCost(t) + F.hubPerFacility) + extra * F.bladeCost;
     cInstall[t] = sites[t] * (ns * F.installPerSensor + F.setupPerFacility) + extra * F.installPerSensor;
     const runPer = t >= a.customQ ? F.runPerSensorCustom : F.runPerSensor;
-    cSupport[t] = (prevActive + active[t]) / 2 * (ns * runPer + F.runPerFacility) / 4 + (t >= F.pilotQ && t < F.pilotQ + 4 ? extra4(t) : 0);
+    cSupport[t] = (prevActive + active[t]) / 2 * (nsAct * runPer + F.runPerFacility) / 4 + (t >= F.pilotQ && t < F.pilotQ + 4 ? extra4(t) : 0);
     cOps[t] = paid(t, 'ops') + Math.max(0, hOps[t] - roster(t, 'ops').length) * perHeadQ;
     cumA += accounts[t]; cumP += accP[t]; cumC += accC[t];
     cChannel[t] = cumA ? rev[t] * (cumP / cumA * F.partnerShare + cumC / cumA * a.contractFee / 100) : 0;   // integrators' share and contract fees, by share of customers won that way
@@ -780,7 +805,7 @@ function buildInputs() {
     'Based in Atlanta, near both pilots. $175k per hire = an average wage of about $125k (BLS May 2025 Atlanta means: electronics engineers $146k, software developers $136k, technical sales $126k; field and admin staff less) + about 40% for benefits and taxes (BLS employer costs: benefits are 30% of total pay). The same team in San Jose would cost about $240k a head. Founders: no salary before Seed, then $' + F.founderPay + 'k each (loaded). Hourly regulatory counsel $' + F.counselQ + 'k a quarter, $' + F.counselLaterQ + 'k once the regulatory lead starts.',
     'Development: $' + F.devPre + 'k a quarter before Seed (two demo kits, travel), $' + F.devSeed + 'k a quarter until launch (pilots, test drones, scored flights).',
     'One field person per ' + F.sitesPerOps + ' facilities in service; one administrator per ' + F.gaPer + ' other staff after Series A; overhead ' + Math.round(F.overhead * 100) + '% of payroll from Seed.',
-    'Market: ' + int(F.segCore) + ' US prisons and jails; about ' + int(F.segStadium) + ' large stadiums once interference removal reaches 40 dB (none work at 20 dB), each needing ' + F.stadiumSize + '× the sensors of Hays; ' + int(F.segLater) + ' airports, bases, refineries and nuclear plants from Series B, each about ' + F.laterSize + '× the size of Hays; facilities abroad from the "Sales abroad start" date. ' + Math.round(F.churn * 100) + '% of facilities lost per year.',
+    'Market: ' + int(F.segCore) + ' US prisons and jails; about ' + int(F.segStadium) + ' large stadiums once interference removal reaches 40 dB (none work at 20 dB), each needing ' + F.stadiumSize + '× the sensors of Hays; ' + int(F.segLater) + ' airports, bases, refineries and nuclear plants from Series B, each about ' + F.laterSize + '× the size of Hays; prisons and jails, at home and abroad, all Hays-size (' + F.coreSize + '×); facilities abroad from the "Sales abroad start" date. ' + Math.round(F.churn * 100) + '% of facilities lost per year.',
   ].map((s) => '<li>' + s + '</li>').join('');
   $('lead').textContent = LEAD;
   $('gloss').innerHTML = GLOSSARY.map((g) => '<div><dt>' + g[0] + '</dt><dd>' + g[1] + '</dd></div>').join('');

@@ -2,6 +2,32 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-12 · Sid · Each site type billed at its own size; uniform-customer, defense and one-product assumptions
+
+**Asked for:**
+- "apply point 1": stop repricing every facility at the market-wide average size;
+- state as assumptions, in the model's assumptions area and in Draft 5's assumptions section, that:
+  - customers of a type are treated as identical (stadiums differ in sensors; big events would pay more);
+  - defense applications are not included;
+  - no products or services other than the subscription are included.
+
+**Done:**
+- Model v19 tracks facilities in service by type (prisons and jails including abroad, stadiums, airports and bases). Each quarter's sales are split by what each type still has unsold, and each facility keeps its type's size and price. New fixed value `coreSize` = 1.
+- Plan results:
+  - peak need $20.4M (was $18.6M); lowest cash $4.8M in 2034 Q1;
+  - cash-flow positive 2034 Q2 (unchanged); $100M/yr 2040 Q2 (was Q3) at about 2,350 facilities and 540 customers, 214 people;
+  - slower sales $100M; faster sales $10.8M, 2032 Q3;
+  - Seed 4.0x / 7.7x on a 2034 sale; faster sales at 9x gives 15.1x.
+- New "Not in the model" box under the model's assumptions, plus a line in "Left out".
+- Draft 5: three new bullets in "Sources and assumptions"; every changed figure updated (text, yearly table, returns table, levers table). The three chart widgets were re-published with new rows and their images replaced in the Google tab.
+- Product Prototype tab: model figures updated ($20.4M, 2040 Q2, $100M slower sales).
+- Both Google tabs re-pasted and checked.
+
+**Decided:** keep prisons at Hays size (1x) in the plan. Event and tier pricing is noted as an assumption to work on, not modeled.
+**Left open:**
+- More sites abroad still trade off against US airport sales, because sales capacity is shared; giving the abroad team its own sales would fix that.
+- The twin's value-based price is still flat per facility.
+
 ## 2026-11-12 · Sid · ESP32 as next week's plan, market check rewritten, international and $1B
 
 **Asked for:**

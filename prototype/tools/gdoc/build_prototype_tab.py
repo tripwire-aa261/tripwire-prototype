@@ -116,7 +116,7 @@ parts = [
     IMG('model_s.jpg', 'Financial model: one facility bottom up (our cost with bladeRF radios and with our own receiver) and top down (what the customer pays today for other systems).'),
     UL([
         '**Try:** the scenario buttons ("40 dB never comes", "Slower sales", "Price war"), then any slider.',
-        '**Look for:** the plan needs about $18.6M, pays its own way from 2034 Q2 and reaches $100M a year in 2040 Q3. Sales speed changes the answer most: with slower sales it needs $101M.',
+        '**Look for:** the plan needs about $20.4M, pays its own way from 2034 Q2 and reaches $100M a year in 2040 Q2. Sales speed changes the answer most: with slower sales it needs $100M.',
     ]),
 
     H(2, '3. Hardware tests'),
