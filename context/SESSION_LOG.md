@@ -451,3 +451,4 @@ Two Claude sessions worked in parallel and coordinated by message; this entry co
 - Handoff: renewal-at-end-of-term fix added to open questions.
 - Financial model: floor labels now read "40% margin on cost" (matching Draft 5); a PDF snapshot of the model was saved for the Canvas upload.\n
 - Technical advisor no longer named in Draft 5, the financial model or the context files (Sid: meeting her next week). Older commits still contain the name.\n
+- Energy-sites assumption reworded more clearly (Draft 5 and model): says plainly that counting refineries and nuclear plants but not data centers is not fully consistent.\n
