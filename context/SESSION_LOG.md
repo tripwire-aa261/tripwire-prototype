@@ -2,6 +2,35 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-13 · Sid · Next-step ideas noted; teammate comments on Draft 5 and the prototype tab
+
+**Asked for:**
+- Note as next steps: "sell our receivers to other customers, military customers, use off the shelf receiver for longer to save on development cost, drone capture, reinvesting money into other technologies, study of how many node facilities we need to be able to actually do traffic monitoring for a town" (now in HANDOFF Next steps 6).
+- Address teammate comments in Draft 5 and the prototype tab, consistently across deliverables.
+
+**Done in Draft 5 (12 comments):**
+- Overview: the teammate's rewrite kept, now naming the other signal sources (FM radio, digital TV, satellite TV) and pointing to the funding table.
+- The roadmap diagram became an editable table, "Funding stages at a glance", with one line per item. Figures checked against the model: Seed end 10 facilities, 4 customers, 6 people; Series A end about 50 facilities, 19 customers, about 34 people (was "38", which is the Series B figure).
+- The funding table's evidence column became "Milestones before it closes", with separate technical, commercial and operational lines.
+- Sales and cash-flow chart: retitled "pays its own way from 2034 and passes $100M of sales a year in 2039", and labels the 2039 bar ($101M of sales, $45M of cash flow).
+- Investor timing now leads with the class figure, a sale 6 to 8 years after investing (AA261), with Kauffman and PitchBook as support; the "12 to 15" line is removed.
+- New pricing overview: Tripwire costs more than the Axon RF kit ($57,915, no software), against our $150,000 over 5 years, but sees drones with no radio link; it is below the cheapest radar option and under a fifth of the most expensive.
+- Funnel section:
+  - proposals shown as 40.5, so every stage weighs $19.8M;
+  - captions on every table;
+  - an explanation that 43.5 customers in 2034 is consistent with sales: about 123 customers signed by end 2034, for about 740 facilities, 478 installed, giving $23.3M of sales.
+- Kept teammates' direct edits in the tab: the Overview, the Georgia paragraphs, two headings, and the team names on separate lines.
+
+**Done in the Product Prototype tab (4 comments):**
+- The live link https://tripwire-cyan.vercel.app replaces the placeholders, and the recording placeholder is dropped.
+- The "campus has poor cell coverage" reasoning is removed in both places.
+
+**Done in the model:**
+- The lead line names the other signal sources.
+- The exit-date hint cites the class's 6 to 8 years.
+
+Both Google tabs were re-pasted; their comment threads now show as detached.
+
 ## 2026-11-12 · Sid · Bill of materials highlighted
 
 **Asked for:** "the prototype dashboard has an excellent BOM list which is used to calculate our unit price. I want to highlight that somewhere": reference it in the bottom-up cost estimate, and give it a special mention in the prototype tab.

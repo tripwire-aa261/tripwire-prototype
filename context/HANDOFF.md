@@ -4,7 +4,7 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 
 ## Current state
 
-- **Digital twin v0.5.1** in `prototype/` (start with `prototype/README.md`): `.venv/bin/python serve.py`, then http://localhost:8000. Vercel static deploy config in `prototype/vercel.json` + `.vercelignore` (not deployed; leaves out `web/runs/*.bin` for Hobby's 100 MB cap).
+- **Digital twin v0.5.1** in `prototype/` (start with `prototype/README.md`): `.venv/bin/python serve.py`, then http://localhost:8000. Deployed on Vercel: https://tripwire-cyan.vercel.app (teammate, Nov 2026; config in `prototype/vercel.json` + `.vercelignore`, which leaves out `web/runs/*.bin`). The financial model page is not part of that deploy (404); Draft 5 links to it on GitHub.
   - Tabs: **Overview** (customer requirements incl. detection range; recommended radio + sensor count, coverage map, cost and price, today / 30 / 40 dB table, competitor comparison), **Trade space simulator**, **3D signal simulation** (16 replays, track-error chart, Bird checkbox), **Financials explorer** (renamed from Financials on 2026-11-12).
   - Sites: Hancock (sparse towers), Hays (moderate towers, default), Fulton County Jail (dense towers), Clemson Memorial Stadium (stadium).
 - Results (5 kg drone; 90 % area, 80 % tracked, 25 m, typical drone first tracked 300 m out): Hays works today (4 custom or 6 bladeRF); Hancock needs 40 dB; Fulton 30 dB (12 custom) or 40 dB; Clemson 30 dB (8 custom / 12 bladeRF) or 40 dB (6 / 6); not possible at 20 dB. At Hays drones from the south-southwest are first tracked only ~50-300 m out.
@@ -35,7 +35,6 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 - **Venture returns** (decision 2026-11-12): investors exit by a sale. At median valuations, a sale at the end of 2034 at 4.5x sales returns Seed only about 4x and Series B under 1x; faster sales plus a strategic buyer (9x) gives Seed about 15x. Seed must prove sales speed; routes are statewide/cooperative contracts (Georgia bought RF detection off a Convergint statewide contract), department follow-on sales and pilot references. Aim for a strategic investor at Series B.
 - **Pipeline:** no customer contacted yet. Draft 5 has the class-format funnel (1 in 10 leads, 1 in 3 proposals, 1 in 2 negotiations); the pilots need 20 leads in 2027 Q2 from 6 Southeast prison systems and 33 SEC/ACC stadiums.
 - Sid: business plan and hiring plan in the Google Doc. The "Product prototype" tab is now a walkthrough for the teaching team (the twin's four tabs, the financial model, the GPS-shadowing test at Lake Lagunita from the AA272 `gnss-drone-detection` repo, lessons table). Still to fill: the prototype link and recording (yellow placeholders). The ESP32 Wi-Fi test is listed as next week's plan (code written, hardware delayed). The tab is built by `prototype/tools/gdoc/build_prototype_tab.py`.
-- A teammate is deploying `prototype/` to Vercel (root directory `prototype`); then put the URL into the Product prototype tab and Draft 4's model link.
 - Nimalan: twin follow-ups below.
 
 ## Next steps
@@ -43,8 +42,8 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 1. **Before the Nov 13 deadline (Sid):**
    - Read Draft 5 once end to end on the Google tab, since its numbers changed several times today.
    - Delete the stray empty bullet at its end.
-   - Fill the Product Prototype tab's prototype link and recording placeholders.
-2. Deploy the prototype (Vercel, teammate) so the teaching team and the model link work without a local server.
+   - Product Prototype tab: the live link is in; the recording placeholder was dropped (a teammate asked "what recording?"). Add a screen recording only if the team wants one.
+2. Done: prototype deployed (https://tripwire-cyan.vercel.app). Optional: add `web/financial-model.html` to the deploy.
 3. **Customer contact:** the pilots need 20 leads in 2027 Q2 (6 Southeast prison systems, 33 SEC/ACC stadiums). No one has been contacted yet; one letter of intent changes the pipeline and the investor story.
 4. ESP32 Wi-Fi motion test next week (code written, hardware delayed).
 5. **Research to replace assumptions:**
@@ -52,8 +51,15 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
    - volume quotes for parts other than our board;
    - stadium and event pricing tiers;
    - defense programs and data centers as markets (path to $1B).
-6. Twin: scale the value-based plan price by sensors (it is flat per facility today).
-7. Drone-vs-bird classifier in the twin; stadium follow-ups; `Iterations.docx` lessons; Seed tests (30-40 dB, -30 dB background, two-board phase lock, Jetson capacity); sensor placement along the Hays fence.
+6. **Strategy options to study (Sid, 2026-11-13):**
+   - sell our own receivers to other customers;
+   - military customers;
+   - stay on off-the-shelf receivers longer to save development cost;
+   - drone capture;
+   - reinvest money into other technologies;
+   - a study of how many facilities with sensors a town needs for real low-altitude traffic monitoring (the airspace map).
+7. Twin: scale the value-based plan price by sensors (it is flat per facility today).
+8. Drone-vs-bird classifier in the twin; stadium follow-ups; `Iterations.docx` lessons; Seed tests (30-40 dB, -30 dB background, two-board phase lock, Jetson capacity); sensor placement along the Hays fence.
 
 ## Open questions
 

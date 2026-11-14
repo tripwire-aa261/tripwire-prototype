@@ -74,17 +74,17 @@ parts = [
     P('Tripwire detects drones at prisons and stadiums with sensors that only listen: they pick up drone echoes of the signals cell towers already send. Our prototype has three parts. Each answers a question we could not answer by argument alone, and together they shaped the business plan in the other tabs. Reading this page and trying the two links takes about 15 minutes.'),
     TABLE([
         ['Part', 'What it is', 'Where', 'The question it answers'],
-        ['1. Digital twin', 'Signal simulator of four real sites: two Georgia prisons, Fulton County Jail in Atlanta and Clemson Memorial Stadium', '[[PROTOTYPE LINK]] · [[RECORDING]] · [code](' + REPO + ')', 'Does it work at a real site, with how many sensors, and at what cost?'],
+        ['1. Digital twin', 'Signal simulator of four real sites: two Georgia prisons, Fulton County Jail in Atlanta and Clemson Memorial Stadium', '[live prototype](https://tripwire-cyan.vercel.app) · [code](' + REPO + ')', 'Does it work at a real site, with how many sensors, and at what cost?'],
         ['2. Financial model', 'Quarterly model of the company, 2027-2042', f'[Financial model]({MODEL}) (also `prototype/web/financial-model.html` in the repo)', 'How much money does the company need, and can it reach $100M a year?'],
         ['3. Hardware tests', 'GPS signal shadowing with phones at Lake Lagunita (an ESP32 Wi-Fi motion test follows next week)', 'Figures below', 'Can a receive-only node really see a drone\'s effect on a signal already in the air?'],
     ], [96, 168, 168, 192]),
 
     H(2, 'Why the prototype looks the way it does'),
-    P('We could not test the real product as students. We cannot fly drones next to a prison, campus has poor cell coverage, and a sensor built on bladeRF radios costs about $1,825 before we know how many a site needs. So we built the product in software first, at real sites, from public data: building outlines from OpenStreetMap, terrain from USGS, and cell towers from the FCC tower register. The signal simulation is calibrated against a published passive-radar trial that used cell signals (Demissie and Steffes, 2025).'),
+    P('We could not test the real product as students. We cannot fly drones next to a prison, and a sensor built on bladeRF radios costs about $1,825 before we know how many a site needs. So we built the product in software first, at real sites, from public data: building outlines from OpenStreetMap, terrain from USGS, and cell towers from the FCC tower register. The signal simulation is calibrated against a published passive-radar trial that used cell signals (Demissie and Steffes, 2025).'),
     P('That answered the engineering and cost questions. It left one physical claim to show with hardware: that a receive-only node can notice a drone in a signal it did not send. The phone test at Lake Lagunita shows that with GPS satellites instead of cell towers.'),
 
     H(2, '1. Software prototype: the digital twin'),
-    P('Open [[PROTOTYPE LINK]] or watch [[RECORDING]]. To run it locally, clone the [repo](' + REPO + '), then run `python serve.py` in `prototype/` and open http://localhost:8000. It has four tabs.'),
+    P('Open the [live prototype](https://tripwire-cyan.vercel.app) in a browser; there is nothing to install. To run it locally, clone the [repo](' + REPO + '), then run `python serve.py` in `prototype/` and open http://localhost:8000. It has four tabs.'),
     H(3, 'Overview: what we can promise a customer'),
     IMG('tab_overview_s.jpg', 'Overview tab at Hays State Prison: we enter what a customer asks for (five requirements, top), and the twin recommends the radio and number of sensors and shows the coverage, performance and price we can promise.'),
     UL([
@@ -123,7 +123,7 @@ parts = [
 
     H(2, '3. Hardware tests'),
     H(3, 'GPS shadowing at Lake Lagunita'),
-    P('Tripwire\'s idea is a receive-only node that notices a drone in a signal someone else sends. Campus has poor cell coverage, so we tested the idea with GPS satellites, which are always overhead. An Android phone running Google\'s GnssLogger app reports the signal strength (C/N0) of every satellite it sees, once a second. When something passes between the phone and a satellite, that one satellite\'s signal dips.'),
+    P('Tripwire\'s idea is a receive-only node that notices a drone in a signal someone else sends. As a first hardware check, we tested the idea with GPS satellites, which are always overhead and need nothing more than a phone to measure. An Android phone running Google\'s GnssLogger app reports the signal strength (C/N0) of every satellite it sees, once a second. When something passes between the phone and a satellite, that one satellite\'s signal dips.'),
     P('On 7 November 2026 we put a Pixel 10 on the ground at Lake Lagunita and held a board over it at about 0.35, 1 and 1.6 m. The blocked satellites dropped by up to 10 dB, while a satellite in another direction stayed flat. A detector replaying the log flags the shadowed satellites as they dip.'),
     IMG('real_dip_detection_s.jpg', 'Measured at Lake Lagunita: three blocked satellite signals dip by 9-10 dB while the board is held over the phone (shaded); G30, in another part of the sky, stays flat as a control.'),
     IMG('dashboard_frame_s.jpg', 'Our live detector replaying the same log: shadowed satellites turn red on the sky view, and the alarm fires.'),

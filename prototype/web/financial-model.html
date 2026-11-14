@@ -330,7 +330,7 @@ td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0
         <div class="card-head"><h2>What investors get back if the company is sold</h2></div>
         <p class="howto">Venture investors are paid when the company is sold, not from its profits. Pick a sale date and a price as a multiple of the last four quarters of sales; the company's cash is added to the price. Each round buys a share at the US median valuation for its stage (PitchBook-NVCA Venture Monitor, Q3 2026: pre-money $18.3M Seed, $60.3M Series A, $187.0M Series B; pre-seed $5M post-money is our assumption), and later rounds shrink earlier shares. Rounds after the sale date are left out. Employee stock options and investor preferences are ignored, so real returns are a little lower.</p>
         <div class="fields exitctl">
-          <div class="field"><div class="row"><label for="in-exitQ">Company sold</label><output id="out-exitQ"></output></div><input type="range" id="in-exitQ" min="16" max="63" step="1"><span class="hint">PitchBook: venture-backed companies now take seven to nine years from founding to a sale or listing.</span></div>
+          <div class="field"><div class="row"><label for="in-exitQ">Company sold</label><output id="out-exitQ"></output></div><input type="range" id="in-exitQ" min="16" max="63" step="1"><span class="hint">In class, investors expect a sale 6 to 8 years after they invest (AA261 lectures); PitchBook reports seven to nine years from founding to a sale or listing.</span></div>
           <div class="field"><div class="row"><label for="in-exitMult">Price, times the last four quarters of sales</label><output id="out-exitMult"></output></div><input type="range" id="in-exitMult" min="2" max="12" step="0.5"><span class="hint">Recent prices: DroneShield trades near 4.4 times its 2025 sales; AeroVironment paid about 4.5 times sales for BlueHalo; Motorola paid about 9.3 times for Silvus.</span></div>
           <div class="field"><div class="row"><label for="in-valPct">Valuations against the median</label><output id="out-valPct"></output></div><input type="range" id="in-valPct" min="25" max="150" step="5"><span class="hint">100% = the median valuation for each stage. A company with little revenue may raise below it.</span></div>
         </div>
@@ -652,7 +652,7 @@ function runModel(a) {
 }
 
 /* ---------- words ---------- */
-const LEAD = 'Tripwire protects prisons and stadiums from drones with receive-only sensors on the fence that hear drone echoes of cell-tower signals. This page works out how much money the company needs, when it pays its own way and whether it can reach $100 million of sales a year. Costs come from our digital twin of Hays State Prison; prices are set against what facilities pay today.';
+const LEAD = 'Tripwire protects prisons and stadiums from drones with receive-only sensors on the fence that hear drone echoes of signals already in the air: cell towers first, later FM radio, digital TV and satellite TV. This page works out how much money the company needs, when it pays its own way and whether it can reach $100 million of sales a year. Costs come from our digital twin of Hays State Prison; prices are set against what facilities pay today.';
 const INPUTS = {
   installPrice: ['Installation fee per facility', 'Paid once. Set below what the customer pays today; at least our cost + 40%.'],
   subPrice: ['Subscription per facility, per year', 'Software, monitoring, upkeep and updates.'],
