@@ -655,7 +655,7 @@ function runModel(a) {
 /* ---------- words ---------- */
 const LEAD = 'Tripwire protects prisons and stadiums from drones with receive-only sensors on the fence that hear drone echoes of signals already in the air: cell towers first, later FM radio, digital TV and satellite TV. This page works out how much money the company needs, when it pays its own way and whether it can reach $100 million of sales a year. Costs come from our digital twin of Hays State Prison; prices are set against what facilities pay today.';
 const INPUTS = {
-  installPrice: ['Installation fee per facility', 'Paid once. Set below what the customer pays today; at least our cost + 40%.'],
+  installPrice: ['Installation fee per facility', 'Paid once. Set below what the customer pays today; at least our cost with a 40% margin.'],
   subPrice: ['Subscription per facility, per year', 'Software, monitoring, upkeep and updates.'],
   winsPerRep: ['Customers won per salesperson, per year', 'A customer is one buyer: a state prison system, a county, a venue owner.'],
   salesCycle: ['Time to close a sale', 'Government buying is slow: budget cycles and procurement.'],
@@ -715,7 +715,7 @@ const GLOSSARY = [
   ['Hub', 'One small computer per facility that tracks drones and raises alerts.'],
   ['Design partner', 'An early customer that pays for a pilot and agrees the test criteria with us.'],
   ['Interference removal', 'How much of the neighboring cell towers’ signal our processing cancels. 20 dB today; 40 dB lets every site work.'],
-  ['Floor price', 'Our cost + 40%: the lowest price that keeps a 40% margin.'],
+  ['Floor price', 'Our cost divided by 0.6: the lowest price that keeps a 40% margin.'],
   ['Quarter', 'Three months. 2029 Q4 is October to December 2029.'],
   ['Gross margin', 'The share of each sale left after the costs that grow with each facility.'],
   ['Burn rate', 'Cash lost per month while costs are higher than income.'],
@@ -894,12 +894,12 @@ function renderEcon(a) {
     row('Our cost up front', usd(b.up), usd(e.up), '', 'total'),
     row('Upkeep, internet and cloud, per year', usd(b.run), usd(e.run), 'prototype'),
     row('Our cost over 5 years', usd(b.five), usd(e.five), ''),
-    row('Floor price (cost + 40%)', usd(b.floorUp) + ' + ' + usd(b.floorRun) + '/yr', usd(e.floorUp) + ' + ' + usd(e.floorRun) + '/yr', 'decision'),
+    row('Floor price (40% margin on cost)', usd(b.floorUp) + ' + ' + usd(b.floorRun) + '/yr', usd(e.floorUp) + ' + ' + usd(e.floorRun) + '/yr', 'decision'),
     row('Our price', usd(a.installPrice) + ' + ' + usd(a.subPrice) + '/yr', usd(a.installPrice) + ' + ' + usd(a.subPrice) + '/yr', 'decision', 'total'),
     row('Gross margin over 5 years', Math.round((1 - b.five / b.ours) * 100) + '%', Math.round(gm * 100) + '%', '', 'total'),
   ].join('') + '</tbody>';
   const items = [{ name: 'Tripwire: our cost', note: 'own receiver, 5 years', lo: e.five, hi: e.five, cls: 'cost' },
-    { name: 'Tripwire: floor price', note: 'our cost + 40% margin', lo: e.floorUp + 5 * e.floorRun, hi: e.floorUp + 5 * e.floorRun, cls: 'cost' },
+    { name: 'Tripwire: floor price', note: 'our cost with a 40% margin', lo: e.floorUp + 5 * e.floorRun, hi: e.floorUp + 5 * e.floorRun, cls: 'cost' },
     { name: 'Tripwire: our price', note: 'installation + 5 years', lo: e.ours, hi: e.ours, cls: 'us' }].concat(COMPARE);
   const max = 1150000, pct = (v) => (v / max * 100).toFixed(2) + '%';
   $('priceBars').innerHTML = items.map((it) => {

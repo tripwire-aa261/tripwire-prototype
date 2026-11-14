@@ -449,3 +449,4 @@ Two Claude sessions worked in parallel and coordinated by message; this entry co
 - Draft 5: Motorola/Silvus citation added. Note on private energy sites vs data centers added to "Later customers" and the assumptions list, and as a bullet in the model's "Not in the model" box (`prototype/web/financial-model.html`, GitHub Pages and the artifact). The consistent fix is in the handoff's open questions. Addressed comments on Draft 5 and the prototype tab resolved.
 - Draft 5 funnel: rates shown as percentages throughout (10%, 33%, 50%); "Average contract value" with the per-type values ($0.9M prison system, $1.35M stadium owner, $3.6M airport or base). Sid's funnel comments resolved. Handoff: linear-growth fix and the price-by-area idea added to open questions.
 - Handoff: renewal-at-end-of-term fix added to open questions.
+- Financial model: floor labels now read "40% margin on cost" (matching Draft 5); a PDF snapshot of the model was saved for the Canvas upload.\n
