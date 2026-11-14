@@ -443,3 +443,4 @@ Two Claude sessions worked in parallel and coordinated by message; this entry co
 - Repo was private, so the doc's GitHub links 404'd for graders. Made it public at Sid's request (no secrets committed; only `.env.example`).
 - Product Prototype tab: replaced the removed cell-coverage line with the real reason. Cell signals need a receiver we don't have, so the GPS (phone) and Wi-Fi (ESP32) prototypes show the receive-only idea with hardware we have. "node" became "sensor" (4 edits, applied in Google and in `build_prototype_tab.py`).
 - Still for Sid: share the Claude artifact link publicly; delete the empty last bullet in both tabs.
+- Draft 5 and Product Prototype tabs justified. Financial model published on GitHub Pages. An Apps Script (Sid's account, link addresses only) repointed 26 links from the private Claude artifact and the GitHub source view to the Pages URL.
