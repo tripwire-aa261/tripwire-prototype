@@ -211,7 +211,7 @@ Both Google tabs were re-pasted; their comment threads now show as detached.
 
 ## 2026-11-12 · Sid · Seven teammate comments on Draft 5, investor timeline, Europe costs
 
-**Asked for:** look up Zerina ("Zerina advises on the technical stuff ... she is a prof"); "the cash in the bank graph goes up after 7 years, but usually vc cycles are less than 6. What is our solution"; then the seven new teammate comments on the Draft 5 tab.
+**Asked for:** look up the technical advisor ("the technical advisor advises on the technical stuff ... she is a prof"); "the cash in the bank graph goes up after 7 years, but usually vc cycles are less than 6. What is our solution"; then the seven new teammate comments on the Draft 5 tab.
 **Done:**
 - Model v15:
   - "Faster sales" scenario (3 wins per salesperson, 6-month cycle): cash-flow positive 2032 Q4, needs $11.9M.
@@ -219,7 +219,7 @@ Both Google tabs were re-pasted; their comment threads now show as detached.
   - Plan unchanged: $18.6M, 2034 Q2, 2040 Q3. Slower sales now needs $101M (was $95M), price war $60M (was $57M).
 - Draft 5:
   - "Investor timeline and exit" (sale of the company, Axon-Dedrone precedent; sales speed decides the date; strategic investor).
-  - Zerina listed as technical advisor (Stanford Assistant Professor of EE).
+  - the technical advisor listed as technical advisor (Stanford Assistant Professor of EE).
   - Comments answered:
     - Clemson paragraph explains RF detection (Alabama chose D-Fend) and why we complement it.
     - Europe costs priced: no BIS fee, ITAR $3,000/yr, CE EUR 8-25k, UK team about GBP 167k/yr.
@@ -240,7 +240,7 @@ Both Google tabs were re-pasted; their comment threads now show as detached.
 
 ## 2026-11-12 · Sid · Europe timing, ITAR, team names, teammate comments, round lines
 
-**Asked for:** when to expand to Western Europe ("our business has to be at a sustainable scale to expand internationally") and whether airports are in the plan; why the facilities-per-customer slider tapers; Zerina Kapetanovic plus Ashlynn, Adeline and Taras as "part time workers/advisors till seed"; funding-round boundaries on the model's charts; keep Google Doc, model and prototype tab in step.
+**Asked for:** when to expand to Western Europe ("our business has to be at a sustainable scale to expand internationally") and whether airports are in the plan; why the facilities-per-customer slider tapers; the technical advisor plus Ashlynn, Adeline and Taras as "part time workers/advisors till seed"; funding-round boundaries on the model's charts; keep Google Doc, model and prototype tab in step.
 **Done:**
 - Model v13: sales abroad start slider (default 2035 Q1, was Series B); facilities lost to churn rejoin the pool that could buy (they were capped out forever, which made revenue fall when the market filled); Seed/Series A/Series B dashed lines on every time chart. Plan: peak need $18.6M (2034 Q1), cash-flow positive 2034 Q2, $100M/yr 2040 Q3.
 - Draft 5: Western Europe section (HMPPS drone incidents, EURO 2028, World Cup 2030, EU policy, no evidence on adoption speed), airports section, export-control paragraph (ECCN 5A001.g; possible USML XI) and Commodity Jurisdiction milestone moved to 2028; five teammate comments answered (runway figures, price war defined, Big Idea Memo, FEMA and NSF SBIR sourced directly, who prisons and stadiums pay); airport error fixed (10 m vs 25 m is not "a tenth").
@@ -450,3 +450,4 @@ Two Claude sessions worked in parallel and coordinated by message; this entry co
 - Draft 5 funnel: rates shown as percentages throughout (10%, 33%, 50%); "Average contract value" with the per-type values ($0.9M prison system, $1.35M stadium owner, $3.6M airport or base). Sid's funnel comments resolved. Handoff: linear-growth fix and the price-by-area idea added to open questions.
 - Handoff: renewal-at-end-of-term fix added to open questions.
 - Financial model: floor labels now read "40% margin on cost" (matching Draft 5); a PDF snapshot of the model was saved for the Canvas upload.\n
+- Technical advisor no longer named in Draft 5, the financial model or the context files (Sid: meeting her next week). Older commits still contain the name.\n

@@ -24,7 +24,7 @@ Last updated 2026-11-13 by Sid. History is in `context/SESSION_LOG.md`.
 - **Export control:** Tripwire may be ITAR (USML XI(a)(3)(xxvii), passive bistatic radar >125 kHz bandwidth below 2 GHz) or EAR ECCN 5A001.g (passive coherent location). Commodity Jurisdiction request moved to 2028 (Seed).
 - **Company based in Atlanta** (founders move at Seed). $175k loaded per hire (~$125k average BLS Atlanta wage + ~40 %).
 - **No full-time regulatory hire until Series A** (decision 2026-11-12): hourly counsel ~$80k/yr through Seed, Taras coordinates part time, regulatory lead 2029 Q4. Reason: before Series A the legal work is one opinion, two pilot contracts and customers' SAFER SKIES paperwork; saves ~$0.4M.
-- **Seed hires (4):** RF/electronics engineer, signal-processing engineer, field engineer, account executive. Part-time until Seed: Adeline (finance), Ashlynn (customers, test drone), Taras (regulatory, flies the drone); Zerina Kapetanovic (Stanford Assistant Professor of EE) advises on the technology. Founders unpaid until Seed.
+- **Seed hires (4):** RF/electronics engineer, signal-processing engineer, field engineer, account executive. Part-time until Seed: Adeline (finance), Ashlynn (customers, test drone), Taras (regulatory, flies the drone); a Stanford EE professor advises on the technology. Founders unpaid until Seed.
 - **Pre-seed demo:** site visits with one bladeRF sensor (the ESP32 tabletop demo is no longer the pre-seed demo).
 - **Do not claim drone-vs-bird classification** until measured at Seed.
 - **Stadium sensors alternate between the top of the stands and 6 m poles outside**; prisons use ~6 m poles on the fence; customer provides poles, power and network.
