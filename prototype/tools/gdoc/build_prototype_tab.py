@@ -148,7 +148,7 @@ parts = [
     UL([
         'Recordings at Hays and Clemson, including a game day, before Seed closes.',
         'Scored flights in the pilots: 20 scripted runs per condition (day, night, wind, a bird nearby), scored against the drone\'s GPS log, with pass marks the customer signs beforehand (our test design).',
-        'FCC Supplier\'s Declaration of Conformity and an outdoor safety listing for the bladeRF sensor kit before the first paid facility (2028 Q3); FCC certification of our own receiver before it ships (2031 Q2) (regulatory milestones, Draft Report 5).',
+        'FCC Supplier\'s Declaration of Conformity and an outdoor safety listing for the bladeRF sensor kit before the first sale after the pilots (2028 Q3); FCC certification of our own receiver before it ships (2031 Q2) (regulatory milestones, Draft Report 5).',
     ]),
     H(3, 'Manufacturing'),
     UL([
