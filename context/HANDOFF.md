@@ -63,6 +63,7 @@ Last updated 2026-11-13 by Sid. History is in `context/SESSION_LOG.md`.
 
 ## Open questions
 
+- **Sales-speed basis (teammate comments on Draft 5, 2026-11-13; to fix after submission):** the 9-month sale and 6 facilities per customer have no source. They are uniform guesses for every customer, though a state corrections department buys for dozens of prisons (Georgia 35), a county for one jail and a stadium owner for one venue. Fix: segment customers by type (state DOC, county, stadium, airport) with their own facility count and sales cycle, sourced from the Georgia purchase records and the design-partner interviews.
 - Customers of one type are all the same size and willingness to pay (prisons 1x, stadiums 1.5x, airports/bases 4x Hays). Stadiums vary in sensors, and big-event venues would likely pay more (per-event or tiered pricing): to test with design partners. Defense programs and products other than the facility subscription are not modeled (listed in Draft 5 "Sources and assumptions" and the model's "Not in the model" box).
 
 - Path to $1B: today's market (7,127 facilities) caps sales near $270M/yr, and more sites abroad alone add nothing without more selling capacity. Candidates: data centers (3,068, memo), defense, the airspace-map data product, a strategic buyer. Not yet in the doc; waiting on the user.
