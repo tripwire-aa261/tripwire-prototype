@@ -435,3 +435,11 @@ Two Claude sessions worked in parallel and coordinated by message; this entry co
   - perimeter intrusion detection
   - remote sites
 - The commit hook was tested by piping sample inputs, and on Siddarth's Windows machine. It is not yet confirmed on a teammate's Mac.
+
+
+## 2026-11-13 · Sid · Pre-submission check; repo public; why GPS/Wi-Fi prototypes
+
+- Checked both Google tabs for unbacked claims: no video/recording promises left (all "recordings" are future Seed RF recordings); no yellow placeholders.
+- Repo was private, so the doc's GitHub links 404'd for graders. Made it public at Sid's request (no secrets committed; only `.env.example`).
+- Product Prototype tab: replaced the removed cell-coverage line with the real reason. Cell signals need a receiver we don't have, so the GPS (phone) and Wi-Fi (ESP32) prototypes show the receive-only idea with hardware we have. "node" became "sensor" (4 edits, applied in Google and in `build_prototype_tab.py`).
+- Still for Sid: share the Claude artifact link publicly; delete the empty last bullet in both tabs.

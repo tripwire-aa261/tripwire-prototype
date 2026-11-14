@@ -1,6 +1,6 @@
 # Handoff: current state
 
-Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
+Last updated 2026-11-13 by Sid. History is in `context/SESSION_LOG.md`.
 
 ## Current state
 
@@ -12,7 +12,7 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 - **Business plan (Sid):** Draft 5 (2026-11-12, latest; all 12 teammate comments so far answered, incl. pipeline table in the course template, airspace-map subsection, named integrators, investor timeline and exit) is the "Draft Report 5" tab; it adds the assignment items Draft 4 lacked (one chart of sales and cash flow to 2042, weighted backlog vs sales, channel partners, contracts and renewals, adoption barriers, commercial Seed tests, integration and manufacturing risks, vendor ratings, headcount at $100M) and cites a source next to every number. Draft 4 is the "Draft Report 4" tab of the team Google Doc "Your Seed Pitch Data Package and Prototype" (source: Claude doc https://claude.ai/artifact/HxtL3TWcyArFEYFmxv95tE). "Draft Report 3" keeps Sid's 23 review comments, all answered in Draft 4.
 - **Financial model** (v20: sales-funnel and investor-returns panels; three sales-speed levers, all off in the plan; each site type billed at its own size; abroad team sells only abroad at abroad staff cost; own-board price falls with volume): `prototype/web/financial-model.html`, same file as `Tripwire Financial Model.html` (repo root, not committed) and https://claude.ai/artifact/1AEzgXgBakzE4U8wNmUqwb (v20). Rounds $0.25M / $4M / $12M / $9M (2027 Q1 / 2027 Q3 / 2029 Q4 / 2031 Q4); peak need $20.5M (2034 Q1; lowest cash $4.8M); cash-flow positive 2034 Q2; $100M/yr 2039 Q4 (2,210 facilities, 31 % of reachable, ~510 customers, 212 people); backlog ~$110M end 2034. Scenarios: slower sales $87M (pays its way 2041 Q4), price war $53M, faster sales (all three levers on) cash-flow positive 2032 Q4 at $12.8M. Europe from 2035 Q1: its own salespeople (1, +1 a year), field staff growing with sites, $90k a head (UK median pay + NI at the Fed H.10 rate, + ~20 % benefits, ASSUMPTION), US price and US install/upkeep cost (ASSUMPTIONS, sliders); ~255 facilities and 19 people abroad by 2042.
 - FCC tower file (Nov 8 2026) in `prototype/data/raw/fcc/` (git-ignored) for tower counts around candidate sites.
-- GitHub repo: https://github.com/tripwire-aa261/tripwire-prototype (main includes v0.5.1, PR #2 merged 2026-11-12 as `24a184b`). Earlier versions: v0.4.4 = `e7bf0ea`, v0.4.5 = `7cb4715`.
+- GitHub repo: https://github.com/tripwire-aa261/tripwire-prototype (public since 2026-11-13 so graders can open the doc's links; main includes v0.5.1, PR #2 merged 2026-11-12 as `24a184b`). Earlier versions: v0.4.4 = `e7bf0ea`, v0.4.5 = `7cb4715`.
 
 ## Decisions in force
 
@@ -34,7 +34,7 @@ Last updated 2026-11-12 by Sid. History is in `context/SESSION_LOG.md`.
 
 - **Venture returns** (decision 2026-11-12): investors exit by a sale. At median valuations, a sale at the end of 2034 at 4.5x sales returns Seed only about 4x and Series B under 1x; faster sales plus a strategic buyer (9x) gives Seed about 15x. Seed must prove sales speed; routes are statewide/cooperative contracts (Georgia bought RF detection off a Convergint statewide contract), department follow-on sales and pilot references. Aim for a strategic investor at Series B.
 - **Pipeline:** no customer contacted yet. Draft 5 has the class-format funnel (1 in 10 leads, 1 in 3 proposals, 1 in 2 negotiations); the pilots need 20 leads in 2027 Q2 from 6 Southeast prison systems and 33 SEC/ACC stadiums.
-- Sid: business plan and hiring plan in the Google Doc. The "Product prototype" tab is now a walkthrough for the teaching team (the twin's four tabs, the financial model, the GPS-shadowing test at Lake Lagunita from the AA272 `gnss-drone-detection` repo, lessons table). Still to fill: the prototype link and recording (yellow placeholders). The ESP32 Wi-Fi test is listed as next week's plan (code written, hardware delayed). The tab is built by `prototype/tools/gdoc/build_prototype_tab.py`.
+- Sid: business plan and hiring plan in the Google Doc. The "Product prototype" tab is now a walkthrough for the teaching team (the twin's four tabs, the financial model, the GPS-shadowing test at Lake Lagunita from the AA272 `gnss-drone-detection` repo, lessons table). Still to fill: the prototype link and recording (yellow placeholders). Why GPS and Wi-Fi hardware: sensing cell signals needs a receiver (bladeRF ~$1,825 per sensor, own receiver is Seed work), so phone GPS and ESP32 Wi-Fi show the receive-only idea with hardware we have (tab text fixed 2026-11-13; the "campus has poor cell coverage" reason is gone). The ESP32 Wi-Fi test is listed as next week's plan (code written, hardware delayed). The tab is built by `prototype/tools/gdoc/build_prototype_tab.py`.
 - Nimalan: twin follow-ups below.
 
 ## Next steps
