@@ -337,7 +337,7 @@ const DEFAULTS = {
   gnssAddon: 20000, gnssAttach: 25, gnssNetPrice: 100, gnssNetsPerYear: 2,   // add-on $/site/yr; standalone network $k/yr
   // selling
   winsDoc: 0.5, winsJail: 3, winsKit: 4, winsDod: 2, winsCbp: 0.5, winsStad: 4,   // customers per seller per year
-  repsAddA: 16,                                // salespeople hired per year after Series A (plan), split across customer types
+  repsAddA: 18,                                // salespeople hired per year after Series A (plan), split across customer types
   bookingsPerSeller: 3,                        // $M of new contract value a year that funds one more seller on top
   rampQ: 2,                                    // quarters before a new seller is fully productive
   contractQ: 9,                                // from 2029 Q2 a GSA Schedule listing and cooperative contracts (OMNIA, Sourcewell, NASPO) shorten every sale by one quarter (ASSUMPTION)
@@ -392,7 +392,7 @@ function runModel(a) {
   for (let t = 0; t < N; t++) {
     // 1. sales capacity this quarter
     const ttmBook = bookings.slice(Math.max(0, t - 4), t).reduce((p, v) => p + v, 0);
-    const extra = t >= A_Q ? Math.floor(ttmBook / (a.bookingsPerSeller * 1e6)) + a.repsAddA * Math.floor((t - A_Q) / 4 + 1) : 0;
+    const extra = t >= A_Q ? Math.floor(ttmBook / (a.bookingsPerSeller * 1e6)) + a.repsAddA * (t - A_Q + 1) / 4 : 0;   // hired evenly through each year
     const base = { doc: t >= 5 ? 1 : 0, jail: t >= 5 ? 0.5 : 0, kit: t >= 2 ? 0.5 : 0, dod: t >= 2 ? 0.5 : 0, cbp: t >= 2 ? 0.25 : 0, stad: t >= 6 ? 0.25 : 0 };
     // founders and Ashlynn split their time across segments; extra sellers go where the money is (by share of last year's bookings, else equally)
     let total = 0;
@@ -615,7 +615,7 @@ const SCENARIOS = [
   ['Government slow', 'Bases and the border buy half as fast, and police buy only a quarter as much once the FEMA money ends.', { winsDod: 1, winsCbp: 0.25, afterGrant: 25 }],
   ['No integrator sales', 'No company buys our sensors for its own contracts.', { oemUnits: 0 }],
   ['Prices 30% lower', 'Competitors force every price down by 30%.', { sitePrice: 17500, siteSub: 17500, largePrice: 700, largeSub: 280, kitPrice: 420, kitSub: 84, oemPrice: 8400, oemLicense: 2100 }],
-  ['Hire faster', '20 salespeople a year after Series A instead of 16.', { repsAddA: 20 }],
+  ['Hire faster', '22 salespeople a year after Series A instead of 18.', { repsAddA: 22 }],
   ['No faster selling', 'No contract vehicles and no reference effect: every sale takes its full cycle.', { contractQ: 99, refGain: 0 }],
   ['FAA GPS program', 'We win a national FAA interference-monitoring service worth $10M a year from 2030.', { faa: 10 }],
 ];
@@ -665,7 +665,7 @@ function buildInputs() {
   $('asmList').innerHTML = [
     'Every price except the prison site, and every win rate, is our estimate (sliders on the left).',
     'Sales cycles: corrections 12 months, jails 9, police 6, bases 18, border 24 months.',
-    'Salespeople: the founders and Ashlynn sell first; after Series A we hire 16 a year plus one per $3M of new contract value, split 25% corrections, 15% jails, 20% police, 25% bases, 5% border, 10% stadiums. A new seller takes 2 quarters to ramp.',
+    'Salespeople: the founders and Ashlynn sell first; after Series A we hire 18 a year, spread through the year, plus one per $3M of new contract value, split 25% corrections, 15% jails, 20% police, 25% bases, 5% border, 10% stadiums. A new seller takes 2 quarters to ramp.',
     'Engineers: 10 after Series A plus one per $2.5M of yearly sales; field staff one per 40 sites; admin one per 8 staff.',
     'Compliance from 2029: $150k a year for ITAR registration, CMMC / NIST 800-171 and facility clearance work.',
     'Contracts run 5 years; 90% of sites renew at the end of each term.',

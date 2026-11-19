@@ -62,7 +62,7 @@ const SCENARIOS = [
   ['Government slow', 'Bases and the border buy half as fast, and police buy only a quarter as much once the FEMA money ends.', { winsDod: 1, winsCbp: 0.25, afterGrant: 25 }],
   ['No integrator sales', 'No company buys our sensors for its own contracts.', { oemUnits: 0 }],
   ['Prices 30% lower', 'Competitors force every price down by 30%.', { sitePrice: 17500, siteSub: 17500, largePrice: 700, largeSub: 280, kitPrice: 420, kitSub: 84, oemPrice: 8400, oemLicense: 2100 }],
-  ['Hire faster', '20 salespeople a year after Series A instead of 16.', { repsAddA: 20 }],
+  ['Hire faster', '22 salespeople a year after Series A instead of 18.', { repsAddA: 22 }],
   ['No faster selling', 'No contract vehicles and no reference effect: every sale takes its full cycle.', { contractQ: 99, refGain: 0 }],
   ['FAA GPS program', 'We win a national FAA interference-monitoring service worth $10M a year from 2030.', { faa: 10 }],
 ];
@@ -112,7 +112,7 @@ function buildInputs() {
   $('asmList').innerHTML = [
     'Every price except the prison site, and every win rate, is our estimate (sliders on the left).',
     'Sales cycles: corrections 12 months, jails 9, police 6, bases 18, border 24 months.',
-    'Salespeople: the founders and Ashlynn sell first; after Series A we hire 16 a year plus one per $3M of new contract value, split 25% corrections, 15% jails, 20% police, 25% bases, 5% border, 10% stadiums. A new seller takes 2 quarters to ramp.',
+    'Salespeople: the founders and Ashlynn sell first; after Series A we hire 18 a year, spread through the year, plus one per $3M of new contract value, split 25% corrections, 15% jails, 20% police, 25% bases, 5% border, 10% stadiums. A new seller takes 2 quarters to ramp.',
     'Engineers: 10 after Series A plus one per $2.5M of yearly sales; field staff one per 40 sites; admin one per 8 staff.',
     'Compliance from 2029: $150k a year for ITAR registration, CMMC / NIST 800-171 and facility clearance work.',
     'Contracts run 5 years; 90% of sites renew at the end of each term.',

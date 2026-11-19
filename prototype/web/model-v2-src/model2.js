@@ -55,7 +55,7 @@ const DEFAULTS = {
   gnssAddon: 20000, gnssAttach: 25, gnssNetPrice: 100, gnssNetsPerYear: 2,   // add-on $/site/yr; standalone network $k/yr
   // selling
   winsDoc: 0.5, winsJail: 3, winsKit: 4, winsDod: 2, winsCbp: 0.5, winsStad: 4,   // customers per seller per year
-  repsAddA: 16,                                // salespeople hired per year after Series A (plan), split across customer types
+  repsAddA: 18,                                // salespeople hired per year after Series A (plan), split across customer types
   bookingsPerSeller: 3,                        // $M of new contract value a year that funds one more seller on top
   rampQ: 2,                                    // quarters before a new seller is fully productive
   contractQ: 9,                                // from 2029 Q2 a GSA Schedule listing and cooperative contracts (OMNIA, Sourcewell, NASPO) shorten every sale by one quarter (ASSUMPTION)
@@ -110,7 +110,7 @@ function runModel(a) {
   for (let t = 0; t < N; t++) {
     // 1. sales capacity this quarter
     const ttmBook = bookings.slice(Math.max(0, t - 4), t).reduce((p, v) => p + v, 0);
-    const extra = t >= A_Q ? Math.floor(ttmBook / (a.bookingsPerSeller * 1e6)) + a.repsAddA * Math.floor((t - A_Q) / 4 + 1) : 0;
+    const extra = t >= A_Q ? Math.floor(ttmBook / (a.bookingsPerSeller * 1e6)) + a.repsAddA * (t - A_Q + 1) / 4 : 0;   // hired evenly through each year
     const base = { doc: t >= 5 ? 1 : 0, jail: t >= 5 ? 0.5 : 0, kit: t >= 2 ? 0.5 : 0, dod: t >= 2 ? 0.5 : 0, cbp: t >= 2 ? 0.25 : 0, stad: t >= 6 ? 0.25 : 0 };
     // founders and Ashlynn split their time across segments; extra sellers go where the money is (by share of last year's bookings, else equally)
     let total = 0;
