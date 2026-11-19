@@ -461,3 +461,4 @@ Two Claude sessions worked in parallel and coordinated by message; this entry co
 - Instructors: not venture scale; aim for a $10-30M raise and $100-200M within ~5 years. Model both readings (exit value and sales a year).
 - Decisions recorded in `context/PIVOT_PLAN.md`: passive sensing platform (drones, more signal sources, heat-camera cueing, GPS jamming/spoofing monitoring), service plus sensor sales, beyond-interception products, government first (FEMA-funded states, then DHS border and DIU), prisons and stadiums as proof sites, Ashlynn leads government and defense, Draft Report 6 in the same sections.
 - VC feedback on the data package recorded there too, to answer in Draft 6.
+- Research milestone done: `context/research/` (government buyers, GNSS monitoring, sensing and VC answers). Proposed model v2 design in `context/PIVOT_MODEL_DESIGN.md`, waiting for Sid's review.\n
