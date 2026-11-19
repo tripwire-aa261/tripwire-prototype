@@ -68,5 +68,16 @@ canvas { width: 100%; height: auto; background: #0e151d; border-radius: 8px; dis
 .timeline .ev { display: grid; grid-template-columns: 64px 130px 1fr; gap: 10px; padding: 8px 10px; border-left: 3px solid #A29E96; background: var(--panel); border-radius: 0 6px 6px 0; }
 .timeline .t { font-family: ui-monospace, Menlo, monospace; font-weight: 600; } .timeline .who { font-weight: 600; }
 .timeline .detect { border-color: var(--ok); } .timeline .camera { border-color: var(--tv); } .timeline .drone { border-color: var(--bad); } .timeline .people { border-color: var(--warn); } .timeline .evidence { border-color: var(--accent); }
+.player { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.player button#smPlay { background: var(--accent); color: #04121c; border: 0; border-radius: 6px; padding: 6px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+.player input[type=range] { flex: 1; min-width: 140px; }
+.mono { font-family: ui-monospace, Menlo, monospace; }
+.ln { display: inline-block; width: 16px; height: 0; border-top: 2px solid; margin-right: 5px; vertical-align: 3px; } .ln.cl { border-color: #38bdf8; } .ln.tvl { border-color: #c4b5fd; }
+.dot.dr { background: #f87171; } .dot.tk { background: #34d399; } .dot.lc { background: #fbbf24; }
+.tri { display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid #8396a8; margin-right: 5px; }
+.card.live b { color: var(--ok); } .card.warnc b { color: var(--warn); } .card.off b { color: var(--muted); }
 footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; padding: 14px 16px 24px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); }
 @media (max-width: 860px) { .grid2, .two { grid-template-columns: 1fr; } .timeline .ev { grid-template-columns: 52px 1fr; } .timeline .who { grid-column: 2; } }
+#smEvents .ev { cursor: pointer; opacity: .5; font-size: 13px; grid-template-columns: 48px 76px 1fr; }
+#smEvents .ev.past { opacity: 1; }
+.dot.tvd { background: #c4b5fd; }

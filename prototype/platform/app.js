@@ -1,5 +1,5 @@
 // Tripwire platform prototype v1.0. Data: data/explore.json (twin/explore_v1.py), data/bom.json (twin/platform_bom.py),
-// data/products.json, data/gnss.json, data/timeline.json (tools/platform_v1.py).
+// data/products.json, data/gnss.json, data/timeline.json (tools/platform_v1.py), data/flights.json (tools/flight_demo_v1.py).
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const usd = (v) => (v === null || v === undefined ? '–' : v >= 1e6 ? `$${(v / 1e6).toFixed(v >= 1e7 ? 0 : 1)}M` : v >= 1e4 ? `$${Math.round(v / 1e3)}k` : `$${Math.round(v).toLocaleString('en-US')}`);
@@ -40,17 +40,24 @@ function renderPlatform() {
     ['Platform sensor cost', usd(s.total_usd), `at 1,000 units; v0.5 cell-only sensor ${usd(B.v05_sensor_usd)}`],
     ['Products', '5', 'site, large perimeter, mobile kit, sensor for integrators, GPS monitoring'],
   ].map(([a, b, c]) => `<div class="kpi"><small>${esc(a)}</small><b>${esc(b)}</b><span>${esc(c)}</span></div>`).join('');
+  // Cell towers alone: the lowest interference removal at which the fewest sensors meet the requirements.
+  const cellNeed = (k, d) => {
+    for (const i of E.interference) { const c = rec(k, d, i).platform_cell; if (c && c.meets) return `${i === 20 ? '<span class="ok">today</span>' : `needs ${i} dB`} · ${c.n} sensors`; }
+    const c = rec(k, d, E.interference[E.interference.length - 1]).platform_cell || {};
+    return `<span class="bad">not met</span> even at 40 dB · best ${pct(c.cov)} covered with ${c.n}`;
+  };
   const rows = SITE_ORDER.filter((k) => E.sites[k]).map((k) => {
-    const s = E.sites[k], r = rec(k, 'mavic', 20), a = r.platform || {}, c = r.platform_cell || {};
-    const f = (x) => (x.n ? `${x.meets ? '' : '<span class="bad">not met</span> · '}${x.n} sensors · ${pct(x.cov)} covered · ${pct(x.trk)} tracked` : '–');
-    return `<tr><td class="l"><b>${esc(s.name)}</b><br><span class="note small">${esc(s.place)} · ${esc(s.type)}</span></td><td class="l">${esc(PRODUCT_NAMES[s.product])}</td>
-      <td class="l">${f(c)}</td><td class="l">${f(a)}</td><td>${(s.tv_used || []).length}</td></tr>`;
+    const s = E.sites[k], a = rec(k, 'mavic', 20).platform || {};
+    const tv = a.n ? `${a.meets ? '<span class="ok">today</span>' : '<span class="bad">not met</span>'} · ${a.n} sensors · ${pct(a.cov)} covered` : '–';
+    return `<tr><td class="l"><b>${esc(s.name)}</b><br><span class="note small">${esc(s.place)} · ${esc(s.type)} · ${s.fence_area_ha} ha</span></td><td class="l">${esc(PRODUCT_NAMES[s.product])}</td>
+      <td class="l">${cellNeed(k, 'm210')}</td><td class="l">${cellNeed(k, 'mavic')}</td><td class="l">${tv}</td></tr>`;
   }).join('');
-  $('pfSites').innerHTML = `<thead><tr><th class="l">Site</th><th class="l">Product</th><th class="l">Cell towers only</th><th class="l">Cell + digital TV</th><th>TV stations used</th></tr></thead><tbody>${rows}</tbody>`;
+  $('pfSites').innerHTML = `<thead><tr><th class="l">Site</th><th class="l">Product</th><th class="l">Cell towers only<br>5 kg drone</th><th class="l">Cell towers only<br>0.9 kg drone</th><th class="l">Cell + digital TV<br>0.9 kg drone</th></tr></thead><tbody>${rows}</tbody>`;
   $('pfChanged').innerHTML = [
     '<b>A sensor that can hear the new signals.</b> The v0.5 sensor cut off above 850 MHz, so it could use neither digital TV (470-608 MHz) nor GPS (1,575 MHz). The platform sensor has three receive banks; see Sensor &amp; parts.',
     '<b>Digital TV in the twin\'s own simulation.</b> TV transmitter-sensor pairs now count toward coverage, accuracy and scored flights together with the cell pairs, instead of a separate estimate.',
     '<b>Three new sites for the products that bring most sales:</b> a military flightline and a port of entry (large-perimeter product) and a park during an event (mobile kit).',
+    '<b>A flight simulator:</b> contraband flights at every site, frame by frame, with the sensors that hear the drone, the track and the alerts, for cell towers alone or cell + TV.',
     '<b>Every product costed from parts:</b> sensor counts from the twin, prices from financial model v2, benchmarks from published contracts.',
   ].map((x) => `<li>${x}</li>`).join('');
   $('pfReal').innerHTML = [
@@ -65,7 +72,7 @@ function renderPlatform() {
 function drawMap(m, site) {
   const cv = $('stMap'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
   ctx.clearRect(0, 0, W, H);
-  if (!m) { ctx.fillStyle = '#8396a8'; ctx.font = '14px sans-serif'; ctx.fillText('No coverage map for this choice (maps are kept for the recommended sensor counts).', 14, 30); return; }
+  if (!m) { ctx.fillStyle = '#8396a8'; ctx.font = '14px sans-serif'; ctx.fillText('No coverage map for this choice yet.', 14, 30); return; }
   const span = m.step * m.n, sc = Math.min(W, H) / span;
   const px = (x) => (x - m.x0 + m.step / 2) * sc, py = (y) => H - (y - m.y0 + m.step / 2) * sc;
   const col = { 0: '#1b2530', 1: '#8a6d1f', 2: '#2f8f6a' };
@@ -203,10 +210,174 @@ function renderTimeline() {
   $('tlCases').innerHTML = T.cases.map((c) => `<div class="pcard"><h3>${esc(c.where)}</h3><p>${esc(c.what)} ${c.url ? link(c.url, '(source)') : ''}</p><p><b>${esc(c.lesson)}</b></p></div>`).join('');
 }
 
-function renderAll() { renderSites(); renderGnss(); }
+
+// ---------------------------------------------------------------- Flight simulator (data/flights.json, tools/flight_demo_v1.py)
+let F = null;
+const sim = { site: 'hays', drone: 'mavic', sig: 'cell+tv', interf: 20, fl: 0, i: 0, playing: false, speed: 4, last: 0 };
+const SIG_NAMES = { 'cell+tv': 'Cell + TV', cell: 'Cell towers only' };
+
+function simData() {
+  const g = F.sites[sim.site], geo = g.flights[sim.fl], run = (F.runs[`${sim.site}|${sim.drone}|${sim.sig}|${sim.interf}`] || [])[sim.fl];
+  return { g, geo, run };
+}
+
+function simEvents(geo, run) {
+  const ev = [], T = geo.t.length;
+  const fl = run.loc.indexOf(1), ft = run.trk.indexOf(1), cross = geo.inside.indexOf(1);
+  let hov = -1;
+  for (let k = 1; k < T; k++) if (geo.xy[k][0] === geo.xy[k - 1][0] && geo.xy[k][1] === geo.xy[k - 1][1]) { hov = k - 1; break; }
+  const leave = cross < 0 ? -1 : geo.inside.lastIndexOf(1);
+  ev.push({ k: 0, kind: 'drone', who: 'Drone', what: `Takes off ${geo.fence_m[0]} m from the fence, flying in from ${geo.from_deg}° at ${geo.speed_mps} m/s, 60 m up.` });
+  if (fl >= 0) ev.push({ k: fl, kind: 'detect', who: 'Tripwire', what: `First located: ${run.n_cell[fl] + run.n_tv[fl]} transmitter-sensor pairs hear the drone, ${geo.inside[fl] ? 'inside the fence' : `${geo.fence_m[fl]} m from the fence`}.` });
+  if (ft >= 0) {
+    const before = cross > ft ? `, ${Math.round(geo.t[cross] - geo.t[ft])} s before the drone crosses the fence` : '';
+    ev.push({ k: ft, kind: 'detect', who: 'Tripwire', what: geo.inside[ft] ? 'Track confirmed only after the drone is inside: alert to the control room.' : `Track confirmed ${geo.fence_m[ft]} m from the fence: alert to the control room and the response team${before}.` });
+  }
+  if (cross >= 0) ev.push({ k: cross, kind: 'drone', who: 'Drone', what: `Crosses the fence${run.trk[cross] ? ' (tracked)' : ' (not tracked)'}.` });
+  if (hov >= 0 && geo.hover_s > 1) ev.push({ k: hov, kind: 'drone', who: 'Drone', what: `Hovers ${Math.round(geo.hover_s)} s over the drop point${run.trk[hov] ? ' (track held)' : ''}.` });
+  if (ft >= 0) {
+    for (let k = ft + 1; k < T; k++) {
+      if (run.trk[k - 1] && !run.trk[k]) ev.push({ k, kind: 'people', who: 'Tripwire', what: `Track lost ${geo.inside[k] ? 'inside the fence' : `${geo.fence_m[k]} m outside`}.` });
+      if (!run.trk[k - 1] && run.trk[k]) ev.push({ k, kind: 'detect', who: 'Tripwire', what: 'Track picked up again.' });
+    }
+  }
+  if (leave >= 0 && leave < T - 1) ev.push({ k: leave + 1, kind: 'evidence', who: 'Drone', what: `Leaves over the fence${run.trk[leave + 1] ? '; the track follows it out, and its heading is kept as evidence' : ''}.` });
+  if (ft < 0) ev.push({ k: T - 1, kind: 'people', who: 'Tripwire', what: 'Never tracked on this flight.' });
+  return ev.sort((a, b) => a.k - b.k).slice(0, 16).map((e) => ({ ...e, t: Math.round(geo.t[e.k]) }));
+}
+
+function simDraw() {
+  if (!F) return;
+  const { g, geo, run } = simData(), cv = $('smMap'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  if (!run) { ctx.fillStyle = '#8396a8'; ctx.font = '14px sans-serif'; ctx.fillText('No flight for this choice.', 14, 30); return; }
+  const fence = E.sites[sim.site].fence;
+  const cx = fence.reduce((a, p) => a + p[0], 0) / fence.length, cy = fence.reduce((a, p) => a + p[1], 0) / fence.length;
+  let half = 0;
+  geo.xy.concat(fence).forEach(([x, y]) => (half = Math.max(half, Math.abs(x - cx), Math.abs(y - cy))));
+  half = Math.ceil((half + 120) / 100) * 100;
+  const sc = W / (2 * half), px = (x) => W / 2 + (x - cx) * sc, py = (y) => H / 2 - (y - cy) * sc;
+  // Coverage map of the same build behind the flight.
+  const m = E.maps.find((mm) => mm.k[0] === sim.site && mm.k[1] === sim.drone && mm.k[2] === 'ring8_enh_hist' && mm.k[4] === sim.interf && mm.k[5] === g.n && (mm.signals || 'cell') === sim.sig);
+  if (m) {
+    const col = { 1: 'rgba(138,109,31,.45)', 2: 'rgba(47,143,106,.45)' };
+    for (let a = 0; a < m.n; a++) for (let b = 0; b < m.n; b++) {
+      const v = m.state[a * m.n + b];
+      if (!col[v]) continue;
+      const x = m.x0 + b * m.step - m.step / 2, y = m.y0 + a * m.step - m.step / 2;
+      ctx.fillStyle = col[v]; ctx.fillRect(px(x), py(y + m.step), m.step * sc + 0.5, m.step * sc + 0.5);
+    }
+  }
+  ctx.strokeStyle = '#f8fafc'; ctx.lineWidth = 2; ctx.beginPath();
+  fence.forEach(([x, y], k) => (k ? ctx.lineTo(px(x), py(y)) : ctx.moveTo(px(x), py(y)))); ctx.stroke();
+  ctx.fillStyle = '#8396a8';
+  g.towers.forEach(([x, y]) => {  // towers beyond the view are pinned to its edge as outlines
+    let X = px(x), Y = py(y);
+    const out = X < 8 || X > W - 8 || Y < 8 || Y > H - 8;
+    X = Math.min(Math.max(X, 8), W - 8); Y = Math.min(Math.max(Y, 8), H - 8);
+    ctx.beginPath(); ctx.moveTo(X, Y - 6); ctx.lineTo(X - 5, Y + 4); ctx.lineTo(X + 5, Y + 4); ctx.closePath();
+    if (out) { ctx.strokeStyle = '#8396a8'; ctx.lineWidth = 1; ctx.stroke(); } else ctx.fill();
+  });
+  if (sim.sig.includes('tv')) {
+    ctx.font = '11px sans-serif';
+    const placed = [];
+    [...g.tv].sort((a, b) => a.bearing_deg - b.bearing_deg).forEach((t) => {  // TV stations are tens of km away: shown by direction
+      const a = (t.bearing_deg * Math.PI) / 180, r = W / 2 - 16, X = W / 2 + r * Math.sin(a), Y = H / 2 - r * Math.cos(a);
+      ctx.fillStyle = '#c4b5fd'; ctx.beginPath(); ctx.arc(X, Y, 4, 0, 7); ctx.fill();
+      const near = placed.filter((p) => Math.abs(p.X - X) < 120 && Math.abs(p.Y - Y) < 14 * (placed.length + 1)).length;
+      const lx = Math.min(Math.max(X + 6, 4), W - 120), ly = Math.min(Math.max(Y + 4, 12) + 13 * near, H - 30);
+      ctx.fillText(`${t.call} ${Math.round(t.distance_km)} km`, lx, ly); placed.push({ X, Y });
+    });
+  }
+  const i = Math.min(sim.i, geo.t.length - 1), [dx, dy] = geo.xy[i];
+  ctx.setLineDash([4, 5]); ctx.strokeStyle = 'rgba(248,113,113,.35)'; ctx.lineWidth = 1.2; ctx.beginPath();
+  geo.xy.forEach(([x, y], k) => (k ? ctx.lineTo(px(x), py(y)) : ctx.moveTo(px(x), py(y)))); ctx.stroke(); ctx.setLineDash([]);
+  for (let k = Math.max(0, i - 60); k <= i; k++) {  // Tripwire's position estimates (track trail)
+    if (!run.loc[k]) continue;
+    ctx.fillStyle = run.trk[k] ? 'rgba(52,211,153,.8)' : 'rgba(251,191,36,.75)';
+    ctx.beginPath(); ctx.arc(px(run.est[k][0]), py(run.est[k][1]), k === i ? 5 : 2.2, 0, 7); ctx.fill();
+  }
+  g.sensors.forEach(([x, y], j) => {  // the echoes each sensor hears now
+    const c = (run.cell[i] >> j) & 1, t = (run.tv[i] >> j) & 1;
+    if (!c && !t) return;
+    ctx.strokeStyle = c ? '#38bdf8' : '#c4b5fd'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(px(x), py(y)); ctx.lineTo(px(dx), py(dy)); ctx.stroke();
+    if (c && t) { ctx.strokeStyle = '#c4b5fd'; ctx.setLineDash([3, 4]); ctx.stroke(); ctx.setLineDash([]); }
+  });
+  ctx.fillStyle = '#38bdf8'; ctx.strokeStyle = '#04121c'; ctx.lineWidth = 1.5;
+  g.sensors.forEach(([x, y]) => { ctx.beginPath(); ctx.arc(px(x), py(y), 5, 0, 7); ctx.fill(); ctx.stroke(); });
+  if (run.trk[i]) { ctx.strokeStyle = '#34d399'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(px(run.est[i][0]), py(run.est[i][1]), Math.max(7, run.err[i] * sc), 0, 7); ctx.stroke(); }
+  ctx.fillStyle = '#f87171'; ctx.beginPath(); ctx.arc(px(dx), py(dy), 5.5, 0, 7); ctx.fill();
+  ctx.fillStyle = '#dbe5ee'; ctx.font = '12px sans-serif';
+  ctx.fillRect(14, H - 18, 500 * sc, 3); ctx.fillText('500 m', 14, H - 24);
+  const heard = run.n_cell[i] + run.n_tv[i];
+  const state = run.trk[i] ? ['Tracked', 'live'] : run.loc[i] ? ['Located', 'warnc'] : heard ? ['Heard, not located', 'warnc'] : ['Not seen', 'off'];
+  $('smNow').innerHTML = [[state[0], 'Tripwire', state[1]], [geo.inside[i] ? 'inside the fence' : `${geo.fence_m[i]} m outside`, 'Drone', ''],
+    [`${run.n_cell[i]} cell · ${run.n_tv[i]} TV`, 'Transmitter-sensor pairs that hear it', ''], [run.loc[i] ? `${Math.round(run.err[i])} m` : '–', 'Expected position error', '']]
+    .map(([b, sm, cl]) => `<div class="card ${cl}"><small>${esc(sm)}</small><b>${esc(b)}</b></div>`).join('');
+  $('smClock').textContent = `${Math.round(geo.t[i])} s / ${Math.round(geo.t[geo.t.length - 1])} s`;
+  $('smTime').value = i;
+  document.querySelectorAll('#smEvents .ev').forEach((li) => li.classList.toggle('past', +li.dataset.k <= i));
+}
+
+function renderSim() {
+  if (!F) { $('smTitle').textContent = 'Flight simulator data not built yet (python -m tools.flight_demo_v1)'; return; }
+  const sites = SITE_ORDER.filter((k) => F.sites[k]);
+  const reset = () => { sim.i = 0; };
+  const short = (k) => E.sites[k].name.replace(' State Prison', '').replace(' Memorial Stadium', '').replace(' County Jail', ' Jail').replace(' flightline apron', '').replace(' Port of Entry', ' port');
+  seg($('smSite'), 'Site', sites.map((k) => [k, short(k)]), () => sim.site, (v) => { sim.site = v; sim.fl = 0; reset(); });
+  seg($('smDrone'), 'Drone', Object.entries(DRONES), () => sim.drone, (v) => { sim.drone = v; reset(); });
+  seg($('smSig'), 'Signals', Object.entries(SIG_NAMES), () => sim.sig, (v) => { sim.sig = v; reset(); });
+  seg($('smInterf'), 'Interference removal', F.interference.map((i) => [i, `${i} dB${i === 20 ? ' (today)' : ''}`]), () => sim.interf, (v) => { sim.interf = +v; reset(); });
+  const g = F.sites[sim.site];
+  seg($('smFlight'), 'Flight', g.flights.map((f, k) => [k, `${k + 1}: from ${f.from_deg}°`]), () => sim.fl, (v) => { sim.fl = +v; reset(); });
+  seg($('smSpeed'), 'Speed', [[1, '1x'], [4, '4x'], [10, '10x']], () => sim.speed, (v) => { sim.speed = +v; });
+  const { geo, run } = simData();
+  $('smTitle').textContent = `${E.sites[sim.site].name} · ${DRONES[sim.drone]} · ${SIG_NAMES[sim.sig].toLowerCase()} · ${sim.interf} dB · ${g.n} platform sensors`;
+  $('smTime').max = geo.t.length - 1;
+  if (run) {
+    $('smEvents').innerHTML = simEvents(geo, run).map((e) => `<li class="ev ${e.kind}" data-k="${e.k}"><span class="t">${e.t} s</span><span class="who">${esc(e.who)}</span><span>${esc(e.what)}</span></li>`).join('');
+    $('smEvents').querySelectorAll('.ev').forEach((li) => (li.onclick = () => { sim.i = +li.dataset.k; sim.playing = false; $('smPlay').textContent = 'Play'; simDraw(); }));
+    const zone = geo.inside.map((v, k) => v || geo.fence_m[k] <= E.default_req.radius_m);
+    const nz = zone.filter(Boolean).length, tz = zone.filter((v, k) => v && run.trk[k]).length;
+    const ft = run.trk.indexOf(1), cross = geo.inside.indexOf(1), early = ft >= 0 && (cross < 0 || ft < cross);
+    $('smSum').innerHTML = [[nz ? pct((100 * tz) / nz) : '–', 'Time tracked inside the zone (fence + 150 m)'],
+      [early ? `${geo.fence_m[ft]} m` : 'none', 'Warning distance (track before the fence)'],
+      [early && cross > ft ? `${Math.round(geo.t[cross] - geo.t[ft])} s` : '–', 'Warning time before the fence']]
+      .map(([b, sm]) => `<div class="card"><small>${esc(sm)}</small><b>${esc(b)}</b></div>`).join('');
+  }
+  $('smNote').innerHTML = `${esc(F.note)} Each frame (${F.sites[sim.site].dt} s), every transmitter-sensor pair hears the drone with the probability the twin's link budget gives (one random draw); a frame is located when 3 or more pairs from 2 or more sensors hear it; a track is confirmed after 2 located frames out of 3 and dropped after 3 misses. The full 3D signal replays (cell towers) are in the ${link(LINKS.twin, 'v0.5 twin')}.`;
+  simDraw();
+}
+
+function simTick(ts) {
+  if (sim.playing && F) {
+    const { geo } = simData();
+    if (ts - sim.last >= (F.sites[sim.site].dt * 1000) / sim.speed) {
+      sim.last = ts; sim.i++;
+      if (sim.i >= geo.t.length) { sim.i = geo.t.length - 1; sim.playing = false; $('smPlay').textContent = 'Replay'; }
+      simDraw();
+    }
+  }
+  requestAnimationFrame(simTick);
+}
+
+function simInit() {
+  $('smPlay').onclick = () => {
+    if (!F) return;
+    const { geo } = simData();
+    if (sim.i >= geo.t.length - 1) sim.i = 0;
+    sim.playing = !sim.playing; $('smPlay').textContent = sim.playing ? 'Pause' : 'Play';
+  };
+  $('smTime').oninput = (e) => { sim.i = +e.target.value; simDraw(); };
+  requestAnimationFrame(simTick);
+}
+
+function renderAll() { renderSites(); renderGnss(); renderSim(); }
 
 async function boot() {
   [E, B, P, G, T] = await Promise.all(['explore', 'bom', 'products', 'gnss', 'timeline'].map(load));
+  F = await load('flights').catch(() => null);
+  simInit();
   $('links').innerHTML = `${link(LINKS.model, 'Financial model v2')} · ${link(LINKS.twin, 'Cell-tower twin v0.5 (3D signal replays)')} · ${link(LINKS.repo, 'Code')}`;
   renderPlatform(); renderSensor(); renderProducts(); renderTimeline(); renderAll();
   const show = (t) => { document.querySelectorAll('.tabbar button').forEach((b) => b.classList.toggle('on', b.dataset.tab === t)); document.querySelectorAll('.tab').forEach((s) => s.classList.toggle('on', s.id === `tab-${t}`)); history.replaceState(null, '', `#${t}`); };

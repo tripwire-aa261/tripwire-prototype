@@ -3,6 +3,7 @@ and what that costs from the platform parts list (platform_bom.py). Writes platf
 
     python -m twin.explore_v1                 all sites (~1 h on 4 cores)
     python -m twin.explore_v1 --site robins   one site, merged into the existing file
+    python -m twin.explore_v1 --maps          add any missing coverage maps (every sensor count, ~1 h)
 
 Same design-point method as twin/explore.py (coverage, accuracy and scored flights from the link budget, fused over
 cell and TV pairs by multiband.py), on a smaller grid: drone height 60 m (the default requirement), interference removal
@@ -79,16 +80,10 @@ def recommendations(results):
             if any(r["k"][0] == s for r in results)}
 
 
-def map_jobs(site, recs):
-    """Coverage maps for each build's recommended sensor count (and its cell-only twin) at every interference level."""
-    out = set()
-    for d in DRONE_KEYS:
-        for i in INTERFERENCE:
-            rec = recs.get(f"{site}|{d}|{i}", {})
-            for bk, r in rec.items():
-                b = BUILDS[bk]
-                out.add((site, d, b["design"], HEIGHT, i, r["n"], b["signals"]))
-    return sorted(out)
+def map_jobs(site, recs=None):
+    """Coverage maps for every build, drone, interference level and sensor count shown in the Sites tab."""
+    return sorted({(site, d, b["design"], HEIGHT, i, n, b["signals"]) for d in DRONE_KEYS for b in BUILDS.values()
+                   for i in INTERFERENCE for n in NODES[SITES[site]]})
 
 
 def _map_sig(args):
@@ -139,6 +134,20 @@ def run(sites):
     return doc
 
 
+def fill_maps(sites):
+    """Add the coverage maps an existing explore.json is missing (no new design points)."""
+    t0 = time.time()
+    doc = json.loads(OUT.read_text())
+    have = {tuple(m["k"]) + (m.get("signals", "cell"),) for m in doc["maps"]}
+    for s in sites:
+        todo = [j for j in map_jobs(s) if j not in have]
+        print(f"{s}: {len(todo)} maps to add", flush=True)
+        if todo:
+            doc["maps"] += _pool(_map_sig, todo, f"{s} maps")
+            save(doc, t0)
+    return doc
+
+
 def save(doc, t0):
     doc.update({
         "created": dt.datetime.now().isoformat(timespec="seconds"),
@@ -153,6 +162,8 @@ def save(doc, t0):
 
 
 def main():
+    if "--maps" in sys.argv:
+        return fill_maps([a for a in sys.argv[1:] if a in SITES] or list(SITES))
     if "--site" in sys.argv:
         return run([sys.argv[sys.argv.index("--site") + 1]])
     return run(list(SITES))

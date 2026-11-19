@@ -17,7 +17,7 @@ const GROUPS = [
     ['largeSub', 'Base or port of entry: per year', 50, 800, 25, k$, 'ASSUMPTION.'],
     ['kitPrice', 'Mobile kit for police: price', 100, 2000, 25, k$, 'Decision: $1.2M over 5 years with support, against ~$2.1M per Dedrone kit over 5 years (Cobb County, 2026).'],
     ['kitSub', 'Mobile kit: support per year', 0, 300, 5, k$, 'ASSUMPTION.'],
-    ['oemPrice', 'Sensor sold to an integrator', 4000, 30000, 500, usd, 'ASSUMPTION. Our cost is ~$1,600-1,800.'],
+    ['oemPrice', 'Sensor sold to an integrator', 4000, 30000, 500, usd, 'ASSUMPTION. Our cost is ~$3,047-3,531 per sensor.'],
     ['oemLicense', 'Integrator software, per sensor per year', 0, 10000, 250, usd, 'ASSUMPTION.'],
     ['gnssAddon', 'GPS jamming monitor, add-on per site per year', 0, 60000, 1000, usd, 'ASSUMPTION; simple detectors list at $1,242-2,539 (NavtechGPS).'],
     ['gnssNetPrice', 'GPS monitoring network for a base or airport, per year', 0, 300, 10, k$, 'ASSUMPTION. FAA held an industry day in Oct 2026 on buying this as a service.'],
@@ -43,7 +43,7 @@ const GROUPS = [
     ['tvShare', 'Sites that work with digital TV', 0, 100, 5, pct, 'Prototype v0.6: Hays, Fulton and Clemson yes; Hancock, far from its TV transmitters, no.'],
     ['q40', '40 dB interference removal works', 4, T, 1, when, 'Cell towers only: until then (or until TV signals work) a third of sites work (one of three simulated sites); stadiums need one of the two.'],
     ['workable', 'Sites that work before 40 dB', 0, 100, 5, pct, 'Prototype: Hays works at 20 dB, Hancock and Fulton do not.'],
-    ['ownQ', 'Our own receiver ships', 4, T, 1, when, 'Sensor $1,601 instead of $1,825 and 4 per site instead of 6 (prototype). Design $400k.'],
+    ['ownQ', 'Our own receiver ships', 4, T, 1, when, 'Sensor $3,047 instead of $3,531 and 6 per site instead of 6 (platform prototype v1.0). Design $600k.'],
     ['gnssFrom', 'GPS monitoring on sale', 4, T, 1, when, 'Needs a holdover clock per site (~$1,000, ASSUMPTION) and $300k of development.'],
     ['hwCost', 'Sensor hardware cost', 50, 200, 5, pct, '% of the prototype parts list.'],
   ] },
@@ -101,7 +101,7 @@ function buildInputs() {
     ['GPS jamming and spoofing monitoring', 'The same receivers find the jammer and record evidence for the FCC, FAA or police.', usd(a.gnssAddon) + ' a year per site; $' + a.gnssNetPrice + 'k a year per network'],
   ].map((l) => '<div><b>' + l[0] + '</b><span>' + l[1] + '</span><code>' + l[2] + '</code></div>').join('');
   $('srcList').innerHTML = [
-    'Costs per sensor, installation and upkeep: Tripwire digital twin v0.5.1 (Tripwire_Assumptions_and_Figures.md, sections 2-5 and 8).',
+    'Costs per sensor and sensors per product: Tripwire platform prototype v1.0 (parts list twin/platform_bom.py, sensor counts twin/explore_v1.py); installation and upkeep rates: digital twin v0.5.1.',
     'Pay: BLS OEWS May 2025, Atlanta means (electronics engineers $146,380, software developers $135,870, sales engineers $109,310) x 1.46 (BLS ECEC Jun 2026: benefits 31.7% of compensation in professional services). Founders $120k (decision, below market).',
     'FEMA C-UAS grant FY2027 NOFO: $250M to 56 state agencies, spent Dec 2026 - Dec 2029; passive radar named; tracks shared with DHS.',
     'Military demand: 350 drone detections over 100 installations in 2024 (NORTHCOM, Senate testimony, Feb 2025). Domestic Shield counter-UAS contracts: $4.15B ceilings, about $50M ordered (Sep 2026).',

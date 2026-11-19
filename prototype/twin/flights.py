@@ -95,8 +95,9 @@ def hover_hold(scene, pos, vel, dt, node_of, draws, rng, extra_loss_db=None):
     return out
 
 
-def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = DRAWS, seed: int = 0,
-                 extra_loss_db: float | None = None, radii=None) -> dict:
+def simulate_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = DRAWS, seed: int = 0,
+                    extra_loss_db: float | None = None) -> dict:
+    """Frame by frame: drone state, detections per pair, located and tracked frames (draws x frames)."""
     p, site = scene.params, scene.site
     dt = dt or p.frame_dt_s
     drone = next(t for t in scene.targets if t.kind == "drone")
@@ -138,6 +139,15 @@ def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = 
         held = np.where(alive & ~start, held + 1, np.where(alive, held, 0))
         misses = np.where(alive, misses, 0)
         tracked[:, k] = alive & (held >= SUSTAIN)
+    return {"ts": ts, "pos": pos, "vel": vel, "hits": hits, "node_of": node_of, "located": located, "tracked": tracked,
+            "mic": mic, "hold": hold}
+
+
+def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = DRAWS, seed: int = 0,
+                 extra_loss_db: float | None = None, radii=None) -> dict:
+    p, site = scene.params, scene.site
+    f = simulate_flight(scene, traj, dt, draws, seed, extra_loss_db)
+    ts, pos, vel, tracked = f["ts"], f["pos"], f["vel"], f["tracked"]
     zone = np.asarray(site.in_zone(pos[:, 0], pos[:, 1], p.zone_buffer_m))
     hover = np.linalg.norm(vel[:, :2], axis=1) < 0.1
     lpos = np.array([l.pos for l in scene.listeners])

@@ -12,6 +12,7 @@
     <nav class="tabbar" role="tablist">
       <button role="tab" data-tab="platform" class="on">Platform</button>
       <button role="tab" data-tab="sites">Sites</button>
+      <button role="tab" data-tab="sim">Flight simulator</button>
       <button role="tab" data-tab="sensor">Sensor &amp; parts</button>
       <button role="tab" data-tab="products">Products &amp; cost</button>
       <button role="tab" data-tab="gnss">GPS monitoring</button>
@@ -27,8 +28,9 @@
     <div class="kpis" id="pfKpis"></div>
     <div class="sec">
       <h2>Seven sites, three kinds of deployment</h2>
-      <p class="note">The fewest sensors that meet the default requirements (90% of the zone covered, a track 80% of the time, 25 m accuracy, the typical drone tracked 300 m before the fence) for a <b>0.9 kg drone</b> at today's 20 dB of interference removal. "Cell only" is what the platform sensor does if digital TV does not work out.</p>
+      <p class="note">The fewest sensors that meet the default requirements (90% of the zone covered, a track 80% of the time, 25 m accuracy, the typical drone tracked 300 m before the fence), and how much interference removal that takes: 20 dB is what processing achieves today (ASSUMPTION), 30 and 40 dB are what better processing would add (not yet shown).</p>
       <div class="scrollx"><table class="cmp" id="pfSites"></table></div>
+      <p class="note small"><b>Cell towers alone.</b> The cell-tower physics are the same as in the v0.5 twin, and the 5 kg results match it (Hays 4 sensors today, Fulton and Clemson at 30 dB, Hancock at 40 dB). v0.5 led with the 5 kg drone; this page also shows the 0.9 kg drone, which the twin gives a tenth of the echo (0.01 m&sup2; against 0.1 m&sup2;, ASSUMPTIONS). Cell towers alone still find it at Hays today and at Fulton and Clemson with 40 dB of interference removal. The flightline (48 ha, four times Hays) and the port (28 ha) are too large for 24 cell-only sensors with the smaller drone. Digital TV adds stronger transmitters with wider coverage, which is why fewer sensors meet the requirements with it; that TV performance is an estimate until it is measured at Seed.</p>
     </div>
     <div class="sec two">
       <div><h2>What changed from the cell-tower prototype</h2><ul class="list" id="pfChanged"></ul></div>
@@ -52,6 +54,27 @@
         <div class="sec"><h2 id="stHead"></h2><p class="note" id="stFacts"></p><div class="checks" id="stChecks"></div></div>
         <div class="sec"><h2>What it costs</h2><div class="cards" id="stCost"></div><p class="note small" id="stCostNote"></p></div>
         <div class="sec"><h2>Signals used</h2><p class="note small" id="stSignals"></p></div>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="tab" id="tab-sim"><div class="page">
+    <div class="ctlbar">
+      <div class="seg" id="smSite"></div>
+      <div class="seg" id="smDrone"></div>
+      <div class="seg" id="smSig"></div>
+      <div class="seg" id="smInterf"></div>
+      <div class="seg" id="smFlight"></div>
+    </div>
+    <div class="grid2">
+      <div class="sec"><h2 id="smTitle">Flight</h2><canvas id="smMap" width="620" height="620"></canvas>
+        <div class="player"><button id="smPlay">Play</button><div class="seg" id="smSpeed"></div><input type="range" id="smTime" min="0" max="100" value="0"><span id="smClock" class="mono">0 s</span></div>
+        <div class="legend"><span><i class="ln cl"></i>sensor hears the drone in a cell-tower echo</span><span><i class="ln tvl"></i>in a TV echo</span><span><i class="dot dr"></i>drone (true position)</span><span><i class="dot tk"></i>Tripwire track</span><span><i class="dot lc"></i>located, track not confirmed yet</span><span><i class="tri"></i>cell tower (outline: beyond the view)</span><span><i class="dot tvd"></i>TV station direction</span><span><i class="sw s2"></i>coverage map behind</span></div>
+      </div>
+      <div>
+        <div class="sec"><h2>Now</h2><div class="cards" id="smNow"></div></div>
+        <div class="sec"><h2>What happens on this flight</h2><ol class="timeline" id="smEvents"></ol></div>
+        <div class="sec"><h2>This flight in numbers</h2><div class="cards" id="smSum"></div><p class="note small" id="smNote"></p></div>
       </div>
     </div>
   </div></section>

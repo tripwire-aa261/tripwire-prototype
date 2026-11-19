@@ -52,6 +52,8 @@ def main():
                     "  // sensors per product from twin/explore_v1.py, 0.9 kg drone at 20 dB; tools/model_from_platform.py writes these)")
     js = re.sub(r"kitCaseCost: ([0-9.]+),( +)// .*", r"kitCaseCost: \1,\2// field kit per sensor (case, mast, battery, radio link) + rugged laptop, LTE router, camera battery (platform_bom.py)", js)
     js = re.sub(r"oscCost: 0,( +)// .*", r"oscCost: 0,\1// holdover oscillator now in every platform sensor (OCXO on the board)", js)
+    js = re.sub(r"(largeCams: 2,)( *)// .*", r"\1\2// sensors: twin, larger of Robins AFB flightline (48 ha, ~4x Hays) and Pharr-Reynosa port, cell + TV", js)
+    js = re.sub(r"(nre: [0-9]+, nreQ: 6,)( *)// .*", r"\1\2// three-bank board design and certification (ASSUMPTION, platform_bom.py), 6 quarters before it ships", js)
     p.write_text(js, encoding="utf-8")
     u = SRC / "ui2.js"
     ui = u.read_text(encoding="utf-8")

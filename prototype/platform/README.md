@@ -7,8 +7,11 @@ stays as submitted with Draft Report 5; its 3D signal replays are cell-only and 
 Open locally: from `prototype/`, `python -m http.server 8000` and go to http://localhost:8000/platform/.
 
 ## Tabs
-- **Platform**: the seven sites and how many platform sensors each needs, with cell towers only and with cell + TV.
+- **Platform**: the seven sites; with cell towers only, the interference removal and sensors each needs for the 5 kg and
+  the 0.9 kg drone; with cell + TV, the sensors for the 0.9 kg drone today.
 - **Sites**: coverage map, requirement checks and cost for any site, drone, interference level, build and sensor count.
+- **Flight simulator**: three contraband flights per site played frame by frame: which sensors hear the drone in cell or
+  TV echoes, located frames, the track, alerts, warning distance and time. Any site, drone, signals, 20 or 40 dB.
 - **Sensor & parts**: the 16-channel, three-bank board and the whole sensor, every line cited or labeled ASSUMPTION;
   the Seed sensor from off-the-shelf radios.
 - **Products & cost**: site, site with heat camera, large perimeter, mobile kit, sensor for integrators, GPS monitoring:
@@ -19,7 +22,11 @@ Open locally: from `prototype/`, `python -m http.server 8000` and go to http://l
 ## Data (rebuild in this order, from `prototype/`)
 1. `python -m twin.platform_bom` writes `data/bom.json` (parts lists, product costs).
 2. `python -m twin.explore_v1` writes `data/explore.json` (~1-2 h on 4 cores; `--site <key>` for one site).
+   `python -m twin.explore_v1 --maps` adds any missing coverage maps (one per build, drone, level and sensor count, ~1 h).
 3. `python -m tools.platform_v1` writes `data/products.json`, `data/gnss.json`, `data/timeline.json`.
+4. `python -m tools.flight_demo_v1` writes `data/flights.json` (~5 min): `twin/flights.simulate_flight`, the same
+   frame-by-frame detection and tracker emulation the scored flights use, one random draw per flight.
+5. `python -m tools.model_from_platform` feeds the sensor costs and counts into financial model v2 and rebuilds it.
 
 New sites (Nov 18): `tools/fetch_site.py` for the outline, buildings and terrain (now with an OSM API fallback when
 Overpass is busy, and `--grow-m` for a port of entry where OSM maps only the building), then `tools/fetch_towers.py`
