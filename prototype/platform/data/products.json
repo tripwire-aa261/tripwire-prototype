@@ -119,7 +119,7 @@
    "key": "kit",
    "name": "Mobile kit",
    "who": "Police and event security",
-   "what": "Six sensors on tripods with batteries and radio links, a heat camera and a rugged laptop: set up for an event or an operation in about an hour.",
+   "what": "Eight sensors on tripods with batteries and radio links, a heat camera and a rugged laptop: set up for an event or an operation in about an hour.",
    "sensors": 8,
    "cost": {
     "upfront": 71433.92,

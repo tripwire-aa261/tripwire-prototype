@@ -182,7 +182,7 @@ function renderProducts() {
 function renderGnss() {
   const sites = Object.keys(G.sites);
   seg($('gnSite'), 'Site', sites.map((k) => [k, G.sites[k].short]), () => st.gSite, (v) => (st.gSite = v));
-  seg($('gnClock'), 'Clock while jammed', [['ocxo', 'Oven crystal (standard)'], ['csac', 'Atomic clock (premium)']], () => st.gClock, (v) => (st.gClock = v));
+  seg($('gnClock'), 'Locator set-up', [['ocxo', 'Today: oven crystal'], ['sync', 'Clocks synced to TV and cell'], ['sync_cal', '+ bearings calibrated to 1°'], ['csac', 'Atomic clock (premium)']].filter((o) => G.sites[st.gSite].maps[o[0]]), () => st.gClock, (v) => (st.gClock = v));
   const g = G.sites[st.gSite], m = g.maps[st.gClock], cv = $('gnMap'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
   ctx.clearRect(0, 0, W, H);
   const n = m.n, cell = W / n, span = m.step_m * n;
@@ -199,7 +199,11 @@ function renderGnss() {
       const a = cs.find((c) => c.where === w && c.power_dbm === p && c.mode === 'tdoa'), b = cs.find((c) => c.where === w && c.power_dbm === p && c.mode === 'tdoa+aoa');
       return `<tr><td class="l">${esc(w)}</td><td>${p === 10 ? '10 mW (car jammer)' : '1 W'}</td><td>${a?.detected ?? '–'}</td><td>${f(a)}</td><td><b>${f(b)}</b></td></tr>`;
     })).join('') + '</tbody>';
-  $('gnNote').innerHTML = `${g.sensors.length} platform sensors at ${esc(g.name)}. ${esc(G.assumptions)}`;
+  const SETUP_NOTE = { ocxo: 'Each sensor holds time on its oven crystal while GPS is jammed (about 50 ns of drift) and places a jammer only when it raises the noise by 10 dB.',
+    sync: 'Software upgrade, no new parts: the sensors keep their clocks in step using the TV and cell signals they already receive (an L1 jammer does not touch them), and cross-correlate their GPS recordings, so a jammer 10 dB below the noise can still be placed.',
+    sync_cal: 'As synced, plus each 4-element GPS array calibrated against known transmitters to 1 degree (the DTU trial reached 0.5-1 degree).',
+    csac: 'Premium hardware: a chip-scale atomic clock in each sensor (about 5 ns while jammed), with the current processing.' };
+  $('gnNote').innerHTML = `<b>${esc(SETUP_NOTE[st.gClock] || '')}</b> ${g.sensors.length} platform sensors at ${esc(g.name)}. ${esc(G.assumptions)}`;
 }
 
 // ---------------------------------------------------------------- Timeline
