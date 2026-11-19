@@ -82,3 +82,4 @@ Last updated 2026-11-13 by Sid. History is in `context/SESSION_LOG.md`.
 - SAFER SKIES: can prison staff operate a contractor's system, and must our sensor be on the federal authorized list?
 - Georgia HB 1230 (2026, felony to fly over a prison): signing seen only in news summaries; confirm.
 - Robin IRIS $396k price seen only in a search result; confirm.
+  - 2026-11-19: financial model v2 now uses the platform app's large-site and kit costs (camera mounts, camera upkeep, one backhaul fee per large site); worst scenario needs $13.0M.

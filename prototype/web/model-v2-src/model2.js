@@ -16,6 +16,7 @@ const FIXED = {
   largeSensorsBlade: 8, largeSensorsCustom: 8, largeCams: 2, // sensors: twin, larger of Robins AFB flightline (48 ha, ~4x Hays) and Pharr-Reynosa port, cell + TV
   kitSensors: 8, kitCaseCost: 14920,                         // field kit per sensor (case, mast, battery, radio link) + rugged laptop, LTE router, camera battery (platform_bom.py)
   camCost: 32138,                                            // Axis Q8752-E Mk II bispectral PTZ, dealer price (research note)
+  camMount: 1500, camUpkeep: 0.05,                           // ASSUMPTIONS as platform_bom.py: mount and cabling per pole camera; upkeep a year as a share of camera price
   oscCost: 0,                                             // holdover oscillator now in every platform sensor (OCXO on the board)
   oemPack: 500,                                              // ASSUMPTION: packaging and test per sensor sold to integrators
   nre: 600000, nreQ: 6,                                      // three-bank board design and certification (ASSUMPTION, platform_bom.py), 6 quarters before it ships
@@ -72,7 +73,7 @@ const DEFAULTS = {
   sbir1: 50, sbir2: 50, diu: 40,
   faa: 0,                                      // FAA national GPS monitoring program, $M a year (scenario)
   // funding $M
-  r0: 0.25, r1: 5, r2: 12,   // Series A sized to need: covers the worst scenario (prices 30% lower, ~$12.7M needed with the platform sensor costs) with ~$4.5M to spare (decision 2026-11-18)
+  r0: 0.25, r1: 5, r2: 12,   // Series A sized to need: covers the worst scenario (prices 30% lower, ~$13.0M needed with the platform sensor and camera costs) with ~$4.3M to spare (decision 2026-11-18)
 };
 // how added salespeople are split across customer types (ASSUMPTION)
 const MIX = { doc: 0.25, jail: 0.15, kit: 0.2, dod: 0.25, cbp: 0.05, stad: 0.1 };
@@ -165,17 +166,17 @@ function runModel(a) {
         sitesActive[t] += act; sitesNew[t] += n;
         // heat-camera option
         const cn = n * a.camAttach / 100, ca = act * a.camAttach / 100;
-        rev.cam[t] += cn * a.camPrice + ca * a.camSub / 4; cHw[t] += cn * F.camCost * hw;
+        rev.cam[t] += cn * a.camPrice + ca * a.camSub / 4; cHw[t] += cn * F.camCost * hw; cInst[t] += cn * F.camMount; cRun[t] += ca * F.camUpkeep * F.camCost * hw / 4;
       } else if (kind === 'large') {
         rev.large[t] += n * a.largePrice * 1e3 + act * a.largeSub * 1e3 / 4;
         const ns = sensorsAt(t, 'large');
-        cHw[t] += n * (ns * sensorCost(t) + F.hubCost + F.largeCams * F.camCost * hw); cInst[t] += n * (ns * F.installPerSensor + 4 * F.setupPerSite);
-        cRun[t] += act * (ns * runPer(t) + 4 * F.runPerSite) / 4;
+        cHw[t] += n * (ns * sensorCost(t) + F.hubCost + F.largeCams * F.camCost * hw); cInst[t] += n * (ns * F.installPerSensor + 4 * F.setupPerSite + F.largeCams * F.camMount);
+        cRun[t] += act * (ns * runPer(t) + F.runPerSite + F.largeCams * F.camUpkeep * F.camCost * hw) / 4;   // one hub, one backhaul and cloud fee (platform_bom.py)
         largeActive[t] += act; sitesActive[t] += 4 * act; sitesNew[t] += 4 * n;
       } else {
         rev.kit[t] += n * a.kitPrice * 1e3 + act * a.kitSub * 1e3 / 4;
         cHw[t] += n * (F.kitSensors * sensorCost(t) + F.camCost * hw + F.kitCaseCost);
-        cRun[t] += act * (F.kitSensors * runPer(t) + F.runPerSite) / 4;
+        cRun[t] += act * (F.kitSensors * runPer(t) + F.runPerSite + F.camUpkeep * F.camCost * hw) / 4;
         kitsActive[t] += act;
       }
     });
