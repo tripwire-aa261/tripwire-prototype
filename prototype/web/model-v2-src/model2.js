@@ -7,17 +7,18 @@ const qLabel = (t) => (START_YEAR + Math.floor(t / 4)) + ' Q' + (t % 4 + 1);
 const yr = (y) => (y - START_YEAR) * 4;            // first quarter of a year
 
 const FIXED = {
-  // sensor and site costs: prototype figures (sections 2-5, 8)
-  bladeCost: 1825.22, customCost: 1601, hubCost: 500,
+  // sensor and site costs: platform prototype v1.0 (twin/platform_bom.py: Seed sensor = bladeCost, own 3-bank board = customCost;
+  // sensors per product from twin/explore_v1.py, 0.9 kg drone at 20 dB; tools/model_from_platform.py writes these)
+  bladeCost: 3531.43, customCost: 3046.94, hubCost: 500,
   installPerSensor: 510, setupPerSite: 2500,
-  runPerSensor: 271.33, runPerSensorCustom: 260.1, runPerSite: 1200,
-  siteSensorsBlade: 6, siteSensorsCustom: 4,                 // Hays-size prison or jail
-  largeSensorsBlade: 24, largeSensorsCustom: 16, largeCams: 2, // ASSUMPTION: a base sector or port of entry is ~4x Hays
-  kitSensors: 6, kitCaseCost: 10000,                         // ASSUMPTION: rugged cases, tripods, laptop
+  runPerSensor: 356.57, runPerSensorCustom: 332.35, runPerSite: 1200,
+  siteSensorsBlade: 6, siteSensorsCustom: 6,                 // Hays-size prison or jail
+  largeSensorsBlade: 8, largeSensorsCustom: 8, largeCams: 2, // sensors: twin, larger of Robins AFB flightline (48 ha, ~4x Hays) and Pharr-Reynosa port, cell + TV
+  kitSensors: 8, kitCaseCost: 14920,                         // field kit per sensor (case, mast, battery, radio link) + rugged laptop, LTE router, camera battery (platform_bom.py)
   camCost: 32138,                                            // Axis Q8752-E Mk II bispectral PTZ, dealer price (research note)
-  oscCost: 1000,                                             // ASSUMPTION: holdover oscillator per site for GPS monitoring
+  oscCost: 0,                                             // holdover oscillator now in every platform sensor (OCXO on the board)
   oemPack: 500,                                              // ASSUMPTION: packaging and test per sensor sold to integrators
-  nre: 400000, nreQ: 6,                                      // own receiver design (prototype section 7), 6 quarters before it ships
+  nre: 600000, nreQ: 6,                                      // three-bank board design and certification (ASSUMPTION, platform_bom.py), 6 quarters before it ships
   gnssDev: 300000, gnssDevQ: 4,                              // ASSUMPTION: GPS monitoring product development
   termQ: 20,                                                 // 5-year contracts (Big Idea Memo)
   // people: BLS OEWS May 2025 Atlanta means x 1.46 (BLS ECEC Jun 2026, benefits 31.7% of compensation)
