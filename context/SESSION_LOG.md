@@ -454,3 +454,10 @@ Two Claude sessions worked in parallel and coordinated by message; this entry co
 - Energy-sites assumption reworded more clearly (Draft 5 and model): says plainly that counting refineries and nuclear plants but not data centers is not fully consistent.\n
 - Product Prototype tab: an "All our links (no login needed)" box under the title (live prototype, financial model, repo, figures file, business plan). Added in Google Docs only; `build_prototype_tab.py` does not have it yet. Model snapshot PDF regenerated for Canvas.\n
 - Model page: removed the last course references and the "1 in 3" format; the exit label now says year 8 for 2034 Q4, matching Draft 5.\n
+
+
+## 2026-11-18 · Sid · Hard pivot started (branch pivot-v1)
+
+- Instructors: not venture scale; aim for a $10-30M raise and $100-200M within ~5 years. Model both readings (exit value and sales a year).
+- Decisions recorded in `context/PIVOT_PLAN.md`: passive sensing platform (drones, more signal sources, heat-camera cueing, GPS jamming/spoofing monitoring), service plus sensor sales, beyond-interception products, government first (FEMA-funded states, then DHS border and DIU), prisons and stadiums as proof sites, Ashlynn leads government and defense, Draft Report 6 in the same sections.
+- VC feedback on the data package recorded there too, to answer in Draft 6.

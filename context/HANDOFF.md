@@ -4,6 +4,8 @@ Last updated 2026-11-13 by Sid. History is in `context/SESSION_LOG.md`.
 
 ## Current state
 
+- **Branch `pivot-v1` (started 2026-11-18): hard pivot to a passive sensing platform for government buyers.** Plan, decisions and the VC feedback to answer are in `context/PIVOT_PLAN.md`. On this branch the facts below describe the old plan until each milestone replaces them; `main` keeps the submitted Draft 5 versions.
+
 - **Digital twin v0.5.1** in `prototype/` (start with `prototype/README.md`): `.venv/bin/python serve.py`, then http://localhost:8000. Deployed on Vercel: https://tripwire-cyan.vercel.app (teammate, Nov 2026; config in `prototype/vercel.json` + `.vercelignore`, which leaves out `web/runs/*.bin`). The financial model page is not part of that deploy (404); it is public on GitHub Pages at https://tripwire-aa261.github.io/tripwire-prototype/prototype/web/financial-model.html (enabled 2026-11-13; `.nojekyll` at repo root), and every financial-model link in Draft 5 and the Product Prototype tab points there (the Claude artifact could not be shared outside the team).
   - Tabs: **Overview** (customer requirements incl. detection range; recommended radio + sensor count, coverage map, cost and price, today / 30 / 40 dB table, competitor comparison), **Trade space simulator**, **3D signal simulation** (16 replays, track-error chart, Bird checkbox), **Financials explorer** (renamed from Financials on 2026-11-12).
   - Sites: Hancock (sparse towers), Hays (moderate towers, default), Fulton County Jail (dense towers), Clemson Memorial Stadium (stadium).
