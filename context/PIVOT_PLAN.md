@@ -42,7 +42,7 @@ Course instructors (Nov 2026): the current plan is not venture scale. It raises 
 1. **Done 2026-11-18.** Research brief (`context/research/`): buyers, contract sizes and timelines; GNSS monitoring market and prices; sensing ranges and heat cameras; answers to the VC questions.
 2. **Built 2026-11-18, for Sid's review.** Financial model v2 (`prototype/web/financial-model-v2.html`, sources in `prototype/web/model-v2-src/`; design in `context/PIVOT_MODEL_DESIGN.md`): by customer type and contract; service and sensor-sales lines; GNSS product; raise and 5-year targets (both readings); 20 dB case.
 3. **Built 2026-11-18.** Prototype v0.6 (`prototype/V06_PLATFORM.md`; viewer tab Platform (v0.6)): new signal sources, GPS-jammer locator, heat-camera cueing, contraband-drop walkthrough, 0.9 kg results.
-4. Draft Report 6 (Claude doc, then Google tab), product prototype tab v2.
+4. **Draft Report 6 written 2026-11-18** as a Claude doc: https://claude.ai/artifact/1aNLoRiRcMLUh1odDKcmc6 (10 sections incl. answers to the VC review, 2 charts). Still to do: copy into a new Google Doc tab "Draft Report 6"; Product Prototype tab v2; links to `financial-model-v2.html` and the v0.6 viewer only work once `pivot-v1` is merged to main (GitHub Pages and Vercel serve main).
 
 ## Target (Sid, 2026-11-18)
 
@@ -70,3 +70,7 @@ Changes after Sid's review: 16 salespeople hired a year after Series A; two sell
 ## Model v2 after prototype v0.6 (2026-11-18)
 
 TV signals (from 2029 Q1, ASSUMPTION) now also open prisons, jails and stadiums that cell towers cannot cover, matching the v0.6 finding. Plan: $116.8M of sales in 2031, $100M a year from 2031 Q3; peak need $7.8M; a 2031 sale $585M-$1.11B; Seed 20.9x / 39.7x. Stuck at 20 dB (no TV, no 40 dB) unchanged at $106.2M in 2031. Selling capacity, not technology, limits the five-year plan.
+
+## Model v2 final plan settings (2026-11-18, used in Draft 6)
+
+18 salespeople a year after Series A, hired evenly through the year; TV opens 75% of sites from 2029 Q1. Raise $17.25M; peak need $5.8M (2029 Q2); lowest cash after Seed $3.9M (2028 Q3); pays its own way 2030 Q3. Sales $2.4M (2028), $19.4M (2029), $47.1M (2030), **$105.3M (2031)**, $170.1M (2032); $100M a year from 2031 Q4. 276 people at the end of 2031. A sale at the end of 2031: $524M (4.5x) to $998M (9x); Seed 18.8x / 35.7x; founders keep 62%. Scenarios (2031 sales): stuck at 20 dB $100.8M; no integrator sales $96.0M; government slow $66.4M; prices 30% lower $68.9M (needs $9.3M); no contract vehicles or references $69.2M; FAA program $115.3M.
