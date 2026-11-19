@@ -463,3 +463,4 @@ Two Claude sessions worked in parallel and coordinated by message; this entry co
 - VC feedback on the data package recorded there too, to answer in Draft 6.
 - Research milestone done: `context/research/` (government buyers, GNSS monitoring, sensing and VC answers). Proposed model v2 design in `context/PIVOT_MODEL_DESIGN.md`, waiting for Sid's review.\n
 - Financial model v2 built (`prototype/web/financial-model-v2.html`): six customer types, five revenue lines plus SBIR/DIU, hiring by plan and bookings, renewals at term end, BLS pay. Results recorded in `context/PIVOT_PLAN.md`; waiting for Sid's review.
+- Model v2 revised to Sid's target ($100M of sales a year by year 5): 16 salespeople a year, contract vehicles and references from 2029, large sites $1M + $0.4M/yr, kits $600k + $120k/yr, Series A $12M. $114M in 2031; results and caveats in `context/PIVOT_PLAN.md`.

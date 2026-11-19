@@ -13,9 +13,9 @@ const GROUPS = [
     ['sitePrice', 'Prison or jail site: installation', 0, 60000, 2500, usd, 'Per Hays-size site. Unchanged from Draft 5.'],
     ['siteSub', 'Prison or jail site: per year', 0, 60000, 2500, usd, 'Software, 24/7 alerts, evidence records, upkeep.'],
     ['camAttach', 'Sites that add a heat camera', 0, 100, 5, pct, 'Option: $40k + $5k a year. Camera costs us $32,138 (Axis bispectral PTZ, dealer price).'],
-    ['largePrice', 'Base or port of entry: installation', 100, 2000, 50, k$, 'ASSUMPTION, about 4x a prison perimeter; CBP pays ~$6M per port site.'],
+    ['largePrice', 'Base or port of entry: installation', 100, 3000, 50, k$, 'Decision: $3M over 5 years with upkeep, against ~$6M per CBP port-of-entry site (CBP FY2027 budget). About 4x a prison perimeter.'],
     ['largeSub', 'Base or port of entry: per year', 50, 800, 25, k$, 'ASSUMPTION.'],
-    ['kitPrice', 'Mobile kit for police: price', 100, 1500, 25, k$, 'ASSUMPTION. Cobb County paid ~$2.1M per Dedrone kit over 5 years.'],
+    ['kitPrice', 'Mobile kit for police: price', 100, 2000, 25, k$, 'Decision: $1.2M over 5 years with support, against ~$2.1M per Dedrone kit over 5 years (Cobb County, 2026).'],
     ['kitSub', 'Mobile kit: support per year', 0, 300, 5, k$, 'ASSUMPTION.'],
     ['oemPrice', 'Sensor sold to an integrator', 4000, 30000, 500, usd, 'ASSUMPTION. Our cost is ~$1,600-1,800.'],
     ['oemLicense', 'Integrator software, per sensor per year', 0, 10000, 250, usd, 'ASSUMPTION.'],
@@ -23,7 +23,9 @@ const GROUPS = [
     ['gnssNetPrice', 'GPS monitoring network for a base or airport, per year', 0, 300, 10, k$, 'ASSUMPTION. FAA held an industry day in Oct 2026 on buying this as a service.'],
   ] },
   { title: 'Selling', plain: 'how fast customers sign', fields: [
-    ['repsAddA', 'Salespeople hired per year after Series A', 0, 20, 1, int, 'Plus one for every $3M of new contract value a year. Each gets half a sales engineer.'],
+    ['repsAddA', 'Salespeople hired per year after Series A', 0, 24, 1, int, 'Plus one for every $3M of new contract value a year. Each gets half a sales engineer.'],
+    ['contractQ', 'Buying off existing contracts, from', 4, T, 1, when, 'A GSA Schedule listing and cooperative contracts (OMNIA, Sourcewell, NASPO) let agencies buy without their own tender: one quarter saved on every sale (ASSUMPTION; ~$60k a year to hold). Georgia bought RF detection this way (GPS Press).'],
+    ['refGain', 'More wins once Hays and Clemson are references', 0, 100, 5, pct, 'From 2029 (ASSUMPTION).'],
     ['winsDoc', 'State corrections departments won per seller a year', 0, 3, 0.25, (v) => v, 'A department buys for ~23 prisons, installing 4 a quarter (ASSUMPTION).'],
     ['winsJail', 'Large jails won per seller a year', 0, 8, 0.5, (v) => v, 'ASSUMPTION.'],
     ['winsKit', 'Police departments won per seller a year', 0, 10, 0.5, (v) => v, 'FEMA grant money is spent Dec 2026 - Dec 2029 (FY2027 NOFO).'],
@@ -50,7 +52,7 @@ const GROUPS = [
     ['diu', 'Chance of a DIU prototype award (~$3.8M)', 0, 100, 10, pct, 'Average DIU prototype agreement, FY2016-23 (GAO-25-106856).'],
     ['faa', 'FAA national GPS monitoring program, $M a year', 0, 30, 1, (v) => '$' + v + 'M', 'Scenario only, not in the plan (FAA industry day Oct 2026).'],
     ['r1', 'Seed round', 0, 15, 0.5, (v) => '$' + v + 'M', '2027 Q3.'],
-    ['r2', 'Series A', 0, 40, 1, (v) => '$' + v + 'M', '2028 Q4.'],
+    ['r2', 'Series A', 0, 40, 1, (v) => '$' + v + 'M', '2028 Q4. Sized to the worst scenario (prices 30% lower) plus a buffer.'],
   ] },
 ].map((g) => ({ ...g, fields: g.fields.map((f) => ({ key: f[0], label: f[1], min: f[2], max: f[3], step: f[4], fmt: f[5], hint: f[6] })) }));
 
@@ -59,8 +61,9 @@ const SCENARIOS = [
   ['Stuck at 20 dB', 'Interference removal never improves and TV signals never work: only a third of sites can be protected, and no stadiums.', { q40: 99, tvQ: 99 }],
   ['Government slow', 'Bases and the border buy half as fast, and police buy only a quarter as much once the FEMA money ends.', { winsDod: 1, winsCbp: 0.25, afterGrant: 25 }],
   ['No integrator sales', 'No company buys our sensors for its own contracts.', { oemUnits: 0 }],
-  ['Prices 30% lower', 'Competitors force every price down by 30%.', { sitePrice: 17500, siteSub: 17500, largePrice: 350, largeSub: 175, kitPrice: 245, kitSub: 52, oemPrice: 8400, oemLicense: 2100 }],
-  ['Hire faster', '14 salespeople a year after Series A instead of 10.', { repsAddA: 14 }],
+  ['Prices 30% lower', 'Competitors force every price down by 30%.', { sitePrice: 17500, siteSub: 17500, largePrice: 700, largeSub: 280, kitPrice: 420, kitSub: 84, oemPrice: 8400, oemLicense: 2100 }],
+  ['Hire faster', '20 salespeople a year after Series A instead of 16.', { repsAddA: 20 }],
+  ['No faster selling', 'No contract vehicles and no reference effect: every sale takes its full cycle.', { contractQ: 99, refGain: 0 }],
   ['FAA GPS program', 'We win a national FAA interference-monitoring service worth $10M a year from 2030.', { faa: 10 }],
 ];
 const state = { a: { ...DEFAULTS }, preset: 'Plan' };
@@ -109,10 +112,11 @@ function buildInputs() {
   $('asmList').innerHTML = [
     'Every price except the prison site, and every win rate, is our estimate (sliders on the left).',
     'Sales cycles: corrections 12 months, jails 9, police 6, bases 18, border 24 months.',
-    'Salespeople: the founders and Ashlynn sell first; after Series A we hire 10 a year plus one per $3M of new contract value, split 25% corrections, 15% jails, 20% police, 25% bases, 5% border, 10% stadiums. A new seller takes 2 quarters to ramp.',
+    'Salespeople: the founders and Ashlynn sell first; after Series A we hire 16 a year plus one per $3M of new contract value, split 25% corrections, 15% jails, 20% police, 25% bases, 5% border, 10% stadiums. A new seller takes 2 quarters to ramp.',
     'Engineers: 10 after Series A plus one per $2.5M of yearly sales; field staff one per 40 sites; admin one per 8 staff.',
     'Compliance from 2029: $150k a year for ITAR registration, CMMC / NIST 800-171 and facility clearance work.',
     'Contracts run 5 years; 90% of sites renew at the end of each term.',
+    'From 2029: contract vehicles save one quarter on every sale, and pilot references add 25% more wins per salesperson.',
   ].map((s) => '<li>' + s + '</li>').join('');
   $('notList').innerHTML = [
     'Taking down drones: detection only, no jamming or takeover.',
@@ -133,10 +137,10 @@ function renderTargets(m) {
   const r45 = investorReturns(m, state.a, Y5, 4.5), r9 = investorReturns(m, state.a, Y5, 9);
   const pill = (ok, txt) => '<span class="pill ' + (ok ? 'good' : 'crit') + '">' + (ok ? '✓' : '✕') + ' ' + txt + '</span>';
   const exitOk = r45.price >= 100e6;
-  $('tgtExit').innerHTML = '<h3>Reading 1: the company is worth $100-200M within 5 years</h3><span class="big">' + money(r45.price) + ' to ' + money(r9.price) + '</span>' +
-    '<p class="small muted">A sale at the end of 2031 at 4.5x to 9x the last four quarters of sales (' + money(m.ttm[Y5]) + '), plus cash in the bank.</p>' + pill(exitOk, exitOk ? 'met' : 'not met');
+  $('tgtExit').innerHTML = '<h3>What a sale would be worth at the end of year 5</h3><span class="big">' + money(r45.price) + ' to ' + money(r9.price) + '</span>' +
+    '<p class="small muted">A sale at the end of 2031 at 4.5x to 9x the last four quarters of sales (' + money(m.ttm[Y5]) + '), plus cash in the bank.</p>' + pill(exitOk, exitOk ? 'above $100M' : 'below $100M');
   const y5 = m.ttm[Y5], ok2 = y5 >= 100e6;
-  $('tgtSales').innerHTML = '<h3>Reading 2: $100-200M of sales a year within 5 years</h3><span class="big">' + money(y5) + ' a year</span>' +
+  $('tgtSales').innerHTML = '<h3>The target: $100M of sales a year by year 5</h3><span class="big">' + money(y5) + ' a year</span>' +
     '<p class="small muted">Sales in 2031. ' + (m.q100 !== null ? '$100M a year is reached in ' + qLabel(m.q100) + ' (year ' + (Math.floor(m.q100 / 4) + 1) + ').' : '$100M a year is not reached by 2034.') + '</p>' + pill(ok2, ok2 ? 'met' : 'not met');
 }
 function renderKpis(m) {

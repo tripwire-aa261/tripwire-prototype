@@ -44,10 +44,17 @@ Course instructors (Nov 2026): the current plan is not venture scale. It raises 
 3. Prototype v0.6 on this branch: new signal sources, GPS-jammer locator, heat-camera cueing, contraband-drop walkthrough, 0.9 kg results.
 4. Draft Report 6 (Claude doc, then Google tab), product prototype tab v2.
 
-## Model v2 results at plan settings (2026-11-18)
+## Target (Sid, 2026-11-18)
 
-- Raises $25.25M (pre-seed $0.25M 2027 Q1, Seed $5M 2027 Q3, Series A $20M 2028 Q4); peak cash need $12.2M; pays its own way 2031 Q3.
-- Sales $38.1M in 2031 (year 5), $65.0M in 2032; $100M a year in 2034 Q1 (year 8).
-- Exit reading met: a sale at the end of 2031 is worth $188M (4.5x sales) to $359M (9x); Seed 6.1x / 11.6x, Series A 2.3x / 4.5x.
-- Sales reading not met within 5 years in any scenario (faster hiring plus an FAA program gives roughly $56M in 2031); best single lever: 14 salespeople a year ($46M in 2031, $100M a year 2033 Q3).
-- Scenarios: stuck at 20 dB barely moves year-5 results (the plan is limited by selling capacity, not by sites that work); government slow $28.5M in 2031; no integrator sales $28.7M; prices 30% lower $26.7M and $21.3M of cash needed.
+$100M of sales a year by year 5 (2031) or earlier, raising $10-30M. Model v2 now shows this target first; what a sale would be worth is shown second.
+
+## Model v2 results at plan settings (updated 2026-11-18)
+
+Changes after Sid's review: 16 salespeople hired a year after Series A; two selling routes switched on from 2029 (contract vehicles save one quarter per sale; pilot references add 25% more wins per seller); large-perimeter sites priced at $1M + $0.4M/yr ($3M over 5 years vs ~$6M per CBP port site) and mobile kits at $600k + $120k/yr ($1.2M over 5 years vs ~$2.1M per Dedrone kit); Series A sized to need at $12M.
+
+- Raises $17.25M (pre-seed $0.25M 2027 Q1, Seed $5M 2027 Q3, Series A $12M 2028 Q4); peak cash need $7.6M; at least $7.6M in the bank after Series A in every scenario; pays its own way 2029 Q3.
+- Sales $21.7M (2029), $54.7M (2030), **$114.4M in 2031 (year 5)**; $100M a year reached 2031 Q4. 2031 mix: mobile kits $44.4M, bases and ports $39.9M, prison/jail/stadium sites $14.2M, integrator sensors $9.4M, heat cameras $3.4M, GPS monitoring $3.0M.
+- By the end of 2031: 15.6 state corrections departments (233 prisons), 62 large jails (116 sites), 77 police departments (116 kits), 37 military installations, 42 stadiums.
+- A sale at the end of 2031: $573M (4.5x sales) to $1,088M (9x); Seed 20.5x / 38.9x, Series A 7.9x / 15.0x; founders keep 62%. 298 people (191 in sales).
+- Scenarios (2031 sales; $100M a year): stuck at 20 dB $106M, 2031 Q4 (but 2032 falls to $99M as the workable sites run out); government slow $71.5M, 2032 Q3; no integrator sales $105M, 2031 Q4; prices 30% lower $74.9M, 2032 Q3 (needs $9.6M); hire faster (20/yr) $132M, 2031 Q3; no faster selling $76.9M, 2032 Q2; FAA program $124M, 2031 Q3.
+- Honest caveats: the plan is aggressive. It signs about a third of US state corrections departments and a third of the 100 military installations with drone detections by 2031, and police keep buying kits after the FEMA money ends (50% of the grant-era pace). The downside cases reach $100M a year in 2032 instead.

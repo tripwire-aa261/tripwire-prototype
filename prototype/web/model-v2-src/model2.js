@@ -49,15 +49,18 @@ const SEGMENTS = [
 const DEFAULTS = {
   // prices (decision 2026-11-18: below every benchmark found)
   sitePrice: 25000, siteSub: 25000, camPrice: 40000, camSub: 5000, camAttach: 30,
-  largePrice: 500, largeSub: 250,              // $k
-  kitPrice: 350, kitSub: 75,                   // $k
+  largePrice: 1000, largeSub: 400,             // $k; $3M over 5 years vs ~$6M per CBP port-of-entry site (decision 2026-11-18)
+  kitPrice: 600, kitSub: 120,                  // $k; $1.2M over 5 years vs ~$2.1M per Dedrone kit in Cobb County (decision 2026-11-18)
   oemPrice: 12000, oemLicense: 3000,           // per sensor
   gnssAddon: 20000, gnssAttach: 25, gnssNetPrice: 100, gnssNetsPerYear: 2,   // add-on $/site/yr; standalone network $k/yr
   // selling
   winsDoc: 0.5, winsJail: 3, winsKit: 4, winsDod: 2, winsCbp: 0.5, winsStad: 4,   // customers per seller per year
-  repsAddA: 10,                                // salespeople hired per year after Series A (plan), split across customer types
+  repsAddA: 16,                                // salespeople hired per year after Series A (plan), split across customer types
   bookingsPerSeller: 3,                        // $M of new contract value a year that funds one more seller on top
   rampQ: 2,                                    // quarters before a new seller is fully productive
+  contractQ: 9,                                // from 2029 Q2 a GSA Schedule listing and cooperative contracts (OMNIA, Sourcewell, NASPO) shorten every sale by one quarter (ASSUMPTION)
+  refGain: 25,                                 // % more wins per seller from 2029, once the Hays and Clemson results are references (ASSUMPTION)
+  refQ: 8,
   renewal: 90,                                 // % of sites renewing at the end of each 5-year term
   afterGrant: 50,                              // % of mobile-kit demand left after the FEMA money ends (2030 on)
   oemPartners: 1, oemFrom: 9, oemUnits: 150, oemGrowth: 25, oemCap: 3000,   // integrator sensor sales: partners (+1 a year), from 2029 Q2, sensors per partner a year, % growth a year, cap on sensors a year (all ASSUMPTIONS)
@@ -68,10 +71,11 @@ const DEFAULTS = {
   sbir1: 50, sbir2: 50, diu: 40,
   faa: 0,                                      // FAA national GPS monitoring program, $M a year (scenario)
   // funding $M
-  r0: 0.25, r1: 5, r2: 20,
+  r0: 0.25, r1: 5, r2: 12,   // Series A sized to need: covers the worst scenario (prices 30% lower, ~$9.6M needed) with ~$7.6M to spare (decision 2026-11-18)
 };
 // how added salespeople are split across customer types (ASSUMPTION)
 const MIX = { doc: 0.25, jail: 0.15, kit: 0.2, dod: 0.25, cbp: 0.05, stad: 0.1 };
+const GSA_COST = 60;   // $k a year to hold a GSA Schedule and cooperative contracts from contractQ (ASSUMPTION: consultant + compliance)
 const ROUNDS = [{ key: 'r0', name: 'Pre-seed', q: 0 }, { key: 'r1', name: 'Seed', q: 2 }, { key: 'r2', name: 'Series A', q: 7 }];
 const SEED_Q = 2, A_Q = 7;
 
@@ -113,10 +117,10 @@ function runModel(a) {
 
     // 2. customers signed (pipeline started `cycle` quarters ago by sellers then on the team), slowed as the pool fills
     SEGMENTS.forEach((s) => {
-      const c = cohorts[s.key], src = t - s.cycle;
+      const cyc = t >= a.contractQ ? Math.max(1, s.cycle - 1) : s.cycle, c = cohorts[s.key], src = t - cyc;
       if (t < s.start || src < 0) return;
       const ramp = Math.min(1, (src + 1 - 2) / a.rampQ);   // new sellers ramp up
-      const capacity = segSellers[s.key][src] * Math.max(0.3, ramp) * wins[s.key] / 4;
+      const capacity = segSellers[s.key][src] * Math.max(0.3, ramp) * wins[s.key] / 4 * (t >= a.refQ ? 1 + a.refGain / 100 : 1);
       const grant = s.key === 'kit' && t >= yr(2030) ? a.afterGrant / 100 : 1;
       const room = Math.max(0, s.pool * workable(s, t) - c.cum);
       const w = Math.min(room, capacity * grant * Math.max(0, 1 - c.cum / s.pool));
@@ -222,7 +226,7 @@ function runModel(a) {
     const dev = (t < SEED_Q ? F.devPre : t < yr(2029) ? F.devSeed : F.devSeed * 2) * 1e3;
     const nre = t >= a.ownQ - F.nreQ && t < a.ownQ ? F.nre / F.nreQ : 0;
     const gdev = t >= a.gnssFrom - F.gnssDevQ && t < a.gnssFrom ? F.gnssDev / F.gnssDevQ : 0;
-    const comp = (t >= F.complianceQ ? F.compliance : 0) * 1e3 / 4 + F.counsel * 1e3 / 4;
+    const comp = (t >= F.complianceQ ? F.compliance : 0) * 1e3 / 4 + F.counsel * 1e3 / 4 + (t >= a.contractQ ? GSA_COST * 1e3 / 4 : 0);
     fixed[t] = payroll[t] * (t >= SEED_Q ? 1 + F.overhead : 1) + dev + nre + gdev + comp;
   }
 
