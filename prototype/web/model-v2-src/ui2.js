@@ -96,7 +96,7 @@ function buildInputs() {
     ['Tripwire Site', 'Prisons, jails and stadiums: sensors on the perimeter, 24/7 alerts, evidence-grade track records, Remote ID receiver included.', usd(a.sitePrice) + ' + ' + usd(a.siteSub) + ' a year'],
     ['Heat-camera option', 'A camera our tracks point at, so staff see the drone before they move.', usd(a.camPrice) + ' + ' + usd(a.camSub) + ' a year'],
     ['Large-perimeter site', 'Military installations, ports of entry and border sites: about 4x a prison, two heat cameras.', '$' + a.largePrice + 'k + $' + a.largeSub + 'k a year'],
-    ['Mobile kit', 'Six sensors, a heat camera and a laptop on tripods for police and events, paid from FEMA grant money.', '$' + a.kitPrice + 'k + $' + a.kitSub + 'k a year'],
+    ['Mobile kit', 'Eight sensors, a heat camera and a laptop on tripods for police and events, paid from FEMA grant money.', '$' + a.kitPrice + 'k + $' + a.kitSub + 'k a year'],
     ['Sensors for integrators', 'Our sensor and software sold to the companies that hold government counter-drone contracts.', usd(a.oemPrice) + ' + ' + usd(a.oemLicense) + ' a year per sensor'],
     ['GPS jamming and spoofing monitoring', 'The same receivers find the jammer and record evidence for the FCC, FAA or police.', usd(a.gnssAddon) + ' a year per site; $' + a.gnssNetPrice + 'k a year per network'],
   ].map((l) => '<div><b>' + l[0] + '</b><span>' + l[1] + '</span><code>' + l[2] + '</code></div>').join('');
