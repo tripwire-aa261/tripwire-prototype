@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from .multiband import all_pairs, is_tv, tv_snr_db
 from .rf import echo_power_re_dbw, rcs_at
 from .scene import face_gains
 
@@ -20,9 +21,12 @@ def albersheim_db(pd: float, pfa: float, n: int = 1) -> float:
 
 
 def pair_snr_db(scene, pair, pts, drone=None):
-    """Expected SNR after processing at each point for one pair, on the node's best face."""
+    """Expected SNR after processing at each point for one pair, on the node's best face. TV pairs (v1.0,
+    multiband.py) use the TV link budget in broadcast.py."""
     p, site = scene.params, scene.site
     drone = drone or next(t for t in scene.targets if t.kind == "drone")
+    if is_tv(pair):
+        return tv_snr_db(scene, pair, pts, drone)
     rcs = rcs_at(drone.rcs_m2, drone.size_m, pair.ill.carrier.freq_hz)
     pw, _, _ = echo_power_re_dbw(site, pair.ill, pair.rx.pos, pts, rcs, 0.0, p.ground_gamma, scene.loss_db)
     g = face_gains(p, pair.rx, pts)  # (E, N)
@@ -47,10 +51,13 @@ def position_error_m(scene, pts, snrs, thr, scale=None):
     n = len(pts)
     J = np.zeros((n, 3, 3))
     cnt = np.zeros(n, dtype=int)
-    for pair, snr in zip(scene.pairs, snrs):
+    tv = np.zeros(n, dtype=bool)
+    for pair, snr in zip(all_pairs(scene), snrs):
         det = snr >= thr
         if not det.any():
             continue
+        if is_tv(pair):
+            tv |= det
         ut = pts - pair.ill.pos
         ur = pts - pair.rx.pos
         u = ut / np.linalg.norm(ut, axis=1, keepdims=True) + ur / np.linalg.norm(ur, axis=1, keepdims=True)
@@ -61,7 +68,11 @@ def position_error_m(scene, pts, snrs, thr, scale=None):
     J[:, 2, 2] += 1.0 / HEIGHT_PRIOR_M ** 2
     J += np.eye(3)[None] * 1e-9
     inv = np.linalg.inv(J)
-    err = np.sqrt(np.maximum(inv[:, 0, 0] + inv[:, 1, 1], 0))
+    var = np.maximum(inv[:, 0, 0] + inv[:, 1, 1], 0)
+    if tv.any():  # broadcast.ERROR_FLOOR_M where a TV pair contributes (same rule as the v0.6 TV estimate)
+        from .broadcast import ERROR_FLOOR_M
+        var = var + np.where(tv, ERROR_FLOOR_M ** 2, 0.0)
+    err = np.sqrt(var)
     return np.where(cnt >= 3, err, np.nan)
 
 
@@ -86,7 +97,7 @@ def coverage_grid(scene, half_m=1500.0, step_m=50.0, pd=0.9, min_pairs=3):
     thr = albersheim_db(pd, p.pfa)
     count = np.zeros(len(pts), dtype=int)
     best = np.full(len(pts), -99.0)
-    for pair in scene.pairs:
+    for pair in all_pairs(scene):
         snr = pair_snr_db(scene, pair, pts)
         count += snr >= thr
         best = np.maximum(best, snr)

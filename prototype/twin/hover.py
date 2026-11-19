@@ -83,7 +83,10 @@ def _profile(scene, pair, face):
         CACHE.mkdir(parents=True, exist_ok=True)
         tmp = CACHE / f"{h}.{np.random.randint(1e9)}.tmp.npz"
         np.savez_compressed(tmp, r0=out[0], c=out[1])
-        tmp.replace(f)
+        try:
+            tmp.replace(f)
+        except OSError:  # Windows/OneDrive: another worker wrote or holds the same entry; the cache is optional
+            tmp.unlink(missing_ok=True)
     if len(_MEM) >= _MEM_MAX:
         _MEM.pop(next(iter(_MEM)))
     _MEM[h] = out

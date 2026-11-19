@@ -215,6 +215,7 @@ class Scene:
     listeners: list
     targets: list
     pairs: list = field(default_factory=list)
+    tv_pairs: list = field(default_factory=list)  # v1.0 multiband.py; not used by the signal replay
     clutter_pts: np.ndarray | None = None
     clutter_rcs: np.ndarray | None = None
     clutter_moving: np.ndarray | None = None

@@ -120,6 +120,9 @@ class Params:
     hover_history: bool = False  # hold a stopped track by comparing with the learned quiet background (hover.py)
     background_stability_db: float = -30.0  # what is left of the static background after subtracting its history
     hover_dwell_s: float = 4.8  # longest listening time on a stopped track
+    # --- v1.0 multi-band sensor ---
+    signals: str = "cell"  # cell | cell+tv: which illuminators the design-point simulation uses (multiband.py)
+    tv_transmitters: int = 3  # digital TV channels processed per sensor (TV bank tuning plan, ASSUMPTION)
     # --- run ---
     frame_dt_s: float = 1.5
     seed: int = 7
@@ -165,6 +168,8 @@ PARAM_SOURCES = {
     "hover_history": ("Hold a stopped (hovering) track by background history: compare each distance bin with its learned quiet level", "design choice (hover.py)"),
     "background_stability_db": ("Leftover of the static background after subtracting its learned history (-40 dB = echoes steady to ~1 %)", "ASSUMPTION: to be measured on Seed recordings; tools/hover_feasibility.py"),
     "hover_dwell_s": ("Longest listening time on a stopped track", "ASSUMPTION"),
+    "signals": ("Illuminators used: cell towers only, or cell towers plus licensed digital TV transmitters (UHF TV bank)", "design choice (multiband.py)"),
+    "tv_transmitters": ("Digital TV channels processed per sensor (strongest drone echo over the site)", "ASSUMPTION: the TV bank's tuning plan fits them"),
     "nf_db": ("Receiver noise figure", "ASSUMPTION (typical SDR front end)"),
     "adc_bits": ("ADC resolution", "CITED: USRP B210 = 12 bit (Ettus); KrakenSDR/RTL = 8 bit"),
     "adc_backoff_db": ("ADC headroom for OFDM peaks", "ASSUMPTION"),

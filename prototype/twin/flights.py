@@ -21,6 +21,7 @@ import numpy as np
 from .config import Params
 from .coverage import acoustic_count, albersheim_db, pair_snr_db
 from .geo import distance_to_polygon
+from .multiband import all_pairs
 from .rf import bistatic_doppler
 from .scene import Trajectory
 
@@ -105,7 +106,7 @@ def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = 
     vel = np.array([s[1] for s in st])
     lis_index = {id(l): k for k, l in enumerate(scene.listeners)}
     pd, node_of = [], []
-    for pair in scene.pairs:
+    for pair in all_pairs(scene):
         snr = pair_snr_db(scene, pair, pos, drone) - (CHAIN_LOSS_DB if extra_loss_db is None else extra_loss_db)
         nu = bistatic_doppler(pair.ill.pos, pair.rx.pos, pos, vel, pair.ill.carrier.freq_hz)
         pd.append(np.where(np.abs(nu) > NOTCH_HZ, pd_from_snr(snr, p.pfa), 0.0))
@@ -119,7 +120,7 @@ def score_flight(scene, traj: Trajectory, dt: float | None = None, draws: int = 
         nodes[:, k] = hits[:, node_of == k].any(axis=1)
     mic = acoustic_count(scene, pos)
     located = ((n_pairs >= 3) & (nodes.sum(axis=1) >= 2)) | (mic >= 2)[None]  # (S, T)
-    hold = hover_hold(scene, pos, vel, dt, node_of, draws, rng, extra_loss_db)  # (S, T): cued hover detections
+    hold = hover_hold(scene, pos, vel, dt, node_of[:len(scene.pairs)], draws, rng, extra_loss_db)  # cell pairs only  # (S, T): cued hover detections
     # Tracker emulation, vectorised over draws.
     alive = np.zeros(draws, dtype=bool)
     held = np.zeros(draws, dtype=int)

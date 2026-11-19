@@ -33,6 +33,7 @@ from .coverage import acoustic_count, albersheim_db, coverage_grid, pair_snr_db,
 from .flights import scored_flights
 from .scenarios import SITE_PARAMS
 from .geo import distance_to_polygon
+from .multiband import all_pairs
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "web" / "data" / "explore.json"
@@ -90,7 +91,7 @@ def _point(args):
     zs = zone_samples(sc.site, max(RADII), height, 40.0)
     dist = np.asarray(distance_to_polygon(zs[:, 0], zs[:, 1], sc.site.fence))
     thr = albersheim_db(0.9, p.pfa)
-    snrs = [pair_snr_db(sc, pr, zs) for pr in sc.pairs]
+    snrs = [pair_snr_db(sc, pr, zs) for pr in all_pairs(sc)]
     cnt = np.sum([s >= thr for s in snrs], axis=0)
     mic = acoustic_count(sc, zs)
     located = (cnt >= 3) | (mic >= 2)

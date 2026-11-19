@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tripwire Platform</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="logo">◎</span> Tripwire <span class="tag">platform prototype v1.0</span></div>
+    <nav class="tabbar" role="tablist">
+      <button role="tab" data-tab="platform" class="on">Platform</button>
+      <button role="tab" data-tab="sites">Sites</button>
+      <button role="tab" data-tab="sensor">Sensor &amp; parts</button>
+      <button role="tab" data-tab="products">Products &amp; cost</button>
+      <button role="tab" data-tab="gnss">GPS monitoring</button>
+      <button role="tab" data-tab="timeline">Incident timeline</button>
+    </nav>
+  </header>
+
+  <section class="tab on" id="tab-platform"><div class="page">
+    <div class="hero">
+      <h1>One sensor, three signals, five products</h1>
+      <p class="lead">Tripwire sensors only listen. They hear drone echoes in signals already in the air (cell towers and digital TV), find GPS jammers, and point a heat camera at the drone. This prototype simulates the platform at seven real sites, from a prison fence to an Air Force flightline, a border crossing and a park during an event, and costs every product from a parts list.</p>
+    </div>
+    <div class="kpis" id="pfKpis"></div>
+    <div class="sec">
+      <h2>Seven sites, three kinds of deployment</h2>
+      <p class="note">The fewest sensors that meet the default requirements (90% of the zone covered, a track 80% of the time, 25 m accuracy, the typical drone tracked 300 m before the fence) for a <b>0.9 kg drone</b> at today's 20 dB of interference removal. "Cell only" is what the platform sensor does if digital TV does not work out.</p>
+      <div class="scrollx"><table class="cmp" id="pfSites"></table></div>
+    </div>
+    <div class="sec two">
+      <div><h2>What changed from the cell-tower prototype</h2><ul class="list" id="pfChanged"></ul></div>
+      <div><h2>Real, simulated, assumed</h2><ul class="list" id="pfReal"></ul></div>
+    </div>
+  </div></section>
+
+  <section class="tab" id="tab-sites"><div class="page">
+    <div class="ctlbar">
+      <div class="seg" id="stSite"></div>
+      <div class="seg" id="stDrone"></div>
+      <div class="seg" id="stInterf"></div>
+      <div class="seg" id="stBuild"></div>
+      <div class="seg" id="stN"></div>
+    </div>
+    <div class="grid2">
+      <div class="sec"><h2 id="stMapTitle">Coverage</h2><canvas id="stMap" width="560" height="560"></canvas>
+        <div class="legend"><span><i class="sw s2"></i>located (3+ signal-sensor pairs)</span><span><i class="sw s1"></i>detected only</span><span><i class="sw s0"></i>not seen</span><span><i class="sw sz"></i>protected zone (outline + 150 m)</span><span><i class="dot"></i>sensor</span></div>
+        <p class="note small" id="stMapNote"></p></div>
+      <div>
+        <div class="sec"><h2 id="stHead"></h2><p class="note" id="stFacts"></p><div class="checks" id="stChecks"></div></div>
+        <div class="sec"><h2>What it costs</h2><div class="cards" id="stCost"></div><p class="note small" id="stCostNote"></p></div>
+        <div class="sec"><h2>Signals used</h2><p class="note small" id="stSignals"></p></div>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="tab" id="tab-sensor"><div class="page">
+    <div class="hero"><h1>The platform sensor</h1><p class="lead" id="snLead"></p></div>
+    <div class="banks" id="snBanks"></div>
+    <div class="sec"><h2>Receiver board, 16 channels <span class="hint" id="snBoardHint"></span></h2><div class="scrollx"><table class="cmp bom" id="snBoard"></table></div><p class="note small" id="snBoardNote"></p></div>
+    <div class="sec"><h2>The whole sensor</h2><div class="scrollx"><table class="cmp bom" id="snSensor"></table></div><p class="note small" id="snSensorNote"></p></div>
+    <div class="sec two">
+      <div><h2>Seed sensor (off-the-shelf radios, 2027-2029)</h2><div class="scrollx"><table class="cmp bom" id="snSeed"></table></div></div>
+      <div><h2>What is still open</h2><ul class="list" id="snOpen"></ul></div>
+    </div>
+  </div></section>
+
+  <section class="tab" id="tab-products"><div class="page">
+    <div class="hero"><h1>Five products from one sensor</h1><p class="lead">Each product is the same sensor with what it needs around it. Our cost comes from the parts list and the twin's sensor counts; the price is the financial model v2 plan price; the benchmark is the cheapest comparable system we found.</p></div>
+    <div class="scrollx"><table class="cmp" id="prTable"></table></div>
+    <div class="cardgrid" id="prCards"></div>
+  </div></section>
+
+  <section class="tab" id="tab-gnss"><div class="page">
+    <div class="hero"><h1>GPS jammer locator</h1><p class="lead">The same sensors listen on GPS L1 through their 4-element GPS array. A jammer raises the noise at every sensor; differences in arrival time and the bearings place it.</p></div>
+    <div class="ctlbar"><div class="seg" id="gnSite"></div><div class="seg" id="gnClock"></div></div>
+    <div class="grid2">
+      <div class="sec"><h2>Error placing a 10 mW car jammer</h2><canvas id="gnMap" width="520" height="520"></canvas>
+        <div class="legend"><span><i class="sw g1"></i>under 25 m</span><span><i class="sw g2"></i>under 100 m</span><span><i class="sw g3"></i>under 300 m</span><span><i class="sw g4"></i>worse</span><span><i class="sw g0"></i>not heard by enough sensors</span></div></div>
+      <div class="sec"><h2>Three jammer positions</h2><div class="scrollx"><table class="cmp" id="gnTable"></table></div><p class="note small" id="gnNote"></p></div>
+    </div>
+  </div></section>
+
+  <section class="tab" id="tab-timeline"><div class="page">
+    <div class="hero"><h1>A contraband drop at Hays, second by second</h1><p class="lead" id="tlHead"></p></div>
+    <ol class="timeline" id="tlEvents"></ol>
+    <h2>Real cases at our kinds of site</h2>
+    <div class="cardgrid" id="tlCases"></div>
+  </div></section>
+
+  <footer>
+    <span>Tripwire platform prototype v1.0 · every number is cited or labeled an assumption.</span>
+    <span id="links"></span>
+  </footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

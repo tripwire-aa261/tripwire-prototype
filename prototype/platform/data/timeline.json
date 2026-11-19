@@ -1,0 +1,104 @@
+{
+ "walkthrough": {
+  "replay": "replay-hays-m210-custom",
+  "site": "Hays State Prison, Trion GA",
+  "drone": "Matrice 210 (5 kg, the Fraunhofer trial drone)",
+  "speed_mps": 12.0,
+  "metrics": {
+   "track_availability_pct": 86.8,
+   "first_track_distance_m": 476,
+   "median_error_m": 11.8,
+   "false_tracks": 0,
+   "bird_tracks": 5
+  },
+  "warning_before_fence_s": 40.5,
+  "camera": "35mm",
+  "dri_m": {
+   "detect": 1711,
+   "recognise": 428,
+   "identify": 214
+  },
+  "events": [
+   {
+    "t": 42.0,
+    "who": "Tripwire",
+    "what": "First track, 596 m from the drop point. Alert to the control room and the response team's phones.",
+    "kind": "detect"
+   },
+   {
+    "t": 44.1,
+    "who": "Tripwire",
+    "what": "Heat camera on the fence turns to the track (2.14 s at 60 deg/s); drone 746 m away.",
+    "kind": "camera"
+   },
+   {
+    "t": 72.0,
+    "who": "Control room",
+    "what": "Drone recognizable on the heat camera at 416 m (Johnson criteria, 35 mm lens).",
+    "kind": "camera"
+   },
+   {
+    "t": 82.5,
+    "who": "Drone",
+    "what": "Crosses the fence line.",
+    "kind": "drone"
+   },
+   {
+    "t": 91.5,
+    "who": "Drone",
+    "what": "Hovers 6 s over the drop point and releases the package.",
+    "kind": "drone"
+   },
+   {
+    "t": 91.5,
+    "who": "Response team",
+    "what": "Already moving to the drop point it was sent to at the first alert; recovers the package (South Carolina uses a pre-selected facility team; SCDC via Facilities Dive).",
+    "kind": "people"
+   },
+   {
+    "t": 160.5,
+    "who": "Tripwire",
+    "what": "Track followed back out of the zone; its heading and the inbound track are kept as evidence and point the sheriff's K-9 team to where the pilot launched (the Georgia DOC pattern: staff alert the sheriff and K-9, who search and arrest).",
+    "kind": "evidence"
+   }
+  ],
+  "cases": [
+   {
+    "where": "Lieber Correctional, SC, 14 Mar 2025",
+    "what": "Drone reported about 5 a.m.; inmates picked up the package shortly after; the pilot walked out of the woods with a drone and a bag and was sentenced to a year and a day (WRDW, Nov 2026).",
+    "lesson": "Inmates reached the package before staff: the warning has to come before the drop, not after."
+   },
+   {
+    "where": "Calhoun State Prison, GA, 21 Sep 2025",
+    "what": "Staff saw a drone carrying a duffel bag; the sheriff and K-9 were called and three civilians were caught that evening with 5 phones, 6.4 kg of tobacco and 1.2 kg of marijuana (Georgia DOC).",
+    "lesson": "The response playbook exists; it needs an earlier and more reliable trigger, and the launch direction."
+   }
+  ]
+ },
+ "cases": [
+  {
+   "where": "Lieber Correctional, SC, 14 Mar 2025",
+   "what": "Drone reported about 5 a.m.; inmates picked up the package shortly after; the pilot walked out of the woods with a drone and a bag and was sentenced to a year and a day (WRDW, Nov 2026).",
+   "lesson": "Inmates reached the package before staff: the warning has to come before the drop, not after.",
+   "url": "https://www.wrdw.com/2026/11/13/man-gets-federal-prison-time-flying-drone-onto-sc-prison-yard/"
+  },
+  {
+   "where": "Calhoun State Prison, GA, 21 Sep 2025",
+   "what": "Staff saw a drone carrying a duffel bag; the sheriff and K-9 were called and three civilians were caught that evening with 5 phones, 6.4 kg of tobacco and 1.2 kg of marijuana (Georgia DOC).",
+   "lesson": "The response playbook exists; it needs an earlier and more reliable trigger, and the launch direction.",
+   "url": "https://gdc.georgia.gov/contraband-report/2025-10-01/contraband-arrests-multiple-state-prisons"
+  },
+  {
+   "where": "Centennial Olympic Park, Atlanta, June 2026",
+   "url": "https://www.cbsnews.com/atlanta/news/fbi-seizes-76-drones-caught-flying-near-atlanta-fifa-mens-world-cup-events-agency-says/",
+   "what": "During the World Cup the FAA closed the airspace over downtown Atlanta; by June 29 the FBI had seized 76 drones, and one pilot was charged for flying over the Centennial Park fan festival on June 15 (CBS News, 30 Jun 2026).",
+   "lesson": "Event security needs a kit it can set up for a few weeks and then move: the mobile kit."
+  },
+  {
+   "where": "Reynosa, across from the Pharr port of entry, October 2025",
+   "url": "https://smallwarsjournal.com/2026/01/06/los-metros-faction-of-the-cartel-del-golfo-cdg-arsenal-of-explosives-ieds-kamikaze-and-other-drones-and-counter-drone-systems-seized-in-reynosa-tamaulipas/",
+   "what": "Mexican forces seized 18 drones, 151 explosive objects and 3 drone jammers from a Gulf Cartel cell (Small Wars Journal, 6 Jan 2026). Pharr handled 705,786 northbound trucks in FY 2024-25 (City of Pharr).",
+   "lesson": "Ports of entry face drones and jammers together: the same sensors watch for both."
+  }
+ ]
+}

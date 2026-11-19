@@ -14,9 +14,11 @@ Inputs and where they come from:
     atomic clock (CSAC) ~5 ns (ASSUMPTIONS, typical holdover figures). Clock error dominates; it is what we test.
   * TDOA noise per sensor pair: clock error (quadrature of both clocks) + correlation error 1 / (2 pi B_rms sqrt(2 SNR_eff))
     (STANDARD Cramer-Rao form), where SNR_eff = JNR x B x T.
-Bearings: our sensors are 8-antenna rings, so each can also measure the direction the jamming comes from. The DTU trial
-got 0.5-1 deg precision from a 5-channel array, with up to 10 deg bias before calibration; we use 2 deg (ASSUMPTION,
-after calibration). Mode "tdoa+aoa" fits both together (weighted Gauss-Newton), which fixes the poor geometry when the
+Bearings: the v1.0 platform sensor has a 4-element GPS L1 patch array (twin/platform_bom.py), so each sensor can also
+measure the direction the jamming comes from. The DTU trial got 0.5-1 deg precision from a 5-channel array, with up to
+10 deg bias before calibration; we use 3 deg for 4 elements (ASSUMPTION, after calibration; v0.6 used 2 deg for the
+8-antenna ring). Clock: the platform sensor holds time on an OCXO (the default product); a chip-scale atomic clock
+is a premium option (~$5.5k). Mode "tdoa+aoa" fits both together (weighted Gauss-Newton), which fixes the poor geometry when the
 jammer sits outside a small ring of sensors.
 Detection: a sensor detects the jammer when its jammer-to-noise ratio is above 10 dB (ASSUMPTION; GPS receivers lose
 lock around 20-30 dB of J/N, so detection comes well before harm).
@@ -35,7 +37,7 @@ T_INT_S = 0.010         # correlation time per fix (ASSUMPTION)
 RX_GAIN_DBI = 3.0
 NF_DB = 2.0
 DETECT_JNR_DB = 10.0
-BEARING_SIGMA_DEG = 2.0
+BEARING_SIGMA_DEG = 3.0  # v1.0: 4-element L1 array (v0.6: 2.0)
 FAIL_M = 500.0          # a fix worse than this counts as a failure (reported separately)
 CLOCKS_NS = {"ocxo": 50.0, "csac": 5.0, "gps": 2.0}   # 1-sigma timing error per sensor while jammed (gps = not yet jammed)
 
@@ -76,7 +78,7 @@ def locate(sensors, toa, guess, sig_r_m=None, bearings=None, sig_b_rad=None, ite
     return x
 
 
-def trial(site, sensors, jam_xy, power_dbm, clock_ns, rng, n_mc=100, mode="tdoa"):
+def trial(site, sensors, jam_xy, power_dbm, clock_ns, rng, n_mc=100, mode="tdoa", bearing_deg=None):
     """Median horizontal error (m) of the fixes that work, the share that fail (> FAIL_M), and how many sensors detect the
     jammer. mode: "tdoa" or "tdoa+aoa"."""
     z = float(site.ground(jam_xy[0], jam_xy[1])) + 1.5
@@ -95,7 +97,7 @@ def trial(site, sensors, jam_xy, power_dbm, clock_ns, rng, n_mc=100, mode="tdoa"
     centre = s[:, :2].mean(axis=0)
     sig_r = float(np.sqrt(2) * np.median(sig) * C)
     true_b = np.arctan2(jam[0] - s[:, 0], jam[1] - s[:, 1])
-    sb = np.radians(BEARING_SIGMA_DEG)
+    sb = np.radians(BEARING_SIGMA_DEG if bearing_deg is None else bearing_deg)
     for _ in range(n_mc):
         toa = true_t + rng.normal(0, sig)
         if mode == "tdoa+aoa":
@@ -109,7 +111,7 @@ def trial(site, sensors, jam_xy, power_dbm, clock_ns, rng, n_mc=100, mode="tdoa"
             "fail_pct": round(100 * float(1 - ok.mean()), 1)}
 
 
-def jammer_map(site, sensors, power_dbm, clock_ns, half_m=1500.0, step_m=150.0, seed=3, mode="tdoa+aoa"):
+def jammer_map(site, sensors, power_dbm, clock_ns, half_m=1500.0, step_m=150.0, seed=3, mode="tdoa+aoa", bearing_deg=None):
     """Median locating error for a jammer at each point of a grid around the site."""
     rng = np.random.default_rng(seed)
     xs = np.arange(-half_m, half_m + 1e-6, step_m)
@@ -117,7 +119,7 @@ def jammer_map(site, sensors, power_dbm, clock_ns, half_m=1500.0, step_m=150.0, 
     for y in xs:
         row = []
         for x in xs:
-            r = trial(site, sensors, (x, y), power_dbm, clock_ns, rng, n_mc=30, mode=mode)
+            r = trial(site, sensors, (x, y), power_dbm, clock_ns, rng, n_mc=30, mode=mode, bearing_deg=bearing_deg)
             row.append(r["error_m"])
         grid.append(row)
     return {"x0": float(xs[0]), "step_m": step_m, "n": len(xs), "error_m": grid}

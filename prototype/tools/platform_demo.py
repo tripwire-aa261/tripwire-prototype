@@ -86,7 +86,7 @@ def walkthrough():
         c = thermal.cue(cam, first[2], az)
         ev.append({"t": round(first[0] + c["slew_s"], 1), "who": "Tripwire", "what": f"Heat camera on the fence turns to the track ({c['slew_s']} s at 60 deg/s); drone {c['range_m']} m away.", "kind": "camera"})
     if recog:
-        ev.append({"t": recog[0], "who": "Control room", "what": f"Drone recognisable on the heat camera at {round(recog[1])} m (Johnson criteria, 35 mm lens).", "kind": "camera"})
+        ev.append({"t": recog[0], "who": "Control room", "what": f"Drone recognizable on the heat camera at {round(recog[1])} m (Johnson criteria, 35 mm lens).", "kind": "camera"})
     if inside:
         ev.append({"t": inside[0], "who": "Drone", "what": "Crosses the fence line.", "kind": "drone"})
     if hover_t is not None:
