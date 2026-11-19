@@ -4,7 +4,7 @@
 # Numbers come from web/runs/platform_v06.json (see prototype/V06_PLATFORM.md) and the model v2 plan settings.
 GH = 'https://raw.githack.com/tripwire-aa261/tripwire-prototype/pivot-v1/prototype/web'
 VIEW = GH + '/index.html#platform'
-MODEL2 = GH + '/financial-model-v2.html'
+MODEL2 = 'https://tripwire-aa261.github.io/tripwire-prototype/prototype/web/financial-model-v2.html'
 BRANCH = 'https://github.com/tripwire-aa261/tripwire-prototype/tree/pivot-v1'
 
 
@@ -18,7 +18,7 @@ def build(H, P, UL, TABLE, IMG):
             ['2. Financial model v2', 'Quarterly model of the company, 2027-2034, with six product lines and government buyers', f'[Financial model v2]({MODEL2})', 'Can Tripwire raise $10-30M and reach $100M of sales a year by year 5?'],
             ['3. Hardware tests', 'GPS signal shadowing with phones at Lake Lagunita', 'Product Prototype tab', 'Unchanged from the first prototype.'],
         ], [96, 168, 168, 192]),
-        P('Both links open the `pivot-v1` branch of our repo through raw.githack.com, which shows a notice the first time: click **Open the page**. To run the twin locally instead, check out `pivot-v1`, run `python -m http.server 8000` in `prototype/` and open http://localhost:8000/web/index.html#platform.'),
+        P('The Platform tab link opens the `pivot-v1` branch of our repo through raw.githack.com, which shows a notice the first time: click **Open the page**. To run the twin locally instead, check out `pivot-v1`, run `python -m http.server 8000` in `prototype/` and open http://localhost:8000/web/index.html#platform.'),
 
         H(2, 'What is new in v0.6'),
         UL([
