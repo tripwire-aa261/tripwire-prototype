@@ -41,7 +41,7 @@ Course instructors (Nov 2026): the current plan is not venture scale. It raises 
 
 1. **Done 2026-11-18.** Research brief (`context/research/`): buyers, contract sizes and timelines; GNSS monitoring market and prices; sensing ranges and heat cameras; answers to the VC questions.
 2. **Built 2026-11-18, for Sid's review.** Financial model v2 (`prototype/web/financial-model-v2.html`, sources in `prototype/web/model-v2-src/`; design in `context/PIVOT_MODEL_DESIGN.md`): by customer type and contract; service and sensor-sales lines; GNSS product; raise and 5-year targets (both readings); 20 dB case.
-3. Prototype v0.6 on this branch: new signal sources, GPS-jammer locator, heat-camera cueing, contraband-drop walkthrough, 0.9 kg results.
+3. **Built 2026-11-18.** Prototype v0.6 (`prototype/V06_PLATFORM.md`; viewer tab Platform (v0.6)): new signal sources, GPS-jammer locator, heat-camera cueing, contraband-drop walkthrough, 0.9 kg results.
 4. Draft Report 6 (Claude doc, then Google tab), product prototype tab v2.
 
 ## Target (Sid, 2026-11-18)
@@ -58,3 +58,11 @@ Changes after Sid's review: 16 salespeople hired a year after Series A; two sell
 - A sale at the end of 2031: $573M (4.5x sales) to $1,088M (9x); Seed 20.5x / 38.9x, Series A 7.9x / 15.0x; founders keep 62%. 298 people (191 in sales).
 - Scenarios (2031 sales; $100M a year): stuck at 20 dB $106M, 2031 Q4 (but 2032 falls to $99M as the workable sites run out); government slow $71.5M, 2032 Q3; no integrator sales $105M, 2031 Q4; prices 30% lower $74.9M, 2032 Q3 (needs $9.6M); hire faster (20/yr) $132M, 2031 Q3; no faster selling $76.9M, 2032 Q2; FAA program $124M, 2031 Q3.
 - Honest caveats: the plan is aggressive. It signs about a third of US state corrections departments and a third of the 100 military installations with drone detections by 2031, and police keep buying kits after the FEMA money ends (50% of the grant-era pace). The downside cases reach $100M a year in 2032 instead.
+
+## Prototype v0.6 results (2026-11-18)
+
+- **Digital TV covers all four sites in the link-budget estimate**, including Hancock and Fulton where cell towers fail at 20 dB, because a TV channel has no co-channel neighbours. 0.9 kg drone, 6 sensors: TV 99-100% of the zone located vs cell 0-79% at 20 dB. Conservative against the DVB-T trial; receiver overload near megawatt transmitters is the main unmodeled risk. Implication for the plan: the "stuck at 20 dB" risk shrinks if Seed measurements confirm TV.
+- **GPS jammer locator:** a 10 mW car jammer 300 m outside Hays is placed to 8-19 m with time differences plus bearings (TDOA alone ~396 m); 1 W at 1 km 44-80 m; at 2 km perimeter sensors are not enough.
+- **Heat camera (35 mm):** 5 kg drone recognisable at ~428 m, 0.9 kg at ~185 m (Johnson upper bounds).
+- **Walkthrough (Hays, 5 kg drone, 4 sensors, 20 dB):** first track 596 m from the drop point, 40.5 s of warning before the fence, ~50 s before the drop; camera recognition at 416 m.
+- **0.9 kg (VC):** Hays needs 12 own-receiver sensors at 20 dB (3x the 5 kg count): cost per small-drone site rises accordingly.

@@ -16,12 +16,13 @@
 </head>
 <body class="app">
   <header>
-    <div class="brand"><span class="logo">◎</span> Tripwire <span class="tag">digital twin v0.5.1</span></div>
+    <div class="brand"><span class="logo">◎</span> Tripwire <span class="tag">digital twin v0.6 (pivot)</span></div>
     <nav class="tabbar" role="tablist">
       <button role="tab" data-tab="overview" class="on">Overview</button>
       <button role="tab" data-tab="sim">Trade space simulator</button>
       <button role="tab" data-tab="signal">3D signal simulation</button>
       <button role="tab" data-tab="fin">Financials explorer</button>
+      <button role="tab" data-tab="platform">Platform (v0.6)</button>
     </nav>
     <div class="spacer"></div>
     <button id="openSources" class="ghost small">Sources &amp; assumptions</button>
@@ -279,6 +280,48 @@
 
       <h2>Custom 8-channel receiver: parts list <span class="hint">Series A; sets the default above</span></h2>
       <div class="panel-card" id="fnBom"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== PLATFORM (v0.6) -->
+  <section class="tab" id="tab-platform">
+    <div class="page">
+      <div class="hero"><div>
+        <h1>One receiver, more signals, more jobs</h1>
+        <p class="lead">v0.6 adds what the pivot needs: digital TV and FM as signal sources next to cell towers, a GPS jammer locator on the same sensors, heat-camera cueing, and a minute-by-minute walkthrough of a contraband drop at Hays State Prison.</p>
+      </div></div>
+
+      <div class="ov-sec">
+        <h2>Which signal works where</h2>
+        <div class="row wrap ctl"><span id="plDrone"></span> <span id="plN"></span></div>
+        <div class="scrollx"><table class="cmp big" id="plSignals"></table></div>
+        <p class="note small" id="plSignalsNote"></p>
+      </div>
+
+      <div class="ov-sec">
+        <h2>GPS jammer locator</h2>
+        <p class="note">The same sensors listen on GPS L1. A jammer raises the noise at every sensor; differences in arrival time and the direction it comes from (our sensors are 8-antenna rings) place the source. Map: locating error for a 10 mW car jammer at each point around the site (green under 25 m, light green under 100 m, sand under 300 m, orange worse, grey not heard by enough sensors).</p>
+        <div class="row wrap ctl"><span id="plGSite"></span> <span id="plGN"></span> <span id="plGClock"></span></div>
+        <div class="two">
+          <div class="panel-card"><canvas id="plJamMap" width="440" height="440" aria-label="GPS jammer locating error map"></canvas></div>
+          <div class="panel-card"><div class="scrollx"><table class="cmp" id="plGnssTable"></table></div>
+            <p class="note small">Clocks: while jammed, a sensor keeps time on its own oscillator, ~50 ns for an oven crystal and ~5 ns for a chip-scale atomic clock over minutes (ASSUMPTIONS). Bearings 2 degrees after calibration (DTU trial, NAVIGATION 2026: 0.5-1 degree precision). Method as the Baltic TDOA network (GPS Solutions 2026).</p></div>
+        </div>
+      </div>
+
+      <div class="ov-sec">
+        <h2>Heat-camera confirmation</h2>
+        <p class="note">Our track points a thermal camera at the drone, so staff see it before they move. Ranges by the Johnson criteria for a 640-pixel, 12 um camera (upper bounds: atmosphere and contrast ignored; a low-cost camera saw a Phantom 4 at only ~51 m in a 2017 test).</p>
+        <div class="scrollx"><table class="cmp" id="plThermal"></table></div>
+      </div>
+
+      <div class="ov-sec">
+        <h2>A contraband drop at Hays, minute by minute</h2>
+        <p class="note" id="plWalkHead"></p>
+        <ol class="timeline" id="plWalk"></ol>
+        <h3>Real cases this answers</h3>
+        <div class="two" id="plCases"></div>
+      </div>
     </div>
   </section>
 

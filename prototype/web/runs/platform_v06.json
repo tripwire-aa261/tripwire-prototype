@@ -1,0 +1,8884 @@
+{
+ "version": "v0.6",
+ "broadcast": {
+  "method": "Which signal works where (v0.6): cell towers vs digital TV vs FM at our four sites.",
+  "notes": [
+   "TV and FM: analytic link budget with the twin's calibrated loss and direct-signal cancellation; no co-channel neighbours (one transmitter per channel per area).",
+   "Cell towers: the twin's full design-point model (same sensors, same zone).",
+   "Located = 3 or more transmitter-sensor pairs detect the drone. FM resolves range only to ~1.5 km, so it can warn but not place a drone.",
+   "SIMPLIFICATIONS: licensed ERP toward the site; 8 dBi receive gain for TV, 2 dBi for FM; terrain beyond the site tile flat; 5 m error floor added.",
+   "CONSERVATIVE: against the published DVB-T trial (Martelli 2020, detection to 5 km bistatic) this model reaches only ~0.5 km; we keep it that way.",
+   "NOT MODELED: receiver blocking next to megawatt transmitters (Fulton is 6 km from a 869 kW station), ATSC 1.0 reference rebuild quality, terrain shadowing beyond the site tile."
+  ],
+  "calibration": {
+   "extra_loss_db": 0.0,
+   "snr_at_limit_db": -14.1,
+   "threshold_db": 13.1,
+   "drone_offset_m_at_limit": 4554,
+   "source": "Martelli et al. 2020, DVB-T AULOS trial (1.6-5 km bistatic)"
+  },
+  "error_floor_m": 5.0,
+  "sites": {
+   "hays": {
+    "name": "Hays State Prison",
+    "type": "moderate towers",
+    "tv_count": 9,
+    "fm_count": 18,
+    "cases": [
+     {
+      "sensors": 6,
+      "drone": "m210",
+      "cell_20db": {
+       "located_pct": 100.0,
+       "tracked_pct": 92.5,
+       "median_error_m": 7.5
+      },
+      "cell_40db": {
+       "located_pct": 100.0,
+       "tracked_pct": 97.7,
+       "median_error_m": 4.8
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.3,
+       "best_snr_db": 55.0,
+       "transmitters": [
+        {
+         "call": "WELF-TV",
+         "kind": "tv",
+         "freq_mhz": 557.0,
+         "distance_km": 36.39,
+         "erp_kw": 475.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WDEF-TV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 69.65,
+         "erp_kw": 35.9,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRCB",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 72.55,
+         "erp_kw": 160.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTVC",
+         "kind": "tv",
+         "freq_mhz": 189.0,
+         "distance_km": 72.5,
+         "erp_kw": 90.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WFLI-TV",
+         "kind": "tv",
+         "freq_mhz": 527.0,
+         "distance_km": 72.5,
+         "erp_kw": 550.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTCI",
+         "kind": "tv",
+         "freq_mhz": 599.0,
+         "distance_km": 77.71,
+         "erp_kw": 200.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 156
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 84.9,
+       "best_snr_db": 33.7,
+       "transmitters": [
+        {
+         "call": "WCLM",
+         "kind": "fm",
+         "freq_mhz": 91.3,
+         "distance_km": 16.63,
+         "erp_kw": 10.5,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WUKV",
+         "kind": "fm",
+         "freq_mhz": 95.7,
+         "distance_km": 4.39,
+         "erp_kw": 1.3,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WBDX",
+         "kind": "fm",
+         "freq_mhz": 102.7,
+         "distance_km": 40.21,
+         "erp_kw": 0.3,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WMBW",
+         "kind": "fm",
+         "freq_mhz": 88.9,
+         "distance_km": 50.82,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WKEA-FM",
+         "kind": "fm",
+         "freq_mhz": 98.3,
+         "distance_km": 56.15,
+         "erp_kw": 11.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WJBP",
+         "kind": "fm",
+         "freq_mhz": 91.5,
+         "distance_km": 48.43,
+         "erp_kw": 11.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 156
+      }
+     },
+     {
+      "sensors": 6,
+      "drone": "mavic",
+      "cell_20db": {
+       "located_pct": 79.2,
+       "tracked_pct": 57.3,
+       "median_error_m": 21.1
+      },
+      "cell_40db": {
+       "located_pct": 87.2,
+       "tracked_pct": 65.5,
+       "median_error_m": 18.0
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 6.0,
+       "best_snr_db": 45.0,
+       "transmitters": [
+        {
+         "call": "WELF-TV",
+         "kind": "tv",
+         "freq_mhz": 557.0,
+         "distance_km": 36.39,
+         "erp_kw": 475.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WFLI-TV",
+         "kind": "tv",
+         "freq_mhz": 527.0,
+         "distance_km": 72.5,
+         "erp_kw": 550.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTCI",
+         "kind": "tv",
+         "freq_mhz": 599.0,
+         "distance_km": 77.71,
+         "erp_kw": 200.0,
+         "zone_seen_pct": 99.4
+        },
+        {
+         "call": "WRCB",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 72.55,
+         "erp_kw": 160.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WDEF-TV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 69.65,
+         "erp_kw": 35.9,
+         "zone_seen_pct": 96.8
+        },
+        {
+         "call": "WDSI-TV",
+         "kind": "tv",
+         "freq_mhz": 473.0,
+         "distance_km": 72.5,
+         "erp_kw": 120.0,
+         "zone_seen_pct": 94.9
+        }
+       ],
+       "n_pts": 156
+      },
+      "fm": {
+       "detected_pct": 14.1,
+       "located_pct": 0.0,
+       "median_error_m": null,
+       "best_snr_db": 9.1,
+       "transmitters": [
+        {
+         "call": "WCLM",
+         "kind": "fm",
+         "freq_mhz": 91.3,
+         "distance_km": 16.63,
+         "erp_kw": 10.5,
+         "zone_seen_pct": 10.3
+        },
+        {
+         "call": "WUKV",
+         "kind": "fm",
+         "freq_mhz": 95.7,
+         "distance_km": 4.39,
+         "erp_kw": 1.3,
+         "zone_seen_pct": 1.3
+        },
+        {
+         "call": "WBDX",
+         "kind": "fm",
+         "freq_mhz": 102.7,
+         "distance_km": 40.21,
+         "erp_kw": 0.3,
+         "zone_seen_pct": 7.1
+        },
+        {
+         "call": "WMBW",
+         "kind": "fm",
+         "freq_mhz": 88.9,
+         "distance_km": 50.82,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 0.6
+        },
+        {
+         "call": "WKEA-FM",
+         "kind": "fm",
+         "freq_mhz": 98.3,
+         "distance_km": 56.15,
+         "erp_kw": 11.0,
+         "zone_seen_pct": 0.0
+        },
+        {
+         "call": "WJBP",
+         "kind": "fm",
+         "freq_mhz": 91.5,
+         "distance_km": 48.43,
+         "erp_kw": 11.0,
+         "zone_seen_pct": 0.0
+        }
+       ],
+       "n_pts": 156
+      }
+     },
+     {
+      "sensors": 12,
+      "drone": "m210",
+      "cell_20db": {
+       "located_pct": 100.0,
+       "tracked_pct": 97.1,
+       "median_error_m": 4.7
+      },
+      "cell_40db": {
+       "located_pct": 100.0,
+       "tracked_pct": 99.6,
+       "median_error_m": 3.1
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.1,
+       "best_snr_db": 57.1,
+       "transmitters": [
+        {
+         "call": "WELF-TV",
+         "kind": "tv",
+         "freq_mhz": 557.0,
+         "distance_km": 36.39,
+         "erp_kw": 475.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRCB",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 72.55,
+         "erp_kw": 160.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WFLI-TV",
+         "kind": "tv",
+         "freq_mhz": 527.0,
+         "distance_km": 72.5,
+         "erp_kw": 550.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTVC",
+         "kind": "tv",
+         "freq_mhz": 189.0,
+         "distance_km": 72.5,
+         "erp_kw": 90.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WDEF-TV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 69.65,
+         "erp_kw": 35.9,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTCI",
+         "kind": "tv",
+         "freq_mhz": 599.0,
+         "distance_km": 77.71,
+         "erp_kw": 200.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 156
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 56.9,
+       "best_snr_db": 35.0,
+       "transmitters": [
+        {
+         "call": "WCLM",
+         "kind": "fm",
+         "freq_mhz": 91.3,
+         "distance_km": 16.63,
+         "erp_kw": 10.5,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WBDX",
+         "kind": "fm",
+         "freq_mhz": 102.7,
+         "distance_km": 40.21,
+         "erp_kw": 0.3,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WUKV",
+         "kind": "fm",
+         "freq_mhz": 95.7,
+         "distance_km": 4.39,
+         "erp_kw": 1.3,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WKXJ",
+         "kind": "fm",
+         "freq_mhz": 105.5,
+         "distance_km": 46.1,
+         "erp_kw": 5.3,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WMBW",
+         "kind": "fm",
+         "freq_mhz": 88.9,
+         "distance_km": 50.82,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WKEA-FM",
+         "kind": "fm",
+         "freq_mhz": 98.3,
+         "distance_km": 56.15,
+         "erp_kw": 11.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 156
+      }
+     },
+     {
+      "sensors": 12,
+      "drone": "mavic",
+      "cell_20db": {
+       "located_pct": 92.0,
+       "tracked_pct": 86.3,
+       "median_error_m": 15.2
+      },
+      "cell_40db": {
+       "located_pct": 95.6,
+       "tracked_pct": 90.4,
+       "median_error_m": 13.1
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.4,
+       "best_snr_db": 47.1,
+       "transmitters": [
+        {
+         "call": "WELF-TV",
+         "kind": "tv",
+         "freq_mhz": 557.0,
+         "distance_km": 36.39,
+         "erp_kw": 475.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WFLI-TV",
+         "kind": "tv",
+         "freq_mhz": 527.0,
+         "distance_km": 72.5,
+         "erp_kw": 550.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRCB",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 72.55,
+         "erp_kw": 160.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTCI",
+         "kind": "tv",
+         "freq_mhz": 599.0,
+         "distance_km": 77.71,
+         "erp_kw": 200.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WDSI-TV",
+         "kind": "tv",
+         "freq_mhz": 473.0,
+         "distance_km": 72.5,
+         "erp_kw": 120.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTVC",
+         "kind": "tv",
+         "freq_mhz": 189.0,
+         "distance_km": 72.5,
+         "erp_kw": 90.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 156
+      },
+      "fm": {
+       "detected_pct": 25.6,
+       "located_pct": 0.0,
+       "median_error_m": null,
+       "best_snr_db": 10.4,
+       "transmitters": [
+        {
+         "call": "WCLM",
+         "kind": "fm",
+         "freq_mhz": 91.3,
+         "distance_km": 16.63,
+         "erp_kw": 10.5,
+         "zone_seen_pct": 15.4
+        },
+        {
+         "call": "WBDX",
+         "kind": "fm",
+         "freq_mhz": 102.7,
+         "distance_km": 40.21,
+         "erp_kw": 0.3,
+         "zone_seen_pct": 11.5
+        },
+        {
+         "call": "WUKV",
+         "kind": "fm",
+         "freq_mhz": 95.7,
+         "distance_km": 4.39,
+         "erp_kw": 1.3,
+         "zone_seen_pct": 5.8
+        },
+        {
+         "call": "WKXJ",
+         "kind": "fm",
+         "freq_mhz": 105.5,
+         "distance_km": 46.1,
+         "erp_kw": 5.3,
+         "zone_seen_pct": 0.0
+        },
+        {
+         "call": "WMBW",
+         "kind": "fm",
+         "freq_mhz": 88.9,
+         "distance_km": 50.82,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 1.3
+        },
+        {
+         "call": "WKEA-FM",
+         "kind": "fm",
+         "freq_mhz": 98.3,
+         "distance_km": 56.15,
+         "erp_kw": 11.0,
+         "zone_seen_pct": 0.0
+        }
+       ],
+       "n_pts": 156
+      }
+     }
+    ]
+   },
+   "hancock": {
+    "name": "Hancock State Prison",
+    "type": "sparse towers",
+    "tv_count": 6,
+    "fm_count": 18,
+    "cases": [
+     {
+      "sensors": 6,
+      "drone": "m210",
+      "cell_20db": {
+       "located_pct": 0.0,
+       "tracked_pct": 0.0,
+       "median_error_m": null
+      },
+      "cell_40db": {
+       "located_pct": 98.8,
+       "tracked_pct": 94.8,
+       "median_error_m": 8.3
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.5,
+       "best_snr_db": 41.1,
+       "transmitters": [
+        {
+         "call": "WCES-TV",
+         "kind": "tv",
+         "freq_mhz": 85.0,
+         "distance_km": 62.02,
+         "erp_kw": 7.9,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WGXA",
+         "kind": "tv",
+         "freq_mhz": 545.0,
+         "distance_km": 79.17,
+         "erp_kw": 540.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WGNM",
+         "kind": "tv",
+         "freq_mhz": 587.0,
+         "distance_km": 77.98,
+         "erp_kw": 793.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WMAZ-TV",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 78.85,
+         "erp_kw": 52.6,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WMGT-TV",
+         "kind": "tv",
+         "freq_mhz": 569.0,
+         "distance_km": 79.07,
+         "erp_kw": 90.1,
+         "zone_seen_pct": 96.9
+        },
+        {
+         "call": "WPGA-TV",
+         "kind": "tv",
+         "freq_mhz": 527.0,
+         "distance_km": 78.89,
+         "erp_kw": 82.2,
+         "zone_seen_pct": 98.1
+        }
+       ],
+       "n_pts": 159
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 79.7,
+       "best_snr_db": 34.6,
+       "transmitters": [
+        {
+         "call": "WMGZ",
+         "kind": "fm",
+         "freq_mhz": 97.7,
+         "distance_km": 28.05,
+         "erp_kw": 8.5,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTHP",
+         "kind": "fm",
+         "freq_mhz": 94.3,
+         "distance_km": 33.37,
+         "erp_kw": 6.3,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WPMA",
+         "kind": "fm",
+         "freq_mhz": 102.7,
+         "distance_km": 40.52,
+         "erp_kw": 7.5,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WDDK",
+         "kind": "fm",
+         "freq_mhz": 103.9,
+         "distance_km": 37.42,
+         "erp_kw": 5.3,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WLRR",
+         "kind": "fm",
+         "freq_mhz": 100.7,
+         "distance_km": 28.96,
+         "erp_kw": 3.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTHO-FM",
+         "kind": "fm",
+         "freq_mhz": 101.7,
+         "distance_km": 47.54,
+         "erp_kw": 5.1,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 159
+      }
+     },
+     {
+      "sensors": 6,
+      "drone": "mavic",
+      "cell_20db": {
+       "located_pct": 0.0,
+       "tracked_pct": 0.0,
+       "median_error_m": null
+      },
+      "cell_40db": {
+       "located_pct": 15.0,
+       "tracked_pct": 4.5,
+       "median_error_m": 22.5
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 98.7,
+       "median_error_m": 16.0,
+       "best_snr_db": 24.5,
+       "transmitters": [
+        {
+         "call": "WGXA",
+         "kind": "tv",
+         "freq_mhz": 545.0,
+         "distance_km": 79.17,
+         "erp_kw": 540.0,
+         "zone_seen_pct": 98.1
+        },
+        {
+         "call": "WGNM",
+         "kind": "tv",
+         "freq_mhz": 587.0,
+         "distance_km": 77.98,
+         "erp_kw": 793.0,
+         "zone_seen_pct": 98.1
+        },
+        {
+         "call": "WCES-TV",
+         "kind": "tv",
+         "freq_mhz": 85.0,
+         "distance_km": 62.02,
+         "erp_kw": 7.9,
+         "zone_seen_pct": 78.0
+        },
+        {
+         "call": "WMAZ-TV",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 78.85,
+         "erp_kw": 52.6,
+         "zone_seen_pct": 89.3
+        },
+        {
+         "call": "WMGT-TV",
+         "kind": "tv",
+         "freq_mhz": 569.0,
+         "distance_km": 79.07,
+         "erp_kw": 90.1,
+         "zone_seen_pct": 25.2
+        },
+        {
+         "call": "WPGA-TV",
+         "kind": "tv",
+         "freq_mhz": 527.0,
+         "distance_km": 78.89,
+         "erp_kw": 82.2,
+         "zone_seen_pct": 25.8
+        }
+       ],
+       "n_pts": 159
+      },
+      "fm": {
+       "detected_pct": 24.5,
+       "located_pct": 2.5,
+       "median_error_m": 2639.7,
+       "best_snr_db": 10.0,
+       "transmitters": [
+        {
+         "call": "WMGZ",
+         "kind": "fm",
+         "freq_mhz": 97.7,
+         "distance_km": 28.05,
+         "erp_kw": 8.5,
+         "zone_seen_pct": 20.1
+        },
+        {
+         "call": "WTHP",
+         "kind": "fm",
+         "freq_mhz": 94.3,
+         "distance_km": 33.37,
+         "erp_kw": 6.3,
+         "zone_seen_pct": 8.2
+        },
+        {
+         "call": "WPMA",
+         "kind": "fm",
+         "freq_mhz": 102.7,
+         "distance_km": 40.52,
+         "erp_kw": 7.5,
+         "zone_seen_pct": 4.4
+        },
+        {
+         "call": "WDDK",
+         "kind": "fm",
+         "freq_mhz": 103.9,
+         "distance_km": 37.42,
+         "erp_kw": 5.3,
+         "zone_seen_pct": 3.8
+        },
+        {
+         "call": "WLRR",
+         "kind": "fm",
+         "freq_mhz": 100.7,
+         "distance_km": 28.96,
+         "erp_kw": 3.0,
+         "zone_seen_pct": 0.0
+        },
+        {
+         "call": "WTHO-FM",
+         "kind": "fm",
+         "freq_mhz": 101.7,
+         "distance_km": 47.54,
+         "erp_kw": 5.1,
+         "zone_seen_pct": 0.0
+        }
+       ],
+       "n_pts": 159
+      }
+     },
+     {
+      "sensors": 12,
+      "drone": "m210",
+      "cell_20db": {
+       "located_pct": 0.8,
+       "tracked_pct": 3.6,
+       "median_error_m": 21.7
+      },
+      "cell_40db": {
+       "located_pct": 100.0,
+       "tracked_pct": 99.6,
+       "median_error_m": 4.6
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.2,
+       "best_snr_db": 42.6,
+       "transmitters": [
+        {
+         "call": "WCES-TV",
+         "kind": "tv",
+         "freq_mhz": 85.0,
+         "distance_km": 62.02,
+         "erp_kw": 7.9,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WGXA",
+         "kind": "tv",
+         "freq_mhz": 545.0,
+         "distance_km": 79.17,
+         "erp_kw": 540.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WGNM",
+         "kind": "tv",
+         "freq_mhz": 587.0,
+         "distance_km": 77.98,
+         "erp_kw": 793.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WMAZ-TV",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 78.85,
+         "erp_kw": 52.6,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WMGT-TV",
+         "kind": "tv",
+         "freq_mhz": 569.0,
+         "distance_km": 79.07,
+         "erp_kw": 90.1,
+         "zone_seen_pct": 99.4
+        },
+        {
+         "call": "WPGA-TV",
+         "kind": "tv",
+         "freq_mhz": 527.0,
+         "distance_km": 78.89,
+         "erp_kw": 82.2,
+         "zone_seen_pct": 98.7
+        }
+       ],
+       "n_pts": 159
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 51.1,
+       "best_snr_db": 36.5,
+       "transmitters": [
+        {
+         "call": "WMGZ",
+         "kind": "fm",
+         "freq_mhz": 97.7,
+         "distance_km": 28.05,
+         "erp_kw": 8.5,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTHP",
+         "kind": "fm",
+         "freq_mhz": 94.3,
+         "distance_km": 33.37,
+         "erp_kw": 6.3,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WPMA",
+         "kind": "fm",
+         "freq_mhz": 102.7,
+         "distance_km": 40.52,
+         "erp_kw": 7.5,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WDDK",
+         "kind": "fm",
+         "freq_mhz": 103.9,
+         "distance_km": 37.42,
+         "erp_kw": 5.3,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WLRR",
+         "kind": "fm",
+         "freq_mhz": 100.7,
+         "distance_km": 28.96,
+         "erp_kw": 3.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WTHO-FM",
+         "kind": "fm",
+         "freq_mhz": 101.7,
+         "distance_km": 47.54,
+         "erp_kw": 5.1,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 159
+      }
+     },
+     {
+      "sensors": 12,
+      "drone": "mavic",
+      "cell_20db": {
+       "located_pct": 0.0,
+       "tracked_pct": 1.5,
+       "median_error_m": null
+      },
+      "cell_40db": {
+       "located_pct": 66.7,
+       "tracked_pct": 60.4,
+       "median_error_m": 19.6
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 11.8,
+       "best_snr_db": 25.6,
+       "transmitters": [
+        {
+         "call": "WGXA",
+         "kind": "tv",
+         "freq_mhz": 545.0,
+         "distance_km": 79.17,
+         "erp_kw": 540.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WGNM",
+         "kind": "tv",
+         "freq_mhz": 587.0,
+         "distance_km": 77.98,
+         "erp_kw": 793.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WMAZ-TV",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 78.85,
+         "erp_kw": 52.6,
+         "zone_seen_pct": 98.1
+        },
+        {
+         "call": "WCES-TV",
+         "kind": "tv",
+         "freq_mhz": 85.0,
+         "distance_km": 62.02,
+         "erp_kw": 7.9,
+         "zone_seen_pct": 92.5
+        },
+        {
+         "call": "WMGT-TV",
+         "kind": "tv",
+         "freq_mhz": 569.0,
+         "distance_km": 79.07,
+         "erp_kw": 90.1,
+         "zone_seen_pct": 40.3
+        },
+        {
+         "call": "WPGA-TV",
+         "kind": "tv",
+         "freq_mhz": 527.0,
+         "distance_km": 78.89,
+         "erp_kw": 82.2,
+         "zone_seen_pct": 45.3
+        }
+       ],
+       "n_pts": 159
+      },
+      "fm": {
+       "detected_pct": 38.4,
+       "located_pct": 7.5,
+       "median_error_m": 2008.6,
+       "best_snr_db": 11.9,
+       "transmitters": [
+        {
+         "call": "WMGZ",
+         "kind": "fm",
+         "freq_mhz": 97.7,
+         "distance_km": 28.05,
+         "erp_kw": 8.5,
+         "zone_seen_pct": 32.7
+        },
+        {
+         "call": "WTHP",
+         "kind": "fm",
+         "freq_mhz": 94.3,
+         "distance_km": 33.37,
+         "erp_kw": 6.3,
+         "zone_seen_pct": 13.8
+        },
+        {
+         "call": "WPMA",
+         "kind": "fm",
+         "freq_mhz": 102.7,
+         "distance_km": 40.52,
+         "erp_kw": 7.5,
+         "zone_seen_pct": 6.9
+        },
+        {
+         "call": "WDDK",
+         "kind": "fm",
+         "freq_mhz": 103.9,
+         "distance_km": 37.42,
+         "erp_kw": 5.3,
+         "zone_seen_pct": 6.3
+        },
+        {
+         "call": "WLRR",
+         "kind": "fm",
+         "freq_mhz": 100.7,
+         "distance_km": 28.96,
+         "erp_kw": 3.0,
+         "zone_seen_pct": 0.0
+        },
+        {
+         "call": "WTHO-FM",
+         "kind": "fm",
+         "freq_mhz": 101.7,
+         "distance_km": 47.54,
+         "erp_kw": 5.1,
+         "zone_seen_pct": 0.0
+        }
+       ],
+       "n_pts": 159
+      }
+     }
+    ]
+   },
+   "fulton": {
+    "name": "Fulton County Jail",
+    "type": "dense towers",
+    "tv_count": 13,
+    "fm_count": 30,
+    "cases": [
+     {
+      "sensors": 6,
+      "drone": "m210",
+      "cell_20db": {
+       "located_pct": 2.1,
+       "tracked_pct": 0.3,
+       "median_error_m": 46.5
+      },
+      "cell_40db": {
+       "located_pct": 100.0,
+       "tracked_pct": 99.3,
+       "median_error_m": 5.5
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.1,
+       "best_snr_db": 64.5,
+       "transmitters": [
+        {
+         "call": "WPCH-TV",
+         "kind": "tv",
+         "freq_mhz": 575.0,
+         "distance_km": 8.43,
+         "erp_kw": 805.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WXIA-TV",
+         "kind": "tv",
+         "freq_mhz": 195.0,
+         "distance_km": 8.82,
+         "erp_kw": 80.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WHSG-TV",
+         "kind": "tv",
+         "freq_mhz": 521.0,
+         "distance_km": 6.97,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WSB-TV",
+         "kind": "tv",
+         "freq_mhz": 581.0,
+         "distance_km": 5.94,
+         "erp_kw": 869.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WGTV",
+         "kind": "tv",
+         "freq_mhz": 177.0,
+         "distance_km": 26.01,
+         "erp_kw": 62.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WANF",
+         "kind": "tv",
+         "freq_mhz": 503.0,
+         "distance_km": 8.43,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 89
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 34.1,
+       "best_snr_db": 43.9,
+       "transmitters": [
+        {
+         "call": "WAIA",
+         "kind": "fm",
+         "freq_mhz": 104.7,
+         "distance_km": 55.94,
+         "erp_kw": 24.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRFG",
+         "kind": "fm",
+         "freq_mhz": 89.3,
+         "distance_km": 8.43,
+         "erp_kw": 65.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WAKL",
+         "kind": "fm",
+         "freq_mhz": 106.7,
+         "distance_km": 55.94,
+         "erp_kw": 77.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WBZY",
+         "kind": "fm",
+         "freq_mhz": 105.7,
+         "distance_km": 32.05,
+         "erp_kw": 20.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRAS",
+         "kind": "fm",
+         "freq_mhz": 88.5,
+         "distance_km": 6.97,
+         "erp_kw": 50.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WAMJ",
+         "kind": "fm",
+         "freq_mhz": 107.5,
+         "distance_km": 25.66,
+         "erp_kw": 18.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 89
+      }
+     },
+     {
+      "sensors": 6,
+      "drone": "mavic",
+      "cell_20db": {
+       "located_pct": 0.0,
+       "tracked_pct": 0.0,
+       "median_error_m": null
+      },
+      "cell_40db": {
+       "located_pct": 75.2,
+       "tracked_pct": 54.6,
+       "median_error_m": 16.4
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.1,
+       "best_snr_db": 53.9,
+       "transmitters": [
+        {
+         "call": "WPCH-TV",
+         "kind": "tv",
+         "freq_mhz": 575.0,
+         "distance_km": 8.43,
+         "erp_kw": 805.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WHSG-TV",
+         "kind": "tv",
+         "freq_mhz": 521.0,
+         "distance_km": 6.97,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WXIA-TV",
+         "kind": "tv",
+         "freq_mhz": 195.0,
+         "distance_km": 8.82,
+         "erp_kw": 80.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WSB-TV",
+         "kind": "tv",
+         "freq_mhz": 581.0,
+         "distance_km": 5.94,
+         "erp_kw": 869.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WANF",
+         "kind": "tv",
+         "freq_mhz": 503.0,
+         "distance_km": 8.43,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WATC-DT",
+         "kind": "tv",
+         "freq_mhz": 593.0,
+         "distance_km": 32.09,
+         "erp_kw": 475.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 89
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 89.9,
+       "median_error_m": 552.9,
+       "best_snr_db": 19.3,
+       "transmitters": [
+        {
+         "call": "WAIA",
+         "kind": "fm",
+         "freq_mhz": 104.7,
+         "distance_km": 55.94,
+         "erp_kw": 24.0,
+         "zone_seen_pct": 85.4
+        },
+        {
+         "call": "WRFG",
+         "kind": "fm",
+         "freq_mhz": 89.3,
+         "distance_km": 8.43,
+         "erp_kw": 65.0,
+         "zone_seen_pct": 53.9
+        },
+        {
+         "call": "WAKL",
+         "kind": "fm",
+         "freq_mhz": 106.7,
+         "distance_km": 55.94,
+         "erp_kw": 77.0,
+         "zone_seen_pct": 91.0
+        },
+        {
+         "call": "WBZY",
+         "kind": "fm",
+         "freq_mhz": 105.7,
+         "distance_km": 32.05,
+         "erp_kw": 20.0,
+         "zone_seen_pct": 82.0
+        },
+        {
+         "call": "WRAS",
+         "kind": "fm",
+         "freq_mhz": 88.5,
+         "distance_km": 6.97,
+         "erp_kw": 50.0,
+         "zone_seen_pct": 46.1
+        },
+        {
+         "call": "WAMJ",
+         "kind": "fm",
+         "freq_mhz": 107.5,
+         "distance_km": 25.66,
+         "erp_kw": 18.0,
+         "zone_seen_pct": 92.1
+        }
+       ],
+       "n_pts": 89
+      }
+     },
+     {
+      "sensors": 12,
+      "drone": "m210",
+      "cell_20db": {
+       "located_pct": 3.5,
+       "tracked_pct": 9.5,
+       "median_error_m": 23.1
+      },
+      "cell_40db": {
+       "located_pct": 100.0,
+       "tracked_pct": 100.0,
+       "median_error_m": 3.8
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.0,
+       "best_snr_db": 64.7,
+       "transmitters": [
+        {
+         "call": "WXIA-TV",
+         "kind": "tv",
+         "freq_mhz": 195.0,
+         "distance_km": 8.82,
+         "erp_kw": 80.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WPCH-TV",
+         "kind": "tv",
+         "freq_mhz": 575.0,
+         "distance_km": 8.43,
+         "erp_kw": 805.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WHSG-TV",
+         "kind": "tv",
+         "freq_mhz": 521.0,
+         "distance_km": 6.97,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WATC-DT",
+         "kind": "tv",
+         "freq_mhz": 593.0,
+         "distance_km": 32.09,
+         "erp_kw": 475.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WANF",
+         "kind": "tv",
+         "freq_mhz": 503.0,
+         "distance_km": 8.43,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WUPA",
+         "kind": "tv",
+         "freq_mhz": 605.0,
+         "distance_km": 8.43,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 89
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 23.4,
+       "best_snr_db": 45.8,
+       "transmitters": [
+        {
+         "call": "WAMJ",
+         "kind": "fm",
+         "freq_mhz": 107.5,
+         "distance_km": 25.66,
+         "erp_kw": 18.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WAKL",
+         "kind": "fm",
+         "freq_mhz": 106.7,
+         "distance_km": 55.94,
+         "erp_kw": 77.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WBZY",
+         "kind": "fm",
+         "freq_mhz": 105.7,
+         "distance_km": 32.05,
+         "erp_kw": 20.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WAIA",
+         "kind": "fm",
+         "freq_mhz": 104.7,
+         "distance_km": 55.94,
+         "erp_kw": 24.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRFG",
+         "kind": "fm",
+         "freq_mhz": 89.3,
+         "distance_km": 8.43,
+         "erp_kw": 65.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WSB-FM",
+         "kind": "fm",
+         "freq_mhz": 98.5,
+         "distance_km": 8.5,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 89
+      }
+     },
+     {
+      "sensors": 12,
+      "drone": "mavic",
+      "cell_20db": {
+       "located_pct": 0.0,
+       "tracked_pct": 2.0,
+       "median_error_m": null
+      },
+      "cell_40db": {
+       "located_pct": 92.2,
+       "tracked_pct": 80.9,
+       "median_error_m": 12.2
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.0,
+       "best_snr_db": 54.0,
+       "transmitters": [
+        {
+         "call": "WPCH-TV",
+         "kind": "tv",
+         "freq_mhz": 575.0,
+         "distance_km": 8.43,
+         "erp_kw": 805.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WXIA-TV",
+         "kind": "tv",
+         "freq_mhz": 195.0,
+         "distance_km": 8.82,
+         "erp_kw": 80.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WHSG-TV",
+         "kind": "tv",
+         "freq_mhz": 521.0,
+         "distance_km": 6.97,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WATC-DT",
+         "kind": "tv",
+         "freq_mhz": 593.0,
+         "distance_km": 32.09,
+         "erp_kw": 475.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WANF",
+         "kind": "tv",
+         "freq_mhz": 503.0,
+         "distance_km": 8.43,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WUPA",
+         "kind": "tv",
+         "freq_mhz": 605.0,
+         "distance_km": 8.43,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 89
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 98.9,
+       "median_error_m": 355.3,
+       "best_snr_db": 21.2,
+       "transmitters": [
+        {
+         "call": "WAMJ",
+         "kind": "fm",
+         "freq_mhz": 107.5,
+         "distance_km": 25.66,
+         "erp_kw": 18.0,
+         "zone_seen_pct": 98.9
+        },
+        {
+         "call": "WAKL",
+         "kind": "fm",
+         "freq_mhz": 106.7,
+         "distance_km": 55.94,
+         "erp_kw": 77.0,
+         "zone_seen_pct": 98.9
+        },
+        {
+         "call": "WBZY",
+         "kind": "fm",
+         "freq_mhz": 105.7,
+         "distance_km": 32.05,
+         "erp_kw": 20.0,
+         "zone_seen_pct": 97.8
+        },
+        {
+         "call": "WAIA",
+         "kind": "fm",
+         "freq_mhz": 104.7,
+         "distance_km": 55.94,
+         "erp_kw": 24.0,
+         "zone_seen_pct": 98.9
+        },
+        {
+         "call": "WRFG",
+         "kind": "fm",
+         "freq_mhz": 89.3,
+         "distance_km": 8.43,
+         "erp_kw": 65.0,
+         "zone_seen_pct": 64.0
+        },
+        {
+         "call": "WSB-FM",
+         "kind": "fm",
+         "freq_mhz": 98.5,
+         "distance_km": 8.5,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 77.5
+        }
+       ],
+       "n_pts": 89
+      }
+     }
+    ]
+   },
+   "clemson": {
+    "name": "Clemson Memorial Stadium",
+    "type": "stadium",
+    "tv_count": 10,
+    "fm_count": 26,
+    "cases": [
+     {
+      "sensors": 6,
+      "drone": "m210",
+      "cell_20db": {
+       "located_pct": 79.7,
+       "tracked_pct": 26.5,
+       "median_error_m": 10.3
+      },
+      "cell_40db": {
+       "located_pct": 100.0,
+       "tracked_pct": 96.2,
+       "median_error_m": 4.3
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.1,
+       "best_snr_db": 54.1,
+       "transmitters": [
+        {
+         "call": "WMYA-TV",
+         "kind": "tv",
+         "freq_mhz": 599.0,
+         "distance_km": 52.67,
+         "erp_kw": 750.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WNTV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 49.17,
+         "erp_kw": 180.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRET-TV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 49.17,
+         "erp_kw": 180.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WLOS",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 66.0,
+         "erp_kw": 144.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WYCW",
+         "kind": "tv",
+         "freq_mhz": 201.0,
+         "distance_km": 74.31,
+         "erp_kw": 33.5,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WSPA-TV",
+         "kind": "tv",
+         "freq_mhz": 201.0,
+         "distance_km": 74.33,
+         "erp_kw": 33.5,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 96
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 65.5,
+       "best_snr_db": 48.3,
+       "transmitters": [
+        {
+         "call": "WJMZ-FM",
+         "kind": "fm",
+         "freq_mhz": 107.3,
+         "distance_km": 21.98,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WCCP-FM",
+         "kind": "fm",
+         "freq_mhz": 105.5,
+         "distance_km": 13.23,
+         "erp_kw": 20.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WSBF-FM",
+         "kind": "fm",
+         "freq_mhz": 88.1,
+         "distance_km": 2.08,
+         "erp_kw": 3.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WMYI",
+         "kind": "fm",
+         "freq_mhz": 102.5,
+         "distance_km": 55.27,
+         "erp_kw": 44.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WSHP-FM",
+         "kind": "fm",
+         "freq_mhz": 103.9,
+         "distance_km": 34.02,
+         "erp_kw": 25.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WKVG",
+         "kind": "fm",
+         "freq_mhz": 94.5,
+         "distance_km": 49.12,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 96
+      }
+     },
+     {
+      "sensors": 6,
+      "drone": "mavic",
+      "cell_20db": {
+       "located_pct": 51.4,
+       "tracked_pct": 12.6,
+       "median_error_m": 21.4
+      },
+      "cell_40db": {
+       "located_pct": 97.3,
+       "tracked_pct": 65.1,
+       "median_error_m": 12.3
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.3,
+       "best_snr_db": 43.4,
+       "transmitters": [
+        {
+         "call": "WMYA-TV",
+         "kind": "tv",
+         "freq_mhz": 599.0,
+         "distance_km": 52.67,
+         "erp_kw": 750.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WNTV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 49.17,
+         "erp_kw": 180.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRET-TV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 49.17,
+         "erp_kw": 180.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WLOS",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 66.0,
+         "erp_kw": 144.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WGTA",
+         "kind": "tv",
+         "freq_mhz": 533.0,
+         "distance_km": 48.94,
+         "erp_kw": 240.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WYCW",
+         "kind": "tv",
+         "freq_mhz": 201.0,
+         "distance_km": 74.31,
+         "erp_kw": 33.5,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 96
+      },
+      "fm": {
+       "detected_pct": 94.8,
+       "located_pct": 56.2,
+       "median_error_m": 903.4,
+       "best_snr_db": 23.7,
+       "transmitters": [
+        {
+         "call": "WJMZ-FM",
+         "kind": "fm",
+         "freq_mhz": 107.3,
+         "distance_km": 21.98,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 84.4
+        },
+        {
+         "call": "WCCP-FM",
+         "kind": "fm",
+         "freq_mhz": 105.5,
+         "distance_km": 13.23,
+         "erp_kw": 20.0,
+         "zone_seen_pct": 58.3
+        },
+        {
+         "call": "WSBF-FM",
+         "kind": "fm",
+         "freq_mhz": 88.1,
+         "distance_km": 2.08,
+         "erp_kw": 3.0,
+         "zone_seen_pct": 70.8
+        },
+        {
+         "call": "WMYI",
+         "kind": "fm",
+         "freq_mhz": 102.5,
+         "distance_km": 55.27,
+         "erp_kw": 44.0,
+         "zone_seen_pct": 24.0
+        },
+        {
+         "call": "WSHP-FM",
+         "kind": "fm",
+         "freq_mhz": 103.9,
+         "distance_km": 34.02,
+         "erp_kw": 25.0,
+         "zone_seen_pct": 9.4
+        },
+        {
+         "call": "WKVG",
+         "kind": "fm",
+         "freq_mhz": 94.5,
+         "distance_km": 49.12,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 9.4
+        }
+       ],
+       "n_pts": 96
+      }
+     },
+     {
+      "sensors": 12,
+      "drone": "m210",
+      "cell_20db": {
+       "located_pct": 83.8,
+       "tracked_pct": 50.4,
+       "median_error_m": 12.1
+      },
+      "cell_40db": {
+       "located_pct": 100.0,
+       "tracked_pct": 100.0,
+       "median_error_m": 1.9
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.0,
+       "best_snr_db": 56.6,
+       "transmitters": [
+        {
+         "call": "WMYA-TV",
+         "kind": "tv",
+         "freq_mhz": 599.0,
+         "distance_km": 52.67,
+         "erp_kw": 750.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WNTV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 49.17,
+         "erp_kw": 180.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRET-TV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 49.17,
+         "erp_kw": 180.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WLOS",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 66.0,
+         "erp_kw": 144.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WGTA",
+         "kind": "tv",
+         "freq_mhz": 533.0,
+         "distance_km": 48.94,
+         "erp_kw": 240.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WYFF",
+         "kind": "tv",
+         "freq_mhz": 569.0,
+         "distance_km": 52.71,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 96
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 43.8,
+       "best_snr_db": 46.6,
+       "transmitters": [
+        {
+         "call": "WJMZ-FM",
+         "kind": "fm",
+         "freq_mhz": 107.3,
+         "distance_km": 21.98,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WCCP-FM",
+         "kind": "fm",
+         "freq_mhz": 105.5,
+         "distance_km": 13.23,
+         "erp_kw": 20.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WSBF-FM",
+         "kind": "fm",
+         "freq_mhz": 88.1,
+         "distance_km": 2.08,
+         "erp_kw": 3.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WMYI",
+         "kind": "fm",
+         "freq_mhz": 102.5,
+         "distance_km": 55.27,
+         "erp_kw": 44.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WROQ",
+         "kind": "fm",
+         "freq_mhz": 101.1,
+         "distance_km": 52.66,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WFBC-FM",
+         "kind": "fm",
+         "freq_mhz": 93.7,
+         "distance_km": 52.72,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 96
+      }
+     },
+     {
+      "sensors": 12,
+      "drone": "mavic",
+      "cell_20db": {
+       "located_pct": 40.5,
+       "tracked_pct": 20.6,
+       "median_error_m": 18.3
+      },
+      "cell_40db": {
+       "located_pct": 100.0,
+       "tracked_pct": 97.6,
+       "median_error_m": 6.0
+      },
+      "tv": {
+       "detected_pct": 100.0,
+       "located_pct": 100.0,
+       "median_error_m": 5.2,
+       "best_snr_db": 45.7,
+       "transmitters": [
+        {
+         "call": "WMYA-TV",
+         "kind": "tv",
+         "freq_mhz": 599.0,
+         "distance_km": 52.67,
+         "erp_kw": 750.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WNTV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 49.17,
+         "erp_kw": 180.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WRET-TV",
+         "kind": "tv",
+         "freq_mhz": 183.0,
+         "distance_km": 49.17,
+         "erp_kw": 180.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WLOS",
+         "kind": "tv",
+         "freq_mhz": 213.0,
+         "distance_km": 66.0,
+         "erp_kw": 144.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WGTA",
+         "kind": "tv",
+         "freq_mhz": 533.0,
+         "distance_km": 48.94,
+         "erp_kw": 240.0,
+         "zone_seen_pct": 100.0
+        },
+        {
+         "call": "WYFF",
+         "kind": "tv",
+         "freq_mhz": 569.0,
+         "distance_km": 52.71,
+         "erp_kw": 1000.0,
+         "zone_seen_pct": 100.0
+        }
+       ],
+       "n_pts": 96
+      },
+      "fm": {
+       "detected_pct": 100.0,
+       "located_pct": 85.4,
+       "median_error_m": 700.5,
+       "best_snr_db": 22.0,
+       "transmitters": [
+        {
+         "call": "WJMZ-FM",
+         "kind": "fm",
+         "freq_mhz": 107.3,
+         "distance_km": 21.98,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 94.8
+        },
+        {
+         "call": "WCCP-FM",
+         "kind": "fm",
+         "freq_mhz": 105.5,
+         "distance_km": 13.23,
+         "erp_kw": 20.0,
+         "zone_seen_pct": 66.7
+        },
+        {
+         "call": "WSBF-FM",
+         "kind": "fm",
+         "freq_mhz": 88.1,
+         "distance_km": 2.08,
+         "erp_kw": 3.0,
+         "zone_seen_pct": 77.1
+        },
+        {
+         "call": "WMYI",
+         "kind": "fm",
+         "freq_mhz": 102.5,
+         "distance_km": 55.27,
+         "erp_kw": 44.0,
+         "zone_seen_pct": 61.5
+        },
+        {
+         "call": "WROQ",
+         "kind": "fm",
+         "freq_mhz": 101.1,
+         "distance_km": 52.66,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 28.1
+        },
+        {
+         "call": "WFBC-FM",
+         "kind": "fm",
+         "freq_mhz": 93.7,
+         "distance_km": 52.72,
+         "erp_kw": 100.0,
+         "zone_seen_pct": 41.7
+        }
+       ],
+       "n_pts": 96
+      }
+     }
+    ]
+   }
+  }
+ },
+ "gnss": {
+  "method": "GPS jammer locator on the drone sensors (v0.6): detect a jammer and find it by time difference of arrival (TDOA).\n\nEach perimeter sensor also listens on GPS L1 (1575.42 MHz). A jammer raises the noise floor at every sensor; the sensors\ncross-correlate what they record and the differences in arrival time place the source (hyperbolic multilateration,\nGauss-Newton least squares; the method of the Baltic TDOA network, GPS Solutions 30:96, 2026).\n\nInputs and where they come from:\n  * jammer: a car \"privacy\" jammer of 10 dBm (the DTU trial tracked one this weak, NAVIGATION 73(1), 2026) or a\n    1 W (30 dBm) jammer, ~2 MHz wide around L1 (ASSUMPTION), 1.5 m above ground on a road;\n  * propagation: the twin's terrain path model (free space + Bullington diffraction + ground reflection);\n  * receiver: 3 dBi L1 patch, noise figure 2 dB with an LNA (ASSUMPTIONS), 10 ms correlation;\n  * timing: the sensors' clocks are disciplined by GPS, which the jammer takes away. Each sensor then holds time on\n    its own oscillator: an oven-controlled crystal (OCXO) drifts ~50 ns over a few minutes of jamming, a chip-scale\n    atomic clock (CSAC) ~5 ns (ASSUMPTIONS, typical holdover figures). Clock error dominates; it is what we test.\n  * TDOA noise per sensor pair: clock error (quadrature of both clocks) + correlation error 1 / (2 pi B_rms sqrt(2 SNR_eff))\n    (STANDARD Cramer-Rao form), where SNR_eff = JNR x B x T.\nBearings: our sensors are 8-antenna rings, so each can also measure the direction the jamming comes from. The DTU trial\ngot 0.5-1 deg precision from a 5-channel array, with up to 10 deg bias before calibration; we use 2 deg (ASSUMPTION,\nafter calibration). Mode \"tdoa+aoa\" fits both together (weighted Gauss-Newton), which fixes the poor geometry when the\njammer sits outside a small ring of sensors.\nDetection: a sensor detects the jammer when its jammer-to-noise ratio is above 10 dB (ASSUMPTION; GPS receivers lose\nlock around 20-30 dB of J/N, so detection comes well before harm).",
+  "cases": [
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 3,
+    "error_m": 396.4,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 2,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 3,
+    "error_m": 19.2,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 2,
+    "error_m": 147.7,
+    "fail_pct": 11.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 3,
+    "error_m": 395.1,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 2,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 3,
+    "error_m": 8.3,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 2,
+    "error_m": 173.2,
+    "fail_pct": 12.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 6,
+    "error_m": 74.0,
+    "fail_pct": 4.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 273.7,
+    "fail_pct": 46.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 2,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 6,
+    "error_m": 16.8,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 79.8,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 2,
+    "error_m": 232.8,
+    "fail_pct": 45.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 6,
+    "error_m": 8.5,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 64.2,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 2,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 6,
+    "error_m": 7.5,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 44.4,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 2,
+    "error_m": 234.4,
+    "fail_pct": 51.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 7,
+    "error_m": 116.0,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 228.2,
+    "fail_pct": 69.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 7,
+    "error_m": 10.5,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 84.3,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 7,
+    "error_m": 10.3,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 107.4,
+    "fail_pct": 4.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 7,
+    "error_m": 6.4,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 82.5,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 12,
+    "error_m": 73.2,
+    "fail_pct": 3.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 12,
+    "error_m": 225.0,
+    "fail_pct": 28.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 5,
+    "error_m": 300.5,
+    "fail_pct": 88.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 12,
+    "error_m": 11.7,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 12,
+    "error_m": 41.8,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 5,
+    "error_m": 178.7,
+    "fail_pct": 17.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 12,
+    "error_m": 6.4,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 12,
+    "error_m": 47.6,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 5,
+    "error_m": 201.6,
+    "fail_pct": 13.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 12,
+    "error_m": 6.7,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 12,
+    "error_m": 23.5,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "hays",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 5,
+    "error_m": 138.1,
+    "fail_pct": 5.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 2,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 2,
+    "error_m": 249.2,
+    "fail_pct": 60.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 2,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 2,
+    "error_m": 228.4,
+    "fail_pct": 66.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 4,
+    "error_m": 144.5,
+    "fail_pct": 31.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 211.5,
+    "fail_pct": 81.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 4,
+    "error_m": 17.6,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 94.9,
+    "fail_pct": 3.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 4,
+    "error_m": 35.3,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 147.0,
+    "fail_pct": 3.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 4,
+    "error_m": 18.6,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 6,
+    "error_m": 87.4,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 6,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 3,
+    "error_m": 461.2,
+    "fail_pct": 96.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 3,
+    "error_m": 273.5,
+    "fail_pct": 61.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 3,
+    "error_m": 326.0,
+    "fail_pct": 94.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 3,
+    "error_m": 336.0,
+    "fail_pct": 57.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 10,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 8,
+    "error_m": 152.9,
+    "fail_pct": 36.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 11,
+    "error_m": 250.4,
+    "fail_pct": 73.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 8,
+    "error_m": 15.8,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 11,
+    "error_m": 77.4,
+    "fail_pct": 1.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "ocxo",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 8,
+    "error_m": 33.2,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "1 km away",
+    "detected": 11,
+    "error_m": 88.0,
+    "fail_pct": 1.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "car on a road 300 m from the fence",
+    "detected": 8,
+    "error_m": 12.1,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "1 km away",
+    "detected": 11,
+    "error_m": 66.9,
+    "fail_pct": 0.0
+   },
+   {
+    "site": "fulton",
+    "sensors": 12,
+    "power_dbm": 30,
+    "clock": "csac",
+    "mode": "tdoa+aoa",
+    "where": "2 km away",
+    "detected": 0,
+    "error_m": null,
+    "fail_pct": 100.0
+   }
+  ],
+  "maps": {
+   "hays|6|10|ocxo": {
+    "x0": -1500.0,
+    "step_m": 150.0,
+    "n": 21,
+    "error_m": [
+     [
+      null,
+      null,
+      null,
+      null,
+      192.5,
+      272.5,
+      null,
+      null,
+      200.1,
+      230.0,
+      221.1,
+      null,
+      null,
+      null,
+      188.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      212.6,
+      130.8,
+      244.6,
+      null,
+      250.3,
+      214.7,
+      144.7,
+      null,
+      188.6,
+      null,
+      null,
+      138.6,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      262.8,
+      142.2,
+      164.8,
+      139.8,
+      135.3,
+      null,
+      null,
+      140.2,
+      101.3,
+      135.2,
+      140.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      114.9,
+      207.9,
+      164.3,
+      145.4,
+      null,
+      164.0,
+      96.9,
+      null,
+      91.5,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      175.8,
+      132.1,
+      156.4,
+      95.5,
+      88.3,
+      72.1,
+      null,
+      65.9,
+      90.9,
+      63.6,
+      111.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      104.8,
+      88.3,
+      139.5,
+      72.7,
+      77.7,
+      77.5,
+      73.3,
+      67.9,
+      46.5,
+      70.2,
+      263.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      100.6,
+      52.4,
+      45.0,
+      45.6,
+      32.9,
+      61.4,
+      39.2,
+      null,
+      44.8,
+      32.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      41.4,
+      null,
+      115.8,
+      38.8,
+      36.4,
+      18.8,
+      28.4,
+      15.2,
+      23.8,
+      22.4,
+      26.4,
+      45.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      183.4,
+      101.8,
+      51.4,
+      28.7,
+      14.8,
+      15.7,
+      7.5,
+      6.9,
+      9.5,
+      24.4,
+      22.2,
+      37.4,
+      62.4,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      308.4,
+      220.0,
+      null,
+      null,
+      30.0,
+      48.1,
+      21.5,
+      6.9,
+      5.1,
+      6.9,
+      6.7,
+      10.5,
+      16.6,
+      30.3,
+      40.5,
+      51.5,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      69.9,
+      23.2,
+      null,
+      19.7,
+      7.9,
+      4.0,
+      4.5,
+      6.3,
+      7.9,
+      16.2,
+      66.2,
+      100.1,
+      143.5,
+      168.6,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      52.5,
+      79.8,
+      12.2,
+      6.6,
+      4.5,
+      4.8,
+      7.2,
+      12.0,
+      21.8,
+      32.8,
+      67.2,
+      53.0,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      57.2,
+      21.3,
+      9.3,
+      4.1,
+      3.5,
+      7.3,
+      62.8,
+      40.0,
+      27.0,
+      47.7,
+      54.1,
+      176.6,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      192.8,
+      null,
+      28.6,
+      57.6,
+      9.7,
+      null,
+      13.4,
+      17.8,
+      null,
+      83.3,
+      48.1,
+      102.9,
+      79.2,
+      113.0,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      118.2,
+      46.3,
+      null,
+      36.8,
+      24.1,
+      33.4,
+      19.3,
+      24.1,
+      31.6,
+      48.6,
+      125.4,
+      240.7,
+      181.3,
+      113.5,
+      83.3,
+      99.7,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      235.3,
+      127.8,
+      87.1,
+      37.3,
+      47.5,
+      61.2,
+      null,
+      null,
+      null,
+      null,
+      170.5,
+      112.5,
+      183.6,
+      277.6,
+      143.8
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      241.5,
+      61.9,
+      null,
+      null,
+      101.4,
+      47.9,
+      null,
+      null,
+      null,
+      null,
+      276.1,
+      270.0,
+      null,
+      156.6,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      146.0,
+      218.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      297.7,
+      359.3,
+      null,
+      205.1
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      234.5,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ],
+    "sensors": [
+     [
+      -39.8,
+      294.0
+     ],
+     [
+      -169.3,
+      199.7
+     ],
+     [
+      -172.5,
+      -24.5
+     ],
+     [
+      -85.9,
+      -214.6
+     ],
+     [
+      57.5,
+      -72.3
+     ],
+     [
+      111.1,
+      138.3
+     ]
+    ],
+    "fence": [
+     [
+      -39.8,
+      294.0
+     ],
+     [
+      -168.0,
+      295.8
+     ],
+     [
+      -173.1,
+      -68.1
+     ],
+     [
+      -172.8,
+      -77.5
+     ],
+     [
+      -171.5,
+      -87.3
+     ],
+     [
+      -169.0,
+      -97.8
+     ],
+     [
+      -165.8,
+      -107.7
+     ],
+     [
+      -147.1,
+      -157.1
+     ],
+     [
+      -143.5,
+      -166.1
+     ],
+     [
+      -138.2,
+      -175.7
+     ],
+     [
+      -133.0,
+      -183.4
+     ],
+     [
+      -126.9,
+      -190.3
+     ],
+     [
+      -120.8,
+      -195.9
+     ],
+     [
+      -113.5,
+      -201.6
+     ],
+     [
+      -105.8,
+      -206.8
+     ],
+     [
+      -97.9,
+      -210.7
+     ],
+     [
+      -89.4,
+      -213.8
+     ],
+     [
+      -81.2,
+      -215.8
+     ],
+     [
+      -71.3,
+      -217.0
+     ],
+     [
+      -62.1,
+      -217.6
+     ],
+     [
+      -54.0,
+      -217.2
+     ],
+     [
+      -46.2,
+      -215.9
+     ],
+     [
+      -38.7,
+      -214.3
+     ],
+     [
+      -31.1,
+      -211.7
+     ],
+     [
+      -23.9,
+      -208.4
+     ],
+     [
+      -17.5,
+      -204.4
+     ],
+     [
+      -11.0,
+      -199.3
+     ],
+     [
+      -5.7,
+      -193.9
+     ],
+     [
+      -1.3,
+      -187.9
+     ],
+     [
+      2.2,
+      -182.4
+     ],
+     [
+      103.9,
+      20.2
+     ],
+     [
+      107.9,
+      29.7
+     ],
+     [
+      111.0,
+      38.2
+     ],
+     [
+      113.4,
+      46.7
+     ],
+     [
+      115.4,
+      54.9
+     ],
+     [
+      116.9,
+      63.8
+     ],
+     [
+      117.8,
+      72.7
+     ],
+     [
+      118.3,
+      81.7
+     ],
+     [
+      118.3,
+      90.6
+     ],
+     [
+      117.9,
+      100.0
+     ],
+     [
+      116.9,
+      109.4
+     ],
+     [
+      115.4,
+      118.9
+     ],
+     [
+      113.5,
+      129.0
+     ],
+     [
+      110.9,
+      138.9
+     ],
+     [
+      108.0,
+      148.0
+     ],
+     [
+      105.2,
+      156.6
+     ],
+     [
+      101.3,
+      165.6
+     ],
+     [
+      97.0,
+      175.5
+     ],
+     [
+      92.5,
+      183.9
+     ],
+     [
+      87.6,
+      191.9
+     ],
+     [
+      82.2,
+      200.4
+     ],
+     [
+      76.7,
+      208.0
+     ],
+     [
+      70.1,
+      216.0
+     ],
+     [
+      64.0,
+      223.1
+     ],
+     [
+      57.4,
+      230.5
+     ],
+     [
+      50.8,
+      236.4
+     ],
+     [
+      42.6,
+      243.2
+     ],
+     [
+      35.5,
+      248.9
+     ],
+     [
+      28.1,
+      254.1
+     ],
+     [
+      21.0,
+      258.8
+     ],
+     [
+      -39.8,
+      294.0
+     ]
+    ]
+   },
+   "hays|6|10|csac": {
+    "x0": -1500.0,
+    "step_m": 150.0,
+    "n": 21,
+    "error_m": [
+     [
+      null,
+      null,
+      null,
+      null,
+      210.5,
+      171.4,
+      null,
+      null,
+      199.7,
+      149.9,
+      249.3,
+      null,
+      null,
+      null,
+      147.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      181.0,
+      126.2,
+      224.9,
+      null,
+      183.7,
+      137.4,
+      150.4,
+      null,
+      188.3,
+      null,
+      null,
+      223.2,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      268.4,
+      120.1,
+      166.3,
+      103.6,
+      142.5,
+      null,
+      null,
+      136.1,
+      116.9,
+      143.3,
+      151.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      118.9,
+      174.0,
+      147.4,
+      103.8,
+      null,
+      192.3,
+      59.8,
+      null,
+      67.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      78.8,
+      126.4,
+      133.7,
+      87.7,
+      100.1,
+      83.7,
+      null,
+      67.9,
+      81.0,
+      82.6,
+      73.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      53.7,
+      78.7,
+      96.9,
+      49.1,
+      62.6,
+      83.6,
+      69.0,
+      null,
+      46.1,
+      68.2,
+      211.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      77.2,
+      55.5,
+      31.9,
+      35.7,
+      31.1,
+      73.3,
+      null,
+      null,
+      25.2,
+      21.7,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      38.7,
+      null,
+      115.3,
+      23.5,
+      19.4,
+      16.5,
+      19.1,
+      28.4,
+      16.5,
+      16.8,
+      16.9,
+      16.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      167.3,
+      104.3,
+      49.1,
+      16.3,
+      10.5,
+      13.3,
+      5.1,
+      5.3,
+      6.5,
+      6.9,
+      11.2,
+      13.2,
+      50.4,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      310.0,
+      321.0,
+      null,
+      null,
+      22.0,
+      47.2,
+      12.2,
+      3.9,
+      1.9,
+      2.2,
+      3.3,
+      7.3,
+      11.8,
+      18.2,
+      19.2,
+      34.8,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      70.0,
+      15.2,
+      null,
+      15.8,
+      3.7,
+      1.2,
+      1.4,
+      2.5,
+      7.0,
+      12.4,
+      43.1,
+      61.2,
+      152.2,
+      191.4,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      29.3,
+      91.5,
+      6.5,
+      4.8,
+      1.8,
+      1.2,
+      3.1,
+      11.2,
+      15.4,
+      19.5,
+      38.9,
+      45.4,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      60.2,
+      20.4,
+      7.0,
+      3.1,
+      1.5,
+      4.8,
+      59.9,
+      41.9,
+      17.8,
+      41.5,
+      41.8,
+      148.9,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      148.1,
+      null,
+      13.6,
+      39.7,
+      7.7,
+      null,
+      9.3,
+      14.4,
+      null,
+      74.0,
+      32.0,
+      50.3,
+      64.8,
+      79.7,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      111.8,
+      45.7,
+      null,
+      30.1,
+      17.9,
+      30.7,
+      19.9,
+      18.2,
+      32.3,
+      36.2,
+      135.9,
+      221.3,
+      172.5,
+      66.2,
+      47.2,
+      109.6,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      196.6,
+      155.5,
+      110.1,
+      33.5,
+      28.8,
+      39.7,
+      null,
+      null,
+      null,
+      null,
+      195.4,
+      66.5,
+      109.6,
+      279.5,
+      94.6
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      240.3,
+      55.0,
+      null,
+      null,
+      109.8,
+      40.6,
+      null,
+      null,
+      null,
+      null,
+      282.4,
+      247.1,
+      null,
+      110.4,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      114.4,
+      383.1,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      265.6,
+      335.7,
+      null,
+      377.7
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      228.0,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ],
+    "sensors": [
+     [
+      -39.8,
+      294.0
+     ],
+     [
+      -169.3,
+      199.7
+     ],
+     [
+      -172.5,
+      -24.5
+     ],
+     [
+      -85.9,
+      -214.6
+     ],
+     [
+      57.5,
+      -72.3
+     ],
+     [
+      111.1,
+      138.3
+     ]
+    ],
+    "fence": [
+     [
+      -39.8,
+      294.0
+     ],
+     [
+      -168.0,
+      295.8
+     ],
+     [
+      -173.1,
+      -68.1
+     ],
+     [
+      -172.8,
+      -77.5
+     ],
+     [
+      -171.5,
+      -87.3
+     ],
+     [
+      -169.0,
+      -97.8
+     ],
+     [
+      -165.8,
+      -107.7
+     ],
+     [
+      -147.1,
+      -157.1
+     ],
+     [
+      -143.5,
+      -166.1
+     ],
+     [
+      -138.2,
+      -175.7
+     ],
+     [
+      -133.0,
+      -183.4
+     ],
+     [
+      -126.9,
+      -190.3
+     ],
+     [
+      -120.8,
+      -195.9
+     ],
+     [
+      -113.5,
+      -201.6
+     ],
+     [
+      -105.8,
+      -206.8
+     ],
+     [
+      -97.9,
+      -210.7
+     ],
+     [
+      -89.4,
+      -213.8
+     ],
+     [
+      -81.2,
+      -215.8
+     ],
+     [
+      -71.3,
+      -217.0
+     ],
+     [
+      -62.1,
+      -217.6
+     ],
+     [
+      -54.0,
+      -217.2
+     ],
+     [
+      -46.2,
+      -215.9
+     ],
+     [
+      -38.7,
+      -214.3
+     ],
+     [
+      -31.1,
+      -211.7
+     ],
+     [
+      -23.9,
+      -208.4
+     ],
+     [
+      -17.5,
+      -204.4
+     ],
+     [
+      -11.0,
+      -199.3
+     ],
+     [
+      -5.7,
+      -193.9
+     ],
+     [
+      -1.3,
+      -187.9
+     ],
+     [
+      2.2,
+      -182.4
+     ],
+     [
+      103.9,
+      20.2
+     ],
+     [
+      107.9,
+      29.7
+     ],
+     [
+      111.0,
+      38.2
+     ],
+     [
+      113.4,
+      46.7
+     ],
+     [
+      115.4,
+      54.9
+     ],
+     [
+      116.9,
+      63.8
+     ],
+     [
+      117.8,
+      72.7
+     ],
+     [
+      118.3,
+      81.7
+     ],
+     [
+      118.3,
+      90.6
+     ],
+     [
+      117.9,
+      100.0
+     ],
+     [
+      116.9,
+      109.4
+     ],
+     [
+      115.4,
+      118.9
+     ],
+     [
+      113.5,
+      129.0
+     ],
+     [
+      110.9,
+      138.9
+     ],
+     [
+      108.0,
+      148.0
+     ],
+     [
+      105.2,
+      156.6
+     ],
+     [
+      101.3,
+      165.6
+     ],
+     [
+      97.0,
+      175.5
+     ],
+     [
+      92.5,
+      183.9
+     ],
+     [
+      87.6,
+      191.9
+     ],
+     [
+      82.2,
+      200.4
+     ],
+     [
+      76.7,
+      208.0
+     ],
+     [
+      70.1,
+      216.0
+     ],
+     [
+      64.0,
+      223.1
+     ],
+     [
+      57.4,
+      230.5
+     ],
+     [
+      50.8,
+      236.4
+     ],
+     [
+      42.6,
+      243.2
+     ],
+     [
+      35.5,
+      248.9
+     ],
+     [
+      28.1,
+      254.1
+     ],
+     [
+      21.0,
+      258.8
+     ],
+     [
+      -39.8,
+      294.0
+     ]
+    ]
+   },
+   "hays|12|10|ocxo": {
+    "x0": -1500.0,
+    "step_m": 150.0,
+    "n": 21,
+    "error_m": [
+     [
+      null,
+      194.3,
+      null,
+      null,
+      206.9,
+      164.0,
+      312.7,
+      null,
+      167.0,
+      181.1,
+      137.9,
+      null,
+      null,
+      null,
+      170.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      173.3,
+      155.8,
+      146.8,
+      null,
+      166.1,
+      117.6,
+      146.3,
+      null,
+      123.7,
+      158.8,
+      null,
+      281.6,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      218.7,
+      116.4,
+      82.0,
+      83.0,
+      97.0,
+      null,
+      null,
+      139.1,
+      61.0,
+      91.1,
+      106.5,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      150.0,
+      113.3,
+      86.2,
+      113.3,
+      null,
+      107.9,
+      74.4,
+      null,
+      80.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      134.0,
+      154.0,
+      70.6,
+      73.0,
+      76.7,
+      65.9,
+      null,
+      68.3,
+      59.6,
+      64.7,
+      82.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      66.9,
+      88.2,
+      51.2,
+      53.8,
+      41.4,
+      37.3,
+      53.8,
+      66.6,
+      37.1,
+      37.8,
+      274.4,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      126.4,
+      143.4,
+      69.7,
+      66.6,
+      37.6,
+      25.4,
+      38.0,
+      55.9,
+      34.0,
+      null,
+      26.2,
+      32.4,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      104.7,
+      null,
+      63.8,
+      30.2,
+      13.4,
+      22.3,
+      21.4,
+      11.1,
+      12.9,
+      18.9,
+      30.7,
+      33.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      214.0,
+      null,
+      113.9,
+      47.9,
+      78.3,
+      30.1,
+      14.5,
+      10.8,
+      5.3,
+      4.7,
+      9.4,
+      11.9,
+      16.3,
+      32.7,
+      48.9,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      384.4,
+      260.0,
+      null,
+      181.7,
+      21.0,
+      21.7,
+      10.7,
+      6.7,
+      3.7,
+      2.1,
+      3.7,
+      8.1,
+      15.4,
+      20.0,
+      31.2,
+      72.6,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      198.9,
+      86.0,
+      24.5,
+      null,
+      14.2,
+      4.6,
+      1.9,
+      3.3,
+      2.6,
+      9.0,
+      11.3,
+      79.1,
+      130.5,
+      107.3,
+      126.6,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      36.1,
+      18.8,
+      10.2,
+      3.8,
+      3.2,
+      2.8,
+      3.3,
+      9.8,
+      16.5,
+      24.0,
+      59.7,
+      47.9,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      59.5,
+      50.9,
+      12.5,
+      8.2,
+      2.0,
+      2.6,
+      4.6,
+      13.8,
+      27.5,
+      17.8,
+      52.2,
+      37.9,
+      221.3,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      56.6,
+      null,
+      22.7,
+      36.3,
+      7.6,
+      null,
+      11.5,
+      14.7,
+      62.6,
+      44.7,
+      47.8,
+      60.6,
+      57.3,
+      98.5,
+      225.7,
+      317.5
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      89.1,
+      59.8,
+      241.1,
+      29.4,
+      20.8,
+      31.8,
+      19.0,
+      16.0,
+      23.7,
+      30.1,
+      121.2,
+      68.5,
+      108.8,
+      99.1,
+      110.8,
+      93.1,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      154.4,
+      147.3,
+      142.2,
+      28.6,
+      22.0,
+      27.9,
+      null,
+      null,
+      428.9,
+      null,
+      102.4,
+      82.9,
+      77.2,
+      126.3,
+      114.0
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      117.7,
+      58.1,
+      313.5,
+      null,
+      88.1,
+      30.7,
+      null,
+      null,
+      null,
+      null,
+      239.5,
+      185.9,
+      null,
+      101.2,
+      205.7
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      205.2,
+      98.4,
+      167.4,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      293.9,
+      230.1,
+      null,
+      148.9
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      231.4,
+      269.9,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ],
+    "sensors": [
+     [
+      -39.8,
+      294.0
+     ],
+     [
+      -151.9,
+      295.6
+     ],
+     [
+      -169.3,
+      199.7
+     ],
+     [
+      -170.9,
+      87.6
+     ],
+     [
+      -172.5,
+      -24.5
+     ],
+     [
+      -155.9,
+      -134.0
+     ],
+     [
+      -85.9,
+      -214.6
+     ],
+     [
+      7.2,
+      -172.5
+     ],
+     [
+      57.5,
+      -72.3
+     ],
+     [
+      107.3,
+      28.2
+     ],
+     [
+      111.1,
+      138.3
+     ],
+     [
+      54.2,
+      233.4
+     ]
+    ],
+    "fence": [
+     [
+      -39.8,
+      294.0
+     ],
+     [
+      -168.0,
+      295.8
+     ],
+     [
+      -173.1,
+      -68.1
+     ],
+     [
+      -172.8,
+      -77.5
+     ],
+     [
+      -171.5,
+      -87.3
+     ],
+     [
+      -169.0,
+      -97.8
+     ],
+     [
+      -165.8,
+      -107.7
+     ],
+     [
+      -147.1,
+      -157.1
+     ],
+     [
+      -143.5,
+      -166.1
+     ],
+     [
+      -138.2,
+      -175.7
+     ],
+     [
+      -133.0,
+      -183.4
+     ],
+     [
+      -126.9,
+      -190.3
+     ],
+     [
+      -120.8,
+      -195.9
+     ],
+     [
+      -113.5,
+      -201.6
+     ],
+     [
+      -105.8,
+      -206.8
+     ],
+     [
+      -97.9,
+      -210.7
+     ],
+     [
+      -89.4,
+      -213.8
+     ],
+     [
+      -81.2,
+      -215.8
+     ],
+     [
+      -71.3,
+      -217.0
+     ],
+     [
+      -62.1,
+      -217.6
+     ],
+     [
+      -54.0,
+      -217.2
+     ],
+     [
+      -46.2,
+      -215.9
+     ],
+     [
+      -38.7,
+      -214.3
+     ],
+     [
+      -31.1,
+      -211.7
+     ],
+     [
+      -23.9,
+      -208.4
+     ],
+     [
+      -17.5,
+      -204.4
+     ],
+     [
+      -11.0,
+      -199.3
+     ],
+     [
+      -5.7,
+      -193.9
+     ],
+     [
+      -1.3,
+      -187.9
+     ],
+     [
+      2.2,
+      -182.4
+     ],
+     [
+      103.9,
+      20.2
+     ],
+     [
+      107.9,
+      29.7
+     ],
+     [
+      111.0,
+      38.2
+     ],
+     [
+      113.4,
+      46.7
+     ],
+     [
+      115.4,
+      54.9
+     ],
+     [
+      116.9,
+      63.8
+     ],
+     [
+      117.8,
+      72.7
+     ],
+     [
+      118.3,
+      81.7
+     ],
+     [
+      118.3,
+      90.6
+     ],
+     [
+      117.9,
+      100.0
+     ],
+     [
+      116.9,
+      109.4
+     ],
+     [
+      115.4,
+      118.9
+     ],
+     [
+      113.5,
+      129.0
+     ],
+     [
+      110.9,
+      138.9
+     ],
+     [
+      108.0,
+      148.0
+     ],
+     [
+      105.2,
+      156.6
+     ],
+     [
+      101.3,
+      165.6
+     ],
+     [
+      97.0,
+      175.5
+     ],
+     [
+      92.5,
+      183.9
+     ],
+     [
+      87.6,
+      191.9
+     ],
+     [
+      82.2,
+      200.4
+     ],
+     [
+      76.7,
+      208.0
+     ],
+     [
+      70.1,
+      216.0
+     ],
+     [
+      64.0,
+      223.1
+     ],
+     [
+      57.4,
+      230.5
+     ],
+     [
+      50.8,
+      236.4
+     ],
+     [
+      42.6,
+      243.2
+     ],
+     [
+      35.5,
+      248.9
+     ],
+     [
+      28.1,
+      254.1
+     ],
+     [
+      21.0,
+      258.8
+     ],
+     [
+      -39.8,
+      294.0
+     ]
+    ]
+   },
+   "hays|12|10|csac": {
+    "x0": -1500.0,
+    "step_m": 150.0,
+    "n": 21,
+    "error_m": [
+     [
+      null,
+      189.1,
+      null,
+      null,
+      172.1,
+      127.2,
+      339.0,
+      null,
+      135.9,
+      157.5,
+      176.1,
+      null,
+      null,
+      null,
+      112.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      129.8,
+      137.7,
+      156.9,
+      null,
+      124.5,
+      128.3,
+      143.0,
+      null,
+      131.6,
+      135.5,
+      null,
+      284.1,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      277.0,
+      80.6,
+      101.7,
+      96.8,
+      87.0,
+      null,
+      null,
+      141.2,
+      113.6,
+      98.1,
+      89.6,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      102.8,
+      54.5,
+      67.2,
+      75.4,
+      null,
+      70.2,
+      69.0,
+      null,
+      59.1,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      96.8,
+      92.7,
+      32.3,
+      51.6,
+      52.3,
+      45.4,
+      null,
+      59.0,
+      40.4,
+      43.0,
+      84.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      63.8,
+      47.4,
+      44.5,
+      44.9,
+      40.7,
+      28.5,
+      41.3,
+      64.2,
+      32.8,
+      39.5,
+      224.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      192.2,
+      185.1,
+      53.4,
+      32.3,
+      29.0,
+      22.0,
+      23.1,
+      73.5,
+      25.1,
+      null,
+      13.2,
+      17.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      34.1,
+      null,
+      36.9,
+      21.0,
+      13.2,
+      21.5,
+      19.2,
+      11.4,
+      9.0,
+      9.9,
+      20.2,
+      22.4,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      218.3,
+      null,
+      63.3,
+      27.3,
+      66.1,
+      14.6,
+      7.9,
+      8.2,
+      4.5,
+      4.4,
+      6.5,
+      6.1,
+      8.4,
+      17.0,
+      23.3,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      300.8,
+      274.9,
+      null,
+      179.1,
+      17.1,
+      10.2,
+      7.3,
+      3.8,
+      0.9,
+      1.1,
+      2.8,
+      4.6,
+      7.3,
+      12.8,
+      13.7,
+      39.2,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      187.9,
+      72.0,
+      14.0,
+      null,
+      7.1,
+      3.0,
+      1.1,
+      0.9,
+      2.0,
+      5.3,
+      10.0,
+      64.2,
+      112.7,
+      157.2,
+      134.3,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      11.9,
+      10.4,
+      5.1,
+      2.4,
+      1.3,
+      1.0,
+      2.1,
+      10.3,
+      14.8,
+      16.6,
+      31.0,
+      39.2,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      30.3,
+      54.6,
+      8.9,
+      5.0,
+      0.7,
+      1.3,
+      3.0,
+      11.0,
+      18.7,
+      9.0,
+      36.1,
+      17.1,
+      163.6,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      40.1,
+      null,
+      13.2,
+      27.7,
+      7.3,
+      null,
+      7.2,
+      9.2,
+      null,
+      43.4,
+      32.1,
+      33.6,
+      41.4,
+      53.7,
+      212.8,
+      256.9
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      82.9,
+      45.4,
+      288.5,
+      22.4,
+      16.5,
+      22.1,
+      11.2,
+      13.9,
+      12.2,
+      17.1,
+      110.8,
+      62.2,
+      90.1,
+      55.8,
+      59.1,
+      43.9,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      140.4,
+      148.7,
+      91.6,
+      33.2,
+      26.7,
+      18.2,
+      null,
+      null,
+      328.3,
+      null,
+      77.4,
+      55.4,
+      40.9,
+      133.7,
+      72.2
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      75.3,
+      59.5,
+      364.4,
+      null,
+      91.2,
+      47.6,
+      null,
+      null,
+      null,
+      null,
+      239.3,
+      144.9,
+      null,
+      107.0,
+      276.5
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      183.0,
+      null,
+      185.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      211.3,
+      142.0,
+      null,
+      240.5
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      216.2,
+      339.9,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ],
+    "sensors": [
+     [
+      -39.8,
+      294.0
+     ],
+     [
+      -151.9,
+      295.6
+     ],
+     [
+      -169.3,
+      199.7
+     ],
+     [
+      -170.9,
+      87.6
+     ],
+     [
+      -172.5,
+      -24.5
+     ],
+     [
+      -155.9,
+      -134.0
+     ],
+     [
+      -85.9,
+      -214.6
+     ],
+     [
+      7.2,
+      -172.5
+     ],
+     [
+      57.5,
+      -72.3
+     ],
+     [
+      107.3,
+      28.2
+     ],
+     [
+      111.1,
+      138.3
+     ],
+     [
+      54.2,
+      233.4
+     ]
+    ],
+    "fence": [
+     [
+      -39.8,
+      294.0
+     ],
+     [
+      -168.0,
+      295.8
+     ],
+     [
+      -173.1,
+      -68.1
+     ],
+     [
+      -172.8,
+      -77.5
+     ],
+     [
+      -171.5,
+      -87.3
+     ],
+     [
+      -169.0,
+      -97.8
+     ],
+     [
+      -165.8,
+      -107.7
+     ],
+     [
+      -147.1,
+      -157.1
+     ],
+     [
+      -143.5,
+      -166.1
+     ],
+     [
+      -138.2,
+      -175.7
+     ],
+     [
+      -133.0,
+      -183.4
+     ],
+     [
+      -126.9,
+      -190.3
+     ],
+     [
+      -120.8,
+      -195.9
+     ],
+     [
+      -113.5,
+      -201.6
+     ],
+     [
+      -105.8,
+      -206.8
+     ],
+     [
+      -97.9,
+      -210.7
+     ],
+     [
+      -89.4,
+      -213.8
+     ],
+     [
+      -81.2,
+      -215.8
+     ],
+     [
+      -71.3,
+      -217.0
+     ],
+     [
+      -62.1,
+      -217.6
+     ],
+     [
+      -54.0,
+      -217.2
+     ],
+     [
+      -46.2,
+      -215.9
+     ],
+     [
+      -38.7,
+      -214.3
+     ],
+     [
+      -31.1,
+      -211.7
+     ],
+     [
+      -23.9,
+      -208.4
+     ],
+     [
+      -17.5,
+      -204.4
+     ],
+     [
+      -11.0,
+      -199.3
+     ],
+     [
+      -5.7,
+      -193.9
+     ],
+     [
+      -1.3,
+      -187.9
+     ],
+     [
+      2.2,
+      -182.4
+     ],
+     [
+      103.9,
+      20.2
+     ],
+     [
+      107.9,
+      29.7
+     ],
+     [
+      111.0,
+      38.2
+     ],
+     [
+      113.4,
+      46.7
+     ],
+     [
+      115.4,
+      54.9
+     ],
+     [
+      116.9,
+      63.8
+     ],
+     [
+      117.8,
+      72.7
+     ],
+     [
+      118.3,
+      81.7
+     ],
+     [
+      118.3,
+      90.6
+     ],
+     [
+      117.9,
+      100.0
+     ],
+     [
+      116.9,
+      109.4
+     ],
+     [
+      115.4,
+      118.9
+     ],
+     [
+      113.5,
+      129.0
+     ],
+     [
+      110.9,
+      138.9
+     ],
+     [
+      108.0,
+      148.0
+     ],
+     [
+      105.2,
+      156.6
+     ],
+     [
+      101.3,
+      165.6
+     ],
+     [
+      97.0,
+      175.5
+     ],
+     [
+      92.5,
+      183.9
+     ],
+     [
+      87.6,
+      191.9
+     ],
+     [
+      82.2,
+      200.4
+     ],
+     [
+      76.7,
+      208.0
+     ],
+     [
+      70.1,
+      216.0
+     ],
+     [
+      64.0,
+      223.1
+     ],
+     [
+      57.4,
+      230.5
+     ],
+     [
+      50.8,
+      236.4
+     ],
+     [
+      42.6,
+      243.2
+     ],
+     [
+      35.5,
+      248.9
+     ],
+     [
+      28.1,
+      254.1
+     ],
+     [
+      21.0,
+      258.8
+     ],
+     [
+      -39.8,
+      294.0
+     ]
+    ]
+   },
+   "fulton|6|10|ocxo": {
+    "x0": -1500.0,
+    "step_m": 150.0,
+    "n": 21,
+    "error_m": [
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      356.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      311.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      324.9,
+      45.7,
+      81.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      120.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      36.5,
+      146.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      18.2,
+      35.6,
+      107.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      189.6,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      13.6,
+      2.5,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      68.0,
+      null,
+      null,
+      31.9,
+      3.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      156.6,
+      197.7,
+      null,
+      null,
+      null,
+      103.8,
+      null,
+      20.4,
+      4.3,
+      2.6,
+      5.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      122.6,
+      111.4,
+      null,
+      null,
+      null,
+      13.4,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      36.2,
+      27.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      210.6,
+      274.9,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      39.9,
+      null,
+      257.6,
+      null,
+      null,
+      null,
+      254.4,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      201.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      101.0,
+      87.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      139.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ],
+    "sensors": [
+     [
+      -102.8,
+      37.5
+     ],
+     [
+      -40.0,
+      123.8
+     ],
+     [
+      74.3,
+      108.0
+     ],
+     [
+      80.1,
+      -40.5
+     ],
+     [
+      23.3,
+      -132.7
+     ],
+     [
+      -31.2,
+      -31.2
+     ]
+    ],
+    "fence": [
+     [
+      -102.8,
+      37.5
+     ],
+     [
+      -41.2,
+      36.5
+     ],
+     [
+      -39.7,
+      143.8
+     ],
+     [
+      10.5,
+      142.8
+     ],
+     [
+      29.1,
+      141.1
+     ],
+     [
+      50.7,
+      135.9
+     ],
+     [
+      62.7,
+      128.2
+     ],
+     [
+      70.3,
+      118.3
+     ],
+     [
+      76.1,
+      103.3
+     ],
+     [
+      78.8,
+      80.5
+     ],
+     [
+      80.3,
+      -60.2
+     ],
+     [
+      79.8,
+      -132.9
+     ],
+     [
+      12.0,
+      -132.7
+     ],
+     [
+      12.2,
+      -119.3
+     ],
+     [
+      9.2,
+      -117.1
+     ],
+     [
+      3.0,
+      -116.6
+     ],
+     [
+      -23.3,
+      -113.9
+     ],
+     [
+      -30.3,
+      -105.9
+     ],
+     [
+      -29.8,
+      -75.3
+     ],
+     [
+      -32.3,
+      -75.3
+     ],
+     [
+      -30.5,
+      -1.8
+     ],
+     [
+      -69.3,
+      -1.8
+     ],
+     [
+      -73.5,
+      -7.5
+     ],
+     [
+      -102.1,
+      -7.5
+     ],
+     [
+      -102.8,
+      37.5
+     ]
+    ]
+   },
+   "fulton|6|10|csac": {
+    "x0": -1500.0,
+    "step_m": 150.0,
+    "n": 21,
+    "error_m": [
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      315.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      269.4,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      302.9,
+      53.0,
+      67.5,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      122.1,
+      null,
+      null,
+      null,
+      null,
+      null,
+      16.7,
+      147.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      12.6,
+      31.2,
+      104.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      110.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      13.3,
+      2.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      76.3,
+      null,
+      null,
+      28.8,
+      3.7,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      120.2,
+      123.2,
+      null,
+      null,
+      null,
+      112.2,
+      null,
+      18.1,
+      3.7,
+      1.5,
+      4.5,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      121.6,
+      110.9,
+      null,
+      null,
+      null,
+      11.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      28.6,
+      24.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      297.0,
+      271.3,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      39.3,
+      null,
+      356.3,
+      null,
+      null,
+      null,
+      361.3,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      190.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      87.8,
+      86.7,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      106.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ],
+    "sensors": [
+     [
+      -102.8,
+      37.5
+     ],
+     [
+      -40.0,
+      123.8
+     ],
+     [
+      74.3,
+      108.0
+     ],
+     [
+      80.1,
+      -40.5
+     ],
+     [
+      23.3,
+      -132.7
+     ],
+     [
+      -31.2,
+      -31.2
+     ]
+    ],
+    "fence": [
+     [
+      -102.8,
+      37.5
+     ],
+     [
+      -41.2,
+      36.5
+     ],
+     [
+      -39.7,
+      143.8
+     ],
+     [
+      10.5,
+      142.8
+     ],
+     [
+      29.1,
+      141.1
+     ],
+     [
+      50.7,
+      135.9
+     ],
+     [
+      62.7,
+      128.2
+     ],
+     [
+      70.3,
+      118.3
+     ],
+     [
+      76.1,
+      103.3
+     ],
+     [
+      78.8,
+      80.5
+     ],
+     [
+      80.3,
+      -60.2
+     ],
+     [
+      79.8,
+      -132.9
+     ],
+     [
+      12.0,
+      -132.7
+     ],
+     [
+      12.2,
+      -119.3
+     ],
+     [
+      9.2,
+      -117.1
+     ],
+     [
+      3.0,
+      -116.6
+     ],
+     [
+      -23.3,
+      -113.9
+     ],
+     [
+      -30.3,
+      -105.9
+     ],
+     [
+      -29.8,
+      -75.3
+     ],
+     [
+      -32.3,
+      -75.3
+     ],
+     [
+      -30.5,
+      -1.8
+     ],
+     [
+      -69.3,
+      -1.8
+     ],
+     [
+      -73.5,
+      -7.5
+     ],
+     [
+      -102.1,
+      -7.5
+     ],
+     [
+      -102.8,
+      37.5
+     ]
+    ]
+   },
+   "fulton|12|10|ocxo": {
+    "x0": -1500.0,
+    "step_m": 150.0,
+    "n": 21,
+    "error_m": [
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      260.7,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      281.8,
+      273.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      248.5,
+      176.4,
+      null,
+      null,
+      null,
+      154.7,
+      53.8,
+      59.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      77.5,
+      null,
+      null,
+      null,
+      null,
+      54.3,
+      28.7,
+      29.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      162.4,
+      null,
+      null,
+      41.5,
+      12.4,
+      11.6,
+      53.5,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      163.5,
+      295.3,
+      259.0,
+      null,
+      null,
+      227.4,
+      null,
+      null,
+      5.2,
+      1.7,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      54.5,
+      109.1,
+      null,
+      10.9,
+      2.4,
+      3.1,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      173.8,
+      217.2,
+      null,
+      null,
+      290.9,
+      84.9,
+      null,
+      19.4,
+      5.5,
+      1.3,
+      4.4,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      110.6,
+      98.7,
+      null,
+      null,
+      37.7,
+      9.9,
+      null,
+      131.2,
+      null,
+      null,
+      348.5,
+      291.3,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      21.3,
+      22.5,
+      null,
+      null,
+      null,
+      null,
+      null,
+      161.3,
+      167.5,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      45.5,
+      null,
+      161.5,
+      null,
+      null,
+      null,
+      300.2,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      276.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      72.3,
+      53.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      145.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      96.1,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      263.1,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ],
+    "sensors": [
+     [
+      -102.8,
+      37.5
+     ],
+     [
+      -41.0,
+      49.4
+     ],
+     [
+      -40.0,
+      123.8
+     ],
+     [
+      14.7,
+      142.4
+     ],
+     [
+      74.3,
+      108.0
+     ],
+     [
+      79.3,
+      34.0
+     ],
+     [
+      80.1,
+      -40.5
+     ],
+     [
+      79.9,
+      -114.9
+     ],
+     [
+      23.3,
+      -132.7
+     ],
+     [
+      -30.3,
+      -103.2
+     ],
+     [
+      -31.2,
+      -31.2
+     ],
+     [
+      -73.0,
+      -6.8
+     ]
+    ],
+    "fence": [
+     [
+      -102.8,
+      37.5
+     ],
+     [
+      -41.2,
+      36.5
+     ],
+     [
+      -39.7,
+      143.8
+     ],
+     [
+      10.5,
+      142.8
+     ],
+     [
+      29.1,
+      141.1
+     ],
+     [
+      50.7,
+      135.9
+     ],
+     [
+      62.7,
+      128.2
+     ],
+     [
+      70.3,
+      118.3
+     ],
+     [
+      76.1,
+      103.3
+     ],
+     [
+      78.8,
+      80.5
+     ],
+     [
+      80.3,
+      -60.2
+     ],
+     [
+      79.8,
+      -132.9
+     ],
+     [
+      12.0,
+      -132.7
+     ],
+     [
+      12.2,
+      -119.3
+     ],
+     [
+      9.2,
+      -117.1
+     ],
+     [
+      3.0,
+      -116.6
+     ],
+     [
+      -23.3,
+      -113.9
+     ],
+     [
+      -30.3,
+      -105.9
+     ],
+     [
+      -29.8,
+      -75.3
+     ],
+     [
+      -32.3,
+      -75.3
+     ],
+     [
+      -30.5,
+      -1.8
+     ],
+     [
+      -69.3,
+      -1.8
+     ],
+     [
+      -73.5,
+      -7.5
+     ],
+     [
+      -102.1,
+      -7.5
+     ],
+     [
+      -102.8,
+      37.5
+     ]
+    ]
+   },
+   "fulton|12|10|csac": {
+    "x0": -1500.0,
+    "step_m": 150.0,
+    "n": 21,
+    "error_m": [
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      224.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      285.9,
+      242.9,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      262.1,
+      166.9,
+      null,
+      null,
+      null,
+      137.1,
+      33.4,
+      52.4,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      57.9,
+      null,
+      null,
+      null,
+      null,
+      50.0,
+      22.4,
+      29.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      163.0,
+      null,
+      null,
+      37.3,
+      12.7,
+      12.5,
+      60.1,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      170.9,
+      294.2,
+      261.7,
+      null,
+      null,
+      234.9,
+      null,
+      null,
+      4.1,
+      1.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      49.8,
+      112.3,
+      null,
+      8.8,
+      2.6,
+      2.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      119.6,
+      143.0,
+      null,
+      null,
+      287.1,
+      79.9,
+      null,
+      20.0,
+      5.0,
+      1.0,
+      3.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      91.7,
+      95.9,
+      null,
+      null,
+      38.2,
+      9.5,
+      null,
+      109.6,
+      null,
+      null,
+      362.6,
+      295.0,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      19.5,
+      18.4,
+      null,
+      null,
+      null,
+      null,
+      null,
+      201.3,
+      138.5,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      33.0,
+      null,
+      176.9,
+      null,
+      null,
+      null,
+      308.3,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      274.8,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      52.6,
+      56.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      133.2,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      131.3,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      234.7,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ],
+    "sensors": [
+     [
+      -102.8,
+      37.5
+     ],
+     [
+      -41.0,
+      49.4
+     ],
+     [
+      -40.0,
+      123.8
+     ],
+     [
+      14.7,
+      142.4
+     ],
+     [
+      74.3,
+      108.0
+     ],
+     [
+      79.3,
+      34.0
+     ],
+     [
+      80.1,
+      -40.5
+     ],
+     [
+      79.9,
+      -114.9
+     ],
+     [
+      23.3,
+      -132.7
+     ],
+     [
+      -30.3,
+      -103.2
+     ],
+     [
+      -31.2,
+      -31.2
+     ],
+     [
+      -73.0,
+      -6.8
+     ]
+    ],
+    "fence": [
+     [
+      -102.8,
+      37.5
+     ],
+     [
+      -41.2,
+      36.5
+     ],
+     [
+      -39.7,
+      143.8
+     ],
+     [
+      10.5,
+      142.8
+     ],
+     [
+      29.1,
+      141.1
+     ],
+     [
+      50.7,
+      135.9
+     ],
+     [
+      62.7,
+      128.2
+     ],
+     [
+      70.3,
+      118.3
+     ],
+     [
+      76.1,
+      103.3
+     ],
+     [
+      78.8,
+      80.5
+     ],
+     [
+      80.3,
+      -60.2
+     ],
+     [
+      79.8,
+      -132.9
+     ],
+     [
+      12.0,
+      -132.7
+     ],
+     [
+      12.2,
+      -119.3
+     ],
+     [
+      9.2,
+      -117.1
+     ],
+     [
+      3.0,
+      -116.6
+     ],
+     [
+      -23.3,
+      -113.9
+     ],
+     [
+      -30.3,
+      -105.9
+     ],
+     [
+      -29.8,
+      -75.3
+     ],
+     [
+      -32.3,
+      -75.3
+     ],
+     [
+      -30.5,
+      -1.8
+     ],
+     [
+      -69.3,
+      -1.8
+     ],
+     [
+      -73.5,
+      -7.5
+     ],
+     [
+      -102.1,
+      -7.5
+     ],
+     [
+      -102.8,
+      37.5
+     ]
+    ]
+   }
+  }
+ },
+ "thermal": {
+  "method": "Heat-camera cueing (v0.6): when our track points a thermal PTZ camera at a drone, how far out can staff see it?\n\nJohnson criteria (STANDARD, used for thermal camera DRI ranges): pixels across the target's critical dimension needed\nfor a 50% chance of detection 1.5, recognition 6, identification 12. Pixels across = size / (range x IFOV), with\nIFOV = pixel pitch / focal length. Camera (ASSUMPTION, typical uncooled security PTZ): 640 x 480 sensor, 12 um pitch,\n35 mm lens (horizontal field of view ~12.5 deg) and, as an option, 100 mm. Atmosphere and contrast are ignored, so\nthese are upper bounds; a measured low-cost camera saw a Phantom 4 at only ~51 m (Univ. of Zagreb 2017).\nSlew-to-cue: the camera turns at 60 deg/s (ASSUMPTION) and the drone must sit inside the field of view, i.e. the\ntrack error must be smaller than half the view width at that range.",
+  "ranges": {
+   "mavic|35mm": {
+    "detect": 739,
+    "recognise": 185,
+    "identify": 92
+   },
+   "mavic|100mm": {
+    "detect": 2111,
+    "recognise": 528,
+    "identify": 264
+   },
+   "m210|35mm": {
+    "detect": 1711,
+    "recognise": 428,
+    "identify": 214
+   },
+   "m210|100mm": {
+    "detect": 4889,
+    "recognise": 1222,
+    "identify": 611
+   }
+  }
+ },
+ "walkthrough": {
+  "replay": "replay-hays-m210-custom",
+  "site": "Hays State Prison, Trion GA",
+  "drone": "Matrice 210 (5 kg, the Fraunhofer trial drone)",
+  "speed_mps": 12.0,
+  "metrics": {
+   "track_availability_pct": 86.8,
+   "first_track_distance_m": 476,
+   "median_error_m": 11.8,
+   "false_tracks": 0,
+   "bird_tracks": 5
+  },
+  "warning_before_fence_s": 40.5,
+  "camera": "35mm",
+  "dri_m": {
+   "detect": 1711,
+   "recognise": 428,
+   "identify": 214
+  },
+  "events": [
+   {
+    "t": 42.0,
+    "who": "Tripwire",
+    "what": "First track, 596 m from the drop point. Alert to the control room and the response team's phones.",
+    "kind": "detect"
+   },
+   {
+    "t": 44.1,
+    "who": "Tripwire",
+    "what": "Heat camera on the fence turns to the track (2.14 s at 60 deg/s); drone 746 m away.",
+    "kind": "camera"
+   },
+   {
+    "t": 72.0,
+    "who": "Control room",
+    "what": "Drone recognisable on the heat camera at 416 m (Johnson criteria, 35 mm lens).",
+    "kind": "camera"
+   },
+   {
+    "t": 82.5,
+    "who": "Drone",
+    "what": "Crosses the fence line.",
+    "kind": "drone"
+   },
+   {
+    "t": 91.5,
+    "who": "Drone",
+    "what": "Hovers 6 s over the drop point and releases the package.",
+    "kind": "drone"
+   },
+   {
+    "t": 91.5,
+    "who": "Response team",
+    "what": "Already moving to the drop point it was sent to at the first alert; recovers the package (South Carolina uses a pre-selected facility team; SCDC via Facilities Dive).",
+    "kind": "people"
+   },
+   {
+    "t": 160.5,
+    "who": "Tripwire",
+    "what": "Track followed back out of the zone; its heading and the inbound track are kept as evidence and point the sheriff's K-9 team to where the pilot launched (the Georgia DOC pattern: staff alert the sheriff and K-9, who search and arrest).",
+    "kind": "evidence"
+   }
+  ],
+  "cases": [
+   {
+    "where": "Lieber Correctional, SC, 14 Mar 2025",
+    "what": "Drone reported about 5 a.m.; inmates picked up the package shortly after; the pilot walked out of the woods with a drone and a bag and was sentenced to a year and a day (WRDW, Nov 2026).",
+    "lesson": "Inmates reached the package before staff: the warning has to come before the drop, not after."
+   },
+   {
+    "where": "Calhoun State Prison, GA, 21 Sep 2025",
+    "what": "Staff saw a drone carrying a duffel bag; the sheriff and K-9 were called and three civilians were caught that evening with 5 phones, 6.4 kg of tobacco and 1.2 kg of marijuana (Georgia DOC).",
+    "lesson": "The response playbook exists; it needs an earlier and more reliable trigger, and the launch direction."
+   }
+  ]
+ }
+}

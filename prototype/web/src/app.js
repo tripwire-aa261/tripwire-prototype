@@ -1,10 +1,11 @@
-// Tripwire digital twin v0.5.1: tabs (Overview, Trade space simulator, 3D signal simulation, Financials) over shared state.
+// Tripwire digital twin v0.6: tabs (Overview, Trade space simulator, 3D signal simulation, Financials) over shared state.
 import { $, esc, X, state, loadData } from './data.js';
 import { initOverview } from './overview.js';
 import { initSimulate } from './simulate.js';
 import { initFinance } from './finance.js';
 import { initViewer, setActive, drawCalibration, showRunFor } from './viewer3d.js';
 import { initHelp } from './help.js';
+import { initPlatform } from './platform.js';
 
 let calibration = null;
 
@@ -25,6 +26,7 @@ async function boot() {
   initSimulate(); // picks the recommended setup first; Financials follows it
   initOverview();
   initFinance();
+  initPlatform();
   await initViewer(meta);
   document.querySelectorAll('.tabbar button').forEach((b) => (b.onclick = () => showTab(b.dataset.tab)));
   $('openSources').onclick = () => {
