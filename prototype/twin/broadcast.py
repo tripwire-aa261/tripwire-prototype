@@ -7,8 +7,13 @@ replay yet):
          + direct-path cancellation residue (dpi_residual_db below it, calibrated on the LTE trial)
   SNR after processing = P_e - noise + 10 log10(B * CIT) - Hann taper loss; detection by Albersheim (Pd 0.9).
 What differs from LTE:
-  * no co-channel neighbours: a US TV or FM channel has one transmitter per area (FCC allocation), so the
-    "interference removal" problem that limits cell signals at dense sites does not arise (STANDARD);
+  * far fewer co-channel neighbours: US TV channels are allotted so that stations sharing a channel are far apart, so
+    the dense same-frequency neighbours that limit cell signals do not arise. Weaker distant co-channel stations do
+    exist (Barott & Himed, IEEE Radar Conf 2015), and ATSC 3.0 single-frequency networks add some on purpose; both
+    are covered here only through the residual floor below (ASSUMPTION, to measure at Seed);
+  * residual floor: measured ATSC passive radar cancels the direct signal and clutter by 30-45 dB in practice, leaving
+    a floor 6-20 dB above thermal noise (Garry, Baker & Smith, IEEE TGRS 55(7), 2017). We hold the floor at least
+    20 dB above thermal (the pessimistic end);
   * the whole channel is the reference, rebuilt by demodulating the signal, as in the published DVB-T trials
     (ATSC 1.0 is single-carrier 8VSB; reconstruction quality equal to DVB-T is an ASSUMPTION);
   * range resolution c/B: 50 m for TV, 1.5 km for FM (FM can warn but cannot place a drone to 25 m);
@@ -60,6 +65,7 @@ def load_broadcast(site, max_km=(80.0, 60.0)) -> list[Broadcast]:
     return out
 
 
+RESIDUAL_OVER_THERMAL_DB = 20.0  # measured ATSC residual floor 6-20 dB above thermal (Garry et al. 2017); pessimistic end
 RX_GAIN = {"tv": 8.0, "fm": 2.0}  # ASSUMPTION: panel toward the drone (UHF/VHF high), dipole for FM
 
 
@@ -72,8 +78,9 @@ def pair_snr(site, p: Params, tx: Broadcast, rx_pos, pts, drone, extra_loss_db: 
     pe = tx.eirp_dbw + g_t + 10 * np.log10(FOUR_PI * rcs / lam ** 2) + g_r + RX_GAIN[tx.kind] - p.resolved_loss_db()
     gd, _ = path_gain_db(site, tx.pos[None, :], np.atleast_2d(rx_pos), tx.freq_hz, p.ground_gamma)
     direct = tx.eirp_dbw + float(gd[0])  # 0 dBi toward the transmitter
-    n = db(undb(10 * np.log10(K_B * T0 * tx.bw_hz) + p.nf_db) + undb(direct - adc_sqnr_db(p.adc_bits, p.adc_backoff_db))
-           + undb(direct - p.resolved_dpi_db()))
+    thermal = 10 * np.log10(K_B * T0 * tx.bw_hz) + p.nf_db
+    n = db(undb(thermal) + undb(direct - adc_sqnr_db(p.adc_bits, p.adc_backoff_db)) + undb(direct - p.resolved_dpi_db()))
+    n = np.maximum(n, thermal + RESIDUAL_OVER_THERMAL_DB)
     return pe - n + 10 * np.log10(tx.bw_hz * p.cit_s) - HANN_LOSS_DB - extra_loss_db
 
 

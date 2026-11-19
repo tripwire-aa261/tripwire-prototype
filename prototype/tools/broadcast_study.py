@@ -38,7 +38,8 @@ def lte_result(explore, site, drone, interf, n, design="ring8_enh_hist", height=
 def main():
     explore = json.loads((ROOT / "web" / "data" / "explore.json").read_text())
     out = {"method": __doc__.strip().splitlines()[0], "notes": [
-        "TV and FM: analytic link budget with the twin's calibrated loss and direct-signal cancellation; no co-channel neighbours (one transmitter per channel per area).",
+        "TV and FM: analytic link budget with the twin's calibrated loss and direct-signal cancellation, and a noise floor at least 20 dB above thermal (measured ATSC passive radar: 6-20 dB, Garry et al. 2017). Far fewer co-channel neighbours than LTE, but some exist (Barott & Himed 2015); not modeled beyond that floor.",
+        "No drone has yet been detected with US digital TV (ATSC) in published work; the evidence is DVB-T, DVB-T2 and DTMB trials in Europe and China (0.2-5 km bistatic). Hovering drones sit in the zero-Doppler clutter notch: a hovering multirotor was seen only through its rotor modulation (Poullin, NATO MP-SET-231, 2016).",
         "Cell towers: the twin's full design-point model (same sensors, same zone).",
         "Located = 3 or more transmitter-sensor pairs detect the drone. FM resolves range only to ~1.5 km, so it can warn but not place a drone.",
         "SIMPLIFICATIONS: licensed ERP toward the site; 8 dBi receive gain for TV, 2 dBi for FM; terrain beyond the site tile flat; 5 m error floor added.",

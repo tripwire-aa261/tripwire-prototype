@@ -39,7 +39,8 @@ const GROUPS = [
     ['gnssNetsPerYear', 'New GPS monitoring networks a year', 0, 10, 1, int, 'ASSUMPTION; first ones at test ranges and bases.'],
   ] },
   { title: 'Technology', plain: 'what has to work, and when', fields: [
-    ['tvQ', 'Digital TV and radio signals in our processing', 4, T, 1, when, 'Published: small DJI drones detected 1.6-5 km away on DVB-T (Leonardo, 2020). Prototype v0.6: TV covers all four of our sites in a link-budget estimate (no neighbor-channel interference). Until then a site works only where cell towers suit us (ASSUMPTION: date).'],
+    ['tvQ', 'Digital TV and radio signals in our processing', 4, T, 1, when, 'Published: small DJI drones detected 1.6-5 km away on DVB-T (Leonardo, 2020); none yet with US digital TV. Prototype v0.6 estimates TV covers 3 of our 4 sites. ASSUMPTION: date.'],
+    ['tvShare', 'Sites that work with digital TV', 0, 100, 5, pct, 'Prototype v0.6: Hays, Fulton and Clemson yes; Hancock, far from its TV transmitters, no.'],
     ['q40', '40 dB interference removal works', 4, T, 1, when, 'Cell towers only: until then (or until TV signals work) a third of sites work (one of three simulated sites); stadiums need one of the two.'],
     ['workable', 'Sites that work before 40 dB', 0, 100, 5, pct, 'Prototype: Hays works at 20 dB, Hancock and Fulton do not.'],
     ['ownQ', 'Our own receiver ships', 4, T, 1, when, 'Sensor $1,601 instead of $1,825 and 4 per site instead of 6 (prototype). Design $400k.'],

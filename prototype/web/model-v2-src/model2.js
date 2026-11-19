@@ -66,7 +66,7 @@ const DEFAULTS = {
   oemPartners: 1, oemFrom: 9, oemUnits: 150, oemGrowth: 25, oemCap: 3000,   // integrator sensor sales: partners (+1 a year), from 2029 Q2, sensors per partner a year, % growth a year, cap on sensors a year (all ASSUMPTIONS)
   gnssFrom: 9,                                 // GPS monitoring on sale from 2029 Q2
   // technology
-  q40: 15, tvQ: 8, ownQ: 13, workable: 33, hwCost: 100,
+  q40: 15, tvQ: 8, tvShare: 75, ownQ: 13, workable: 33, hwCost: 100,
   // government R&D (expected value = award x chance)
   sbir1: 50, sbir2: 50, diu: 40,
   faa: 0,                                      // FAA national GPS monitoring program, $M a year (scenario)
@@ -98,9 +98,9 @@ function runModel(a) {
   const rev = {}; lines.forEach((k) => { rev[k] = z(); });
   const cHw = z(), cInst = z(), cRun = z(), cChan = z();
   const sitesNew = z(), sitesActive = z(), largeActive = z(), kitsActive = z(), sellers = z(), bookings = z();
-  // A site works with cell towers (a third before 40 dB) or, once our processing uses digital TV, with TV: prototype v0.6 finds TV
-  // covers all four sites because a TV channel has no co-channel neighbours (link-budget estimate, to be measured at Seed).
-  const workable = (s, t) => (t >= a.tvQ || t >= a.q40 ? 1 : s.needs40 ? 0 : a.workable / 100);
+  // A site works with cell towers (a third before 40 dB, all after) or, once our processing uses digital TV, with TV: prototype v0.6
+  // estimates TV covers 3 of our 4 sites (not Hancock, far from its transmitters), so tvShare = 75% (link-budget estimate, Seed measures it).
+  const workable = (s, t) => (t >= a.q40 ? 1 : Math.max(t >= a.tvQ ? a.tvShare / 100 : 0, s.needs40 ? 0 : a.workable / 100));
   const wins = { doc: a.winsDoc, jail: a.winsJail, kit: a.winsKit, dod: a.winsDod, cbp: a.winsCbp, stad: a.winsStad };
 
   // sellers: the named team first, then one more seller for every $bookingsPerSeller M of new contract value in the last year

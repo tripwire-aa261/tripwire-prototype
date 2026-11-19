@@ -61,7 +61,7 @@ Changes after Sid's review: 16 salespeople hired a year after Series A; two sell
 
 ## Prototype v0.6 results (2026-11-18)
 
-- **Digital TV covers all four sites in the link-budget estimate**, including Hancock and Fulton where cell towers fail at 20 dB, because a TV channel has no co-channel neighbours. 0.9 kg drone, 6 sensors: TV 99-100% of the zone located vs cell 0-79% at 20 dB. Conservative against the DVB-T trial; receiver overload near megawatt transmitters is the main unmodeled risk. Implication for the plan: the "stuck at 20 dB" risk shrinks if Seed measurements confirm TV.
+- **Digital TV covers three of the four sites in the link-budget estimate** (Hays, Fulton, Clemson for both drones; Hancock, far from its TV transmitters, only partly for 5 kg and not for 0.9 kg), after holding the noise floor 20 dB above thermal as measured for ATSC (Garry et al. 2017). TV has far fewer same-frequency neighbours than LTE, not none (Barott & Himed 2015). No drone has yet been detected with US digital TV in published work. Cell stays the base; TV is the upgrade measured at Seed (decision 2026-11-18). Research: `context/research/tv_passive_radar.md`.
 - **GPS jammer locator:** a 10 mW car jammer 300 m outside Hays is placed to 8-19 m with time differences plus bearings (TDOA alone ~396 m); 1 W at 1 km 44-80 m; at 2 km perimeter sensors are not enough.
 - **Heat camera (35 mm):** 5 kg drone recognisable at ~428 m, 0.9 kg at ~185 m (Johnson upper bounds).
 - **Walkthrough (Hays, 5 kg drone, 4 sensors, 20 dB):** first track 596 m from the drop point, 40.5 s of warning before the fence, ~50 s before the drop; camera recognition at 416 m.
