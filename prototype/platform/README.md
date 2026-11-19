@@ -16,7 +16,7 @@ Open locally: from `prototype/`, `python -m http.server 8000` and go to http://l
   the Seed sensor from off-the-shelf radios.
 - **Products & cost**: site, site with heat camera, large perimeter, mobile kit, sensor for integrators, GPS monitoring:
   our cost from parts and the twin's sensor counts, the financial model v2 price, the cheapest comparable system.
-- **GPS monitoring**: the jammer locator at the Robins flightline, the Pharr-Reynosa port and Hays.
+- **GPS monitoring**: the jammer locator at the Robins flightline, the Pharr-Reynosa port and Hays, with four set-ups: today (oven crystal), clocks synced to the TV and cell signals plus correlation detection (software), the same with 1-degree bearing calibration, and the premium atomic clock (`twin/gnss_jam.SETUPS`).
 - **Incident timeline**: the Hays contraband drop from the full signal replay, and real cases at each kind of site.
 
 ## Data (rebuild in this order, from `prototype/`)

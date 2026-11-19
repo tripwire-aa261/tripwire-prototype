@@ -22,6 +22,17 @@ is a premium option (~$5.5k). Mode "tdoa+aoa" fits both together (weighted Gauss
 jammer sits outside a small ring of sensors.
 Detection: a sensor detects the jammer when its jammer-to-noise ratio is above 10 dB (ASSUMPTION; GPS receivers lose
 lock around 20-30 dB of J/N, so detection comes well before harm).
+
+v1.0 improvements (2026-11-19), all software on the same sensor:
+  * clock sync to broadcast: every sensor also receives the cell towers and TV stations around the site, whose positions
+    are known (FCC licenses) and whose signals are not jammed by an L1 jammer. Cross-correlating the same TV or cell signal
+    at two sensors gives their clock offset directly, so the sensors keep a common time base while GPS is jammed:
+    5 ns per sensor (ASSUMPTION, the CSAC figure; to be measured at Seed), instead of the OCXO's 50 ns of drift.
+  * correlation detection: the sensors cross-correlate their L1 recordings, and 10 ms at 2 MHz gives 43 dB of processing
+    gain, so a jammer can be placed when it is 10 dB below the noise at a sensor (CORR_DETECT_JNR_DB, ASSUMPTION), not only
+    when it raises the noise floor by 10 dB. The arrival-time noise below already grows as the jammer gets weaker.
+  * bearing calibration: 1 degree after calibrating each array against known transmitters (the DTU trial reached
+    0.5-1 degree with 5 elements; ASSUMPTION for our 4) instead of 3 degrees.
 """
 from __future__ import annotations
 
@@ -37,9 +48,15 @@ T_INT_S = 0.010         # correlation time per fix (ASSUMPTION)
 RX_GAIN_DBI = 3.0
 NF_DB = 2.0
 DETECT_JNR_DB = 10.0
+CORR_DETECT_JNR_DB = -10.0   # v1.0 correlation detection (ASSUMPTION, see docstring)
 BEARING_SIGMA_DEG = 3.0  # v1.0: 4-element L1 array (v0.6: 2.0)
 FAIL_M = 500.0          # a fix worse than this counts as a failure (reported separately)
-CLOCKS_NS = {"ocxo": 50.0, "csac": 5.0, "gps": 2.0}   # 1-sigma timing error per sensor while jammed (gps = not yet jammed)
+CLOCKS_NS = {"ocxo": 50.0, "sync": 5.0, "csac": 5.0, "gps": 2.0}   # 1-sigma timing error per sensor while jammed (sync = OCXO kept
+# in step by the TV and cell signals, ASSUMPTION; gps = not yet jammed)
+
+# Locator set-ups shown in the platform app: (clock, detection threshold dB, bearing sigma deg)
+SETUPS = {"ocxo": ("ocxo", DETECT_JNR_DB, BEARING_SIGMA_DEG), "sync": ("sync", CORR_DETECT_JNR_DB, BEARING_SIGMA_DEG),
+          "sync_cal": ("sync", CORR_DETECT_JNR_DB, 1.0), "csac": ("csac", DETECT_JNR_DB, BEARING_SIGMA_DEG)}
 
 
 def jnr_db(site, jam_xyz, sensors, power_dbm):
@@ -78,13 +95,13 @@ def locate(sensors, toa, guess, sig_r_m=None, bearings=None, sig_b_rad=None, ite
     return x
 
 
-def trial(site, sensors, jam_xy, power_dbm, clock_ns, rng, n_mc=100, mode="tdoa", bearing_deg=None):
+def trial(site, sensors, jam_xy, power_dbm, clock_ns, rng, n_mc=100, mode="tdoa", bearing_deg=None, detect_db=None):
     """Median horizontal error (m) of the fixes that work, the share that fail (> FAIL_M), and how many sensors detect the
     jammer. mode: "tdoa" or "tdoa+aoa"."""
     z = float(site.ground(jam_xy[0], jam_xy[1])) + 1.5
     jam = np.array([jam_xy[0], jam_xy[1], z])
     jnr = jnr_db(site, jam, sensors, power_dbm)
-    det = jnr >= DETECT_JNR_DB
+    det = jnr >= (DETECT_JNR_DB if detect_db is None else detect_db)
     need = 2 if mode == "tdoa+aoa" else 3
     if det.sum() < need:
         return {"detected": int(det.sum()), "error_m": None, "fail_pct": 100.0}
@@ -111,7 +128,7 @@ def trial(site, sensors, jam_xy, power_dbm, clock_ns, rng, n_mc=100, mode="tdoa"
             "fail_pct": round(100 * float(1 - ok.mean()), 1)}
 
 
-def jammer_map(site, sensors, power_dbm, clock_ns, half_m=1500.0, step_m=150.0, seed=3, mode="tdoa+aoa", bearing_deg=None):
+def jammer_map(site, sensors, power_dbm, clock_ns, half_m=1500.0, step_m=150.0, seed=3, mode="tdoa+aoa", bearing_deg=None, detect_db=None):
     """Median locating error for a jammer at each point of a grid around the site."""
     rng = np.random.default_rng(seed)
     xs = np.arange(-half_m, half_m + 1e-6, step_m)
@@ -119,7 +136,7 @@ def jammer_map(site, sensors, power_dbm, clock_ns, half_m=1500.0, step_m=150.0, 
     for y in xs:
         row = []
         for x in xs:
-            r = trial(site, sensors, (x, y), power_dbm, clock_ns, rng, n_mc=30, mode=mode, bearing_deg=bearing_deg)
+            r = trial(site, sensors, (x, y), power_dbm, clock_ns, rng, n_mc=30, mode=mode, bearing_deg=bearing_deg, detect_db=detect_db)
             row.append(r["error_m"])
         grid.append(row)
     return {"x0": float(xs[0]), "step_m": step_m, "n": len(xs), "error_m": grid}

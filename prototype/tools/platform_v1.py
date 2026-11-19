@@ -48,7 +48,7 @@ WHAT = {
     "site": "Sensors on the perimeter of a prison, jail or stadium, 24/7 alerts to the control room and phones, track records as evidence, upkeep.",
     "site_cam": "The site plus one bispectral heat camera that our track points at the drone, so staff see it before they move.",
     "large": "A military flightline, port of entry or border sector: many times a prison perimeter, with two heat cameras.",
-    "kit": "Six sensors on tripods with batteries and radio links, a heat camera and a rugged laptop: set up for an event or an operation in about an hour.",
+    "kit": "Eight sensors on tripods with batteries and radio links, a heat camera and a rugged laptop: set up for an event or an operation in about an hour.",
     "oem": "Our sensor and software sold to the companies that already hold government counter-drone contracts; they install it.",
     "gnss_addon": "GPS jamming and spoofing monitoring at a site we already protect: the GPS bank is in every platform sensor, so it is software.",
     "gnss_net": "A stand-alone GPS monitoring network: 8 platform sensors spread over a wider area (an airport or a port), sold yearly.",
@@ -112,34 +112,41 @@ GNSS_SITES = {"robins": "Robins flightline", "poe": "Pharr-Reynosa port", "hays"
 
 def gnss_doc(ex):
     rng = np.random.default_rng(11)
-    out = {"assumptions": ("Clock error while jammed: oven crystal ~50 ns, chip-scale atomic clock ~5 ns over minutes; bearings 3 degrees "
-                           "from the 4-element array after calibration; detection at 10 dB jammer-to-noise (ASSUMPTIONS, twin/gnss_jam.py). "
-                           "Method as the Baltic TDOA network (GPS Solutions 2026); the DTU trial tracked a 10 mW car jammer (NAVIGATION 2026)."),
-           "sites": {}}
+    out = {"assumptions": ("Today: oven crystal ~50 ns while jammed, detection at 10 dB jammer-to-noise, bearings 3 degrees from the "
+                           "4-element array. Software upgrades: clocks kept in step by the TV and cell signals (5 ns), correlation "
+                           "detection down to 10 dB below the noise, bearing calibration to 1 degree. Premium: chip-scale atomic clock "
+                           "~5 ns. All ASSUMPTIONS (twin/gnss_jam.py), measured at Seed. Method as the Baltic TDOA network "
+                           "(GPS Solutions 2026); the DTU trial tracked a 10 mW car jammer (NAVIGATION 2026)."),
+           "setups": list(gnss_jam.SETUPS), "sites": {}}
+    names = {0: "N", 45: "NE", 90: "E", 135: "SE", 180: "S", 225: "SW", 270: "W", 315: "NW"}
     for key, short in GNSS_SITES.items():
         n = rec_n(ex, key) or 8
         site, s = sensors_for(key, n)
         fence = np.asarray(site.fence)
         c = fence[:-1].mean(axis=0)
         rmax = float(np.max(np.linalg.norm(fence[:, :2] - c, axis=1)))
-        u = np.array([np.sin(np.radians(135)), np.cos(np.radians(135))])
-        spots = [("car on a road 300 m outside", c + (rmax + 300) * u), ("1 km outside", c + (rmax + 1000) * np.array([0.6, 0.8])),
-                 ("2 km outside", c + (rmax + 2000) * np.array([-0.8, 0.6]))]
+        g0 = float(np.mean([site.ground(x, y) for x, y in s[:, :2]]))
+        spots = []
+        for d, label, az in ((300, "car on a road 300 m outside", 135), (1000, "1 km outside", 37), (2000, "2 km outside", 307)):
+            xy = c + (rmax + d) * np.array([np.sin(np.radians(az)), np.cos(np.radians(az))])
+            dz = float(site.ground(*xy)) - g0
+            terr = f", {abs(round(dz))} m below the sensors" if dz < -10 else (f", {round(dz)} m above the sensors" if dz > 10 else "")
+            spots.append((f"{label} ({names[min(names, key=lambda a: min(abs(a - az), 360 - abs(a - az)))]}{terr})", xy))
         cases = []
-        for power in (10, 30):
-            for clock in ("ocxo", "csac"):
+        for setup, (clock, thr, bdeg) in gnss_jam.SETUPS.items():
+            for power in (10, 30):
                 for mode in ("tdoa", "tdoa+aoa"):
                     for name, xy in spots:
-                        r = gnss_jam.trial(site, s, xy, power, gnss_jam.CLOCKS_NS[clock], rng, mode=mode)
-                        cases.append({"where": name, "power_dbm": power, "clock": clock, "mode": mode, **r})
+                        r = gnss_jam.trial(site, s, xy, power, gnss_jam.CLOCKS_NS[clock], rng, mode=mode, bearing_deg=bdeg, detect_db=thr)
+                        cases.append({"where": name, "power_dbm": power, "clock": setup, "mode": mode, **r})
         half = float(np.ceil((rmax + 1500) / 150) * 150)
         maps = {}
-        for clock in ("ocxo", "csac"):
-            m = gnss_jam.jammer_map(site, s, 10, gnss_jam.CLOCKS_NS[clock], half_m=half, step_m=max(150.0, round(2 * half / 24 / 50) * 50))
-            maps[clock] = m
+        for setup, (clock, thr, bdeg) in gnss_jam.SETUPS.items():
+            maps[setup] = gnss_jam.jammer_map(site, s, 10, gnss_jam.CLOCKS_NS[clock], half_m=half, step_m=max(150.0, round(2 * half / 24 / 50) * 50),
+                                              bearing_deg=bdeg, detect_db=thr)
         out["sites"][key] = {"name": site.name, "short": short, "sensors": np.round(s[:, :2], 1).tolist(),
                              "fence": np.round(fence, 1).tolist(), "cases": cases, "maps": maps}
-        print("gnss", key, n, "sensors", [(c_["where"][:10], c_["clock"], c_["mode"], c_["power_dbm"], c_["error_m"]) for c_ in cases if c_["clock"] == "ocxo"])
+        print("gnss", key, n, "sensors", [(c_["where"][:12], c_["clock"], c_["power_dbm"], c_["error_m"], c_["fail_pct"]) for c_ in cases if c_["mode"] == "tdoa+aoa"])
     return out
 
 
