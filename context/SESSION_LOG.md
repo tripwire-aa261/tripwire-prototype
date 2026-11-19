@@ -454,3 +454,4 @@ Two Claude sessions worked in parallel and coordinated by message; this entry co
 - Energy-sites assumption reworded more clearly (Draft 5 and model): says plainly that counting refineries and nuclear plants but not data centers is not fully consistent.\n
 - Product Prototype tab: an "All our links (no login needed)" box under the title (live prototype, financial model, repo, figures file, business plan). Added in Google Docs only; `build_prototype_tab.py` does not have it yet. Model snapshot PDF regenerated for Canvas.\n
 - Model page: removed the last course references and the "1 in 3" format; the exit label now says year 8 for 2034 Q4, matching Draft 5.\n
+- 2026-11-18: Merged financial model v2 (only `prototype/web/financial-model-v2.html` and `prototype/web/model-v2-src/`) from `pivot-v1` into `main` at the user's request, so its GitHub Pages link works. Nothing else from the pivot branch is on main.

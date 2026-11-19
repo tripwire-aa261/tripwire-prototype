@@ -1,0 +1,72 @@
+.targets { padding: 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 28px; }
+@media (max-width: 900px) { .targets { grid-template-columns: minmax(0, 1fr); } }
+.targets > div { display: flex; flex-direction: column; gap: 6px; }
+.targets h3 { color: var(--ink); padding-bottom: 7px; border-bottom: 1px solid var(--ink); }
+.targets .big { font: 500 22px/1.2 var(--mono); letter-spacing: -0.03em; }
+.lines { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 28px; }
+@media (max-width: 1000px) { .lines { grid-template-columns: minmax(0, 1fr); } }
+.lines div { display: flex; flex-direction: column; gap: 4px; padding-top: 8px; border-top: 1px solid var(--line); }
+.lines b { font-weight: 600; } .lines span { color: var(--ink-2); font-size: 13px; } .lines code { font: 500 12px var(--mono); }
+.sw-3 { background: #2F3136; } .sw-4 { background: #7A776F; } .sw-5 { background: #C7C2B8; } .sw-6 { background: repeating-linear-gradient(135deg, var(--ink) 0 1.2px, var(--surface) 1.2px 3.6px); outline: 1px solid var(--ink); outline-offset: -1px; } .sw-7 { background: var(--signal); }
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div>
+      <span class="eyebrow">Financial model v2 &middot; pivot &middot; every three months, 2027 to 2034 &middot; US dollars</span>
+      <h1>Tripwire: a passive sensing platform for government</h1>
+      <p id="lead"></p>
+    </div>
+  </header>
+
+  <section class="panel targets" aria-labelledby="tgtTitle">
+    <div style="grid-column:1/-1"><h2 id="tgtTitle">The target: raise $10-30M and reach $100M of sales a year by year 5 (2031)</h2>
+      <p class="small muted">Year 5 is 2031: the company starts in 2027 and raises its Seed and Series A in 2027-2028. Every number below moves with the sliders and scenarios.</p></div>
+    <div id="tgtSales"></div>
+    <div id="tgtExit"></div>
+  </section>
+
+  <section class="panel intro" aria-labelledby="linesTitle">
+    <h2 id="linesTitle">What Tripwire sells</h2>
+    <div class="lines" id="lineCards"></div>
+    <p class="small muted">Every price is a team decision set below the cheapest benchmark we found: Cobb County, Georgia paid about $8.3M for four Dedrone kits with 5 years of support (about $2.1M each); CBP's port-of-entry sensors cost about $6M per site (CBP FY2027 budget). Detection only: we never jam or take over a drone.</p>
+  </section>
+
+  <div class="presets" id="presets"><span>Scenarios</span></div>
+  <p class="small muted" id="presetDesc"></p>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="cols">
+    <aside class="panel inputs" id="inputs" aria-label="Assumptions you can change"></aside>
+    <main class="results">
+      <section class="panel card">
+        <div class="card-head"><h2>Sales by product line, each quarter</h2><p>Line: cash in minus cash out</p></div>
+        <div class="legend" id="revLegend"></div>
+        <div class="chart" id="revChart"></div>
+      </section>
+      <section class="panel card">
+        <div class="card-head"><h2>Cash in the bank</h2><p id="cashCaption"></p></div>
+        <div class="chart" id="cashChart"></div>
+      </section>
+      <section class="panel card">
+        <div class="card-head"><h2>Customers by type</h2><p>Buyers signed and sites in service by the end of year 5 (2031) and 2034</p></div>
+        <div class="tablewrap"><table id="segTable"></table></div>
+        <p class="small muted">Each type has its own number of buyers, sites per buyer, sales cycle and channel. Most sales come from salespeople we hire; integrators sell stadiums and keep 37.5% (Security Sales &amp; Integration, 2020). The model stops each type at the buyers that exist.</p>
+      </section>
+      <section class="panel card">
+        <div class="card-head"><h2>What investors get back from a sale at the end of 2031 (year 5)</h2></div>
+        <div class="tablewrap"><table id="retTable"></table></div>
+        <p class="small muted" id="retNote"></p>
+      </section>
+      <section class="panel card">
+        <div class="card-head"><h2>Every year in numbers</h2><p>$M</p></div>
+        <div class="tablewrap" id="table"></div>
+      </section>
+      <details class="panel drop">
+        <summary><h2>Where the numbers come from</h2><span class="more">sources and assumptions</span></summary>
+        <div class="notes"><div><h3>Cited</h3><ul id="srcList"></ul></div><div><h3>Assumptions (sliders)</h3><ul id="asmList"></ul></div></div>
+        <div class="notes notmodeled"><div><h3>Not in the model</h3><ul id="notList"></ul></div></div>
+      </details>
+    </main>
+  </div>
+</div>

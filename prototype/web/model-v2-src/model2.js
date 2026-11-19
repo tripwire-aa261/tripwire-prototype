@@ -1,0 +1,271 @@
+<script>
+/* Tripwire financial model v2 (pivot): a passive sensing platform sold to government and corrections buyers.
+   Every quarter 2027 Q1 .. 2034 Q4. Sources: context/research/*.md and Tripwire_Assumptions_and_Figures.md (prototype v0.5.1).
+   Anything not cited is an ASSUMPTION and has a slider. */
+const START_YEAR = 2027, T = 32;
+const qLabel = (t) => (START_YEAR + Math.floor(t / 4)) + ' Q' + (t % 4 + 1);
+const yr = (y) => (y - START_YEAR) * 4;            // first quarter of a year
+
+const FIXED = {
+  // sensor and site costs: prototype figures (sections 2-5, 8)
+  bladeCost: 1825.22, customCost: 1601, hubCost: 500,
+  installPerSensor: 510, setupPerSite: 2500,
+  runPerSensor: 271.33, runPerSensorCustom: 260.1, runPerSite: 1200,
+  siteSensorsBlade: 6, siteSensorsCustom: 4,                 // Hays-size prison or jail
+  largeSensorsBlade: 24, largeSensorsCustom: 16, largeCams: 2, // ASSUMPTION: a base sector or port of entry is ~4x Hays
+  kitSensors: 6, kitCaseCost: 10000,                         // ASSUMPTION: rugged cases, tripods, laptop
+  camCost: 32138,                                            // Axis Q8752-E Mk II bispectral PTZ, dealer price (research note)
+  oscCost: 1000,                                             // ASSUMPTION: holdover oscillator per site for GPS monitoring
+  oemPack: 500,                                              // ASSUMPTION: packaging and test per sensor sold to integrators
+  nre: 400000, nreQ: 6,                                      // own receiver design (prototype section 7), 6 quarters before it ships
+  gnssDev: 300000, gnssDevQ: 4,                              // ASSUMPTION: GPS monitoring product development
+  termQ: 20,                                                 // 5-year contracts (Big Idea Memo)
+  // people: BLS OEWS May 2025 Atlanta means x 1.46 (BLS ECEC Jun 2026, benefits 31.7% of compensation)
+  engCost: 206, salesCost: 160, fieldCost: 150, adminCost: 120, founderPay: 120,   // $k a year; field and admin ASSUMPTIONS
+  overhead: 0.20, gaPer: 8, sitesPerField: 40,
+  compliance: 150, complianceQ: 8,                           // $k a year from 2029: ITAR registration, CMMC/NIST 800-171, facility clearance (ASSUMPTION)
+  counsel: 80,                                               // $k a year hourly counsel (Draft 5)
+  pilotFee: 55000 + 77000, pilotQ: 4,                        // Hays and Clemson paid pilots (Draft 5)
+  devPre: 12, devSeed: 40,                                   // $k a quarter: demo kits, travel, test drones, scored flights
+  partnerShare: 0.375,                                       // integrators keep 37.5% (Security Sales & Integration, 2020)
+};
+
+// Customer types. pool = buyers that exist; sites = sites per buyer; cycle = quarters from first meeting to signature.
+const SEGMENTS = [
+  { key: 'doc',   name: 'State corrections departments', pool: 50, sites: 23, product: 'site', cycle: 4, start: 5, rollout: 4, size: 1, tower: true,
+    note: '1,155 state-run facilities under ~50 state departments (BJS 2019); Georgia 34, South Carolina 21' },
+  { key: 'jail',  name: 'Large county jails', pool: 150, sites: 2, product: 'site', cycle: 3, start: 5, rollout: 1, size: 1, tower: true,
+    note: '150 jail jurisdictions hold 1,000+ people (BJS Census of Jails 2019); 2 sites each is an ASSUMPTION' },
+  { key: 'kit',   name: 'City and county police (mobile kits)', pool: 300, sites: 1.5, product: 'kit', cycle: 2, start: 3, rollout: 2, size: 1, tower: false,
+    note: 'FEMA C-UAS grant: $250M FY2027 to 56 state agencies, 97% passed to local governments, spent Dec 2026 - Dec 2029; 300 jurisdictions and 1.5 kits each are ASSUMPTIONS' },
+  { key: 'dod',   name: 'Military installations', pool: 100, sites: 1, product: 'large', cycle: 6, start: 8, rollout: 1, size: 1, tower: false,
+    note: '350 drone detections over 100 installations in 2024 (NORTHCOM, SASC testimony Feb 2025); sold through Domestic Shield primes or DIU' },
+  { key: 'cbp',   name: 'DHS border and ports of entry', pool: 16, sites: 5, product: 'large', cycle: 8, start: 12, rollout: 1, size: 1, tower: false,
+    note: '25 southern-border ports of entry in the FY2027 counter-UAS request and a goal of 58 PWAAS sites (CBP FY2027 budget); 16 awards of 5 sites is an ASSUMPTION' },
+  { key: 'stad',  name: 'Stadiums', pool: 200, sites: 1, product: 'site', cycle: 3, start: 8, rollout: 1, size: 1.5, tower: true, needs40: true,
+    note: '~200 large US stadiums (ASSUMPTION); Clemson needs 30 dB; sold through integrators who keep 37.5%' },
+];
+
+const DEFAULTS = {
+  // prices (decision 2026-11-18: below every benchmark found)
+  sitePrice: 25000, siteSub: 25000, camPrice: 40000, camSub: 5000, camAttach: 30,
+  largePrice: 1000, largeSub: 400,             // $k; $3M over 5 years vs ~$6M per CBP port-of-entry site (decision 2026-11-18)
+  kitPrice: 600, kitSub: 120,                  // $k; $1.2M over 5 years vs ~$2.1M per Dedrone kit in Cobb County (decision 2026-11-18)
+  oemPrice: 12000, oemLicense: 3000,           // per sensor
+  gnssAddon: 20000, gnssAttach: 25, gnssNetPrice: 100, gnssNetsPerYear: 2,   // add-on $/site/yr; standalone network $k/yr
+  // selling
+  winsDoc: 0.5, winsJail: 3, winsKit: 4, winsDod: 2, winsCbp: 0.5, winsStad: 4,   // customers per seller per year
+  repsAddA: 18,                                // salespeople hired per year after Series A (plan), split across customer types
+  bookingsPerSeller: 3,                        // $M of new contract value a year that funds one more seller on top
+  rampQ: 2,                                    // quarters before a new seller is fully productive
+  contractQ: 9,                                // from 2029 Q2 a GSA Schedule listing and cooperative contracts (OMNIA, Sourcewell, NASPO) shorten every sale by one quarter (ASSUMPTION)
+  refGain: 25,                                 // % more wins per seller from 2029, once the Hays and Clemson results are references (ASSUMPTION)
+  refQ: 8,
+  renewal: 90,                                 // % of sites renewing at the end of each 5-year term
+  afterGrant: 50,                              // % of mobile-kit demand left after the FEMA money ends (2030 on)
+  oemPartners: 1, oemFrom: 9, oemUnits: 150, oemGrowth: 25, oemCap: 3000,   // integrator sensor sales: partners (+1 a year), from 2029 Q2, sensors per partner a year, % growth a year, cap on sensors a year (all ASSUMPTIONS)
+  gnssFrom: 9,                                 // GPS monitoring on sale from 2029 Q2
+  // technology
+  q40: 15, tvQ: 8, tvShare: 75, ownQ: 13, workable: 33, hwCost: 100,
+  // government R&D (expected value = award x chance)
+  sbir1: 50, sbir2: 50, diu: 40,
+  faa: 0,                                      // FAA national GPS monitoring program, $M a year (scenario)
+  // funding $M
+  r0: 0.25, r1: 5, r2: 12,   // Series A sized to need: covers the worst scenario (prices 30% lower, ~$9.6M needed) with ~$7.6M to spare (decision 2026-11-18)
+};
+// how added salespeople are split across customer types (ASSUMPTION)
+const MIX = { doc: 0.25, jail: 0.15, kit: 0.2, dod: 0.25, cbp: 0.05, stad: 0.1 };
+const GSA_COST = 60;   // $k a year to hold a GSA Schedule and cooperative contracts from contractQ (ASSUMPTION: consultant + compliance)
+const ROUNDS = [{ key: 'r0', name: 'Pre-seed', q: 0 }, { key: 'r1', name: 'Seed', q: 2 }, { key: 'r2', name: 'Series A', q: 7 }];
+const SEED_Q = 2, A_Q = 7;
+
+// Named team until Series A [role, team, first quarter, founder?]; rules take over after Series A.
+const ROSTER = [
+  ['CEO: customers, pitching, fundraising (Sid)', 'ga', 0, true],
+  ['CTO: technology and product (Nimalan)', 'eng', 0, true],
+  ['Government and defense lead (Ashlynn, US Air Force)', 'sales', 2, true],
+  ['RF and electronics engineer', 'eng', 2], ['Signal-processing engineer', 'eng', 3],
+  ['Field engineer: installs and scored flights', 'field', 4], ['Account executive, corrections', 'sales', 5],
+  ['GPS-interference engineer', 'eng', 6],
+];
+
+function runModel(a) {
+  const F = FIXED, N = T, z = () => new Array(N).fill(0);
+  const hw = a.hwCost / 100, own = (t) => t >= a.ownQ;
+  const sensorCost = (t) => (own(t) ? F.customCost : F.bladeCost) * hw;
+  const out = { seg: {} };
+  const lines = ['site', 'large', 'kit', 'oem', 'gnss', 'cam', 'rnd', 'faa'];
+  const rev = {}; lines.forEach((k) => { rev[k] = z(); });
+  const cHw = z(), cInst = z(), cRun = z(), cChan = z();
+  const sitesNew = z(), sitesActive = z(), largeActive = z(), kitsActive = z(), sellers = z(), bookings = z();
+  // A site works with cell towers (a third before 40 dB, all after) or, once our processing uses digital TV, with TV: prototype v0.6
+  // estimates TV covers 3 of our 4 sites (not Hancock, far from its transmitters), so tvShare = 75% (link-budget estimate, Seed measures it).
+  const workable = (s, t) => (t >= a.q40 ? 1 : Math.max(t >= a.tvQ ? a.tvShare / 100 : 0, s.needs40 ? 0 : a.workable / 100));
+  const wins = { doc: a.winsDoc, jail: a.winsJail, kit: a.winsKit, dod: a.winsDod, cbp: a.winsCbp, stad: a.winsStad };
+
+  // sellers: the named team first, then one more seller for every $bookingsPerSeller M of new contract value in the last year
+  const segSellers = {}; SEGMENTS.forEach((s) => { segSellers[s.key] = z(); });
+  const cohorts = {}; SEGMENTS.forEach((s) => { cohorts[s.key] = { won: z(), installed: z(), cum: 0 }; });
+
+  for (let t = 0; t < N; t++) {
+    // 1. sales capacity this quarter
+    const ttmBook = bookings.slice(Math.max(0, t - 4), t).reduce((p, v) => p + v, 0);
+    const extra = t >= A_Q ? Math.floor(ttmBook / (a.bookingsPerSeller * 1e6)) + a.repsAddA * (t - A_Q + 1) / 4 : 0;   // hired evenly through each year
+    const base = { doc: t >= 5 ? 1 : 0, jail: t >= 5 ? 0.5 : 0, kit: t >= 2 ? 0.5 : 0, dod: t >= 2 ? 0.5 : 0, cbp: t >= 2 ? 0.25 : 0, stad: t >= 6 ? 0.25 : 0 };
+    // founders and Ashlynn split their time across segments; extra sellers go where the money is (by share of last year's bookings, else equally)
+    let total = 0;
+    SEGMENTS.forEach((s) => { segSellers[s.key][t] = base[s.key] + extra * MIX[s.key]; total += segSellers[s.key][t]; });
+    sellers[t] = total;
+
+    // 2. customers signed (pipeline started `cycle` quarters ago by sellers then on the team), slowed as the pool fills
+    SEGMENTS.forEach((s) => {
+      const cyc = t >= a.contractQ ? Math.max(1, s.cycle - 1) : s.cycle, c = cohorts[s.key], src = t - cyc;
+      if (t < s.start || src < 0) return;
+      const ramp = Math.min(1, (src + 1 - 2) / a.rampQ);   // new sellers ramp up
+      const capacity = segSellers[s.key][src] * Math.max(0.3, ramp) * wins[s.key] / 4 * (t >= a.refQ ? 1 + a.refGain / 100 : 1);
+      const grant = s.key === 'kit' && t >= yr(2030) ? a.afterGrant / 100 : 1;
+      const room = Math.max(0, s.pool * workable(s, t) - c.cum);
+      const w = Math.min(room, capacity * grant * Math.max(0, 1 - c.cum / s.pool));
+      c.won[t] = w; c.cum += w;
+      const unitVal = s.product === 'site' ? s.size * (a.sitePrice + 5 * a.siteSub) : s.product === 'large' ? (a.largePrice + 5 * a.largeSub) * 1e3 : (a.kitPrice + 5 * a.kitSub) * 1e3;
+      bookings[t] += w * s.sites * unitVal;
+    });
+
+    // 3. installations: each signed customer installs `rollout` sites a quarter until done
+    SEGMENTS.forEach((s) => {
+      const c = cohorts[s.key];
+      let inst = 0;
+      for (let k = 0; k <= t; k++) {
+        if (!c.won[k]) continue;
+        const done = Math.min(s.sites, s.rollout * (t - k)), now = Math.min(s.sites, s.rollout * (t - k + 1));
+        inst += c.won[k] * (now - done);
+      }
+      c.installed[t] = inst;
+    });
+  }
+
+  // 4. revenue and direct costs by product, with renewals at the end of each term
+  const pilot = (t) => (t === F.pilotQ ? 1 : 0);
+  const life = (k, t) => { const age = t - k; if (age < 0) return 0; return Math.pow(a.renewal / 100, Math.floor(age / F.termQ)); };
+  const sensorsAt = (t, kind) => (kind === 'large' ? (own(t) ? F.largeSensorsCustom : F.largeSensorsBlade) : kind === 'kit' ? F.kitSensors : (own(t) ? F.siteSensorsCustom : F.siteSensorsBlade));
+  const runPer = (t) => (own(t) ? F.runPerSensorCustom : F.runPerSensor);
+  for (let t = 0; t < N; t++) {
+    SEGMENTS.forEach((s) => {
+      const c = cohorts[s.key], kind = s.product, n = c.installed[t];
+      let act = 0; for (let k = 0; k <= t; k++) act += c.installed[k] * life(k, t);
+      const chan = s.key === 'stad' ? F.partnerShare : 0;
+      if (kind === 'site') {
+        const units = s.size;
+        rev.site[t] += n * units * a.sitePrice + act * units * a.siteSub / 4;
+        cChan[t] += chan * (n * units * a.sitePrice + act * units * a.siteSub / 4);
+        const ns = sensorsAt(t, 'site') * units;
+        cHw[t] += n * (ns * sensorCost(t) + F.hubCost); cInst[t] += n * (ns * F.installPerSensor + F.setupPerSite);
+        cRun[t] += act * (ns * runPer(t) + F.runPerSite) / 4;
+        sitesActive[t] += act; sitesNew[t] += n;
+        // heat-camera option
+        const cn = n * a.camAttach / 100, ca = act * a.camAttach / 100;
+        rev.cam[t] += cn * a.camPrice + ca * a.camSub / 4; cHw[t] += cn * F.camCost * hw;
+      } else if (kind === 'large') {
+        rev.large[t] += n * a.largePrice * 1e3 + act * a.largeSub * 1e3 / 4;
+        const ns = sensorsAt(t, 'large');
+        cHw[t] += n * (ns * sensorCost(t) + F.hubCost + F.largeCams * F.camCost * hw); cInst[t] += n * (ns * F.installPerSensor + 4 * F.setupPerSite);
+        cRun[t] += act * (ns * runPer(t) + 4 * F.runPerSite) / 4;
+        largeActive[t] += act; sitesActive[t] += 4 * act; sitesNew[t] += 4 * n;
+      } else {
+        rev.kit[t] += n * a.kitPrice * 1e3 + act * a.kitSub * 1e3 / 4;
+        cHw[t] += n * (F.kitSensors * sensorCost(t) + F.camCost * hw + F.kitCaseCost);
+        cRun[t] += act * (F.kitSensors * runPer(t) + F.runPerSite) / 4;
+        kitsActive[t] += act;
+      }
+    });
+    // pilots (Hays and Clemson, one year), Draft 5
+    rev.site[t] += pilot(t) * F.pilotFee;
+    cHw[t] += pilot(t) * (18 * F.bladeCost + 2 * F.hubCost); cInst[t] += pilot(t) * (18 * F.installPerSensor + 2 * F.setupPerSite + 16000);
+    // GPS monitoring: add-on on a share of sites, plus standalone networks at bases and airports
+    if (t >= a.gnssFrom) {
+      const attach = a.gnssAttach / 100;
+      rev.gnss[t] += sitesActive[t] * attach * a.gnssAddon / 4;
+      cHw[t] += sitesNew[t] * attach * F.oscCost;
+      const nets = a.gnssNetsPerYear * ((t - a.gnssFrom) / 4 + 1) * ((t - a.gnssFrom) / 4 + 1) / 2;   // cumulative networks, a few more each year
+      rev.gnss[t] += nets * a.gnssNetPrice * 1e3 / 4;
+      cRun[t] += nets * 8 * runPer(t) / 4; cHw[t] += (t - a.gnssFrom) % 4 === 0 ? a.gnssNetsPerYear * ((t - a.gnssFrom) / 4 + 1) * 8 * (sensorCost(t) + F.oscCost) : 0;
+    }
+    // sensors sold to integrators (primes holding Domestic Shield and DHS counter-UAS contracts)
+    if (t >= a.oemFrom) {
+      const y = (t - a.oemFrom) / 4, partners = a.oemPartners + Math.floor(y) * 1;
+      const units = Math.min(a.oemCap, partners * a.oemUnits * Math.pow(1 + a.oemGrowth / 100, Math.floor(y))) / 4;
+      out.oemUnits = (out.oemUnits || z()); out.oemUnits[t] = units;
+      const base = out.oemUnits.slice(0, t).reduce((p, v) => p + v, 0);
+      rev.oem[t] += units * a.oemPrice + base * a.oemLicense / 4;
+      cHw[t] += units * (sensorCost(t) + F.oemPack);
+    }
+    // government R&D: SBIR Phase I (2027 Q3-2028 Q1), Phase II (2028 Q2-2029 Q4), DIU prototype (2029 Q1-2030 Q2), expected value
+    if (t >= 2 && t < 5) rev.rnd[t] += 335937 * a.sbir1 / 100 / 3;
+    if (t >= 5 && t < 12) rev.rnd[t] += 2239578 * a.sbir2 / 100 / 7;
+    if (t >= 8 && t < 14) rev.rnd[t] += 3.8e6 * a.diu / 100 / 6;
+    // FAA national program (scenario): from 2030
+    if (t >= yr(2030)) rev.faa[t] += a.faa * 1e6 / 4;
+  }
+
+  // 5. people and fixed costs
+  const totalRev = z(); for (let t = 0; t < N; t++) lines.forEach((k) => { totalRev[t] += rev[k][t]; });
+  const hEng = z(), hSales = z(), hField = z(), hGA = z(), heads = z(), payroll = z(), fixed = z();
+  for (let t = 0; t < N; t++) {
+    const ttm = totalRev.slice(Math.max(0, t - 3), t + 1).reduce((p, v) => p + v, 0);
+    const named = ROSTER.filter((r) => t >= r[2]);
+    const namedEng = named.filter((r) => r[1] === 'eng').length, namedSales = named.filter((r) => r[1] === 'sales').length;
+    hEng[t] = t >= A_Q ? Math.max(namedEng, 10 + Math.ceil(ttm / 2.5e6)) : namedEng;            // ASSUMPTION: one engineer per $2.5M of yearly sales after Series A
+    hSales[t] = Math.max(namedSales, Math.ceil(sellers[t] * 1.5));                               // each seller with half a sales engineer
+    hField[t] = Math.max(t >= 4 ? 1 : 0, Math.ceil((sitesActive[t] + kitsActive[t]) / F.sitesPerField));
+    hGA[t] = 1 + (t >= A_Q ? Math.ceil((hEng[t] + hSales[t] + hField[t]) / F.gaPer) : 0);
+    heads[t] = hEng[t] + hSales[t] + hField[t] + hGA[t];
+    // pay: founders $0 before Seed, then $120k; others at BLS-based loaded rates
+    const founders = named.filter((r) => r[3]).length, paidFounders = t >= SEED_Q ? founders : 0;
+    const engPaid = Math.max(0, hEng[t] - named.filter((r) => r[3] && r[1] === 'eng').length);
+    const salesPaid = Math.max(0, hSales[t] - named.filter((r) => r[3] && r[1] === 'sales').length);
+    const gaPaid = Math.max(0, hGA[t] - named.filter((r) => r[3] && r[1] === 'ga').length);
+    payroll[t] = (paidFounders * F.founderPay + engPaid * F.engCost + salesPaid * F.salesCost + hField[t] * F.fieldCost + gaPaid * F.adminCost) * 1e3 / 4;
+    const dev = (t < SEED_Q ? F.devPre : t < yr(2029) ? F.devSeed : F.devSeed * 2) * 1e3;
+    const nre = t >= a.ownQ - F.nreQ && t < a.ownQ ? F.nre / F.nreQ : 0;
+    const gdev = t >= a.gnssFrom - F.gnssDevQ && t < a.gnssFrom ? F.gnssDev / F.gnssDevQ : 0;
+    const comp = (t >= F.complianceQ ? F.compliance : 0) * 1e3 / 4 + F.counsel * 1e3 / 4 + (t >= a.contractQ ? GSA_COST * 1e3 / 4 : 0);
+    fixed[t] = payroll[t] * (t >= SEED_Q ? 1 + F.overhead : 1) + dev + nre + gdev + comp;
+  }
+
+  // 6. profit and cash (customers pay a quarter after billing; hardware is paid for when it ships)
+  const varCost = z(), gross = z(), op = z(), ocf = z(), fin = z(), cash = z(), cumOcf = z();
+  ROUNDS.forEach((r) => { fin[r.q] += (a[r.key] || 0) * 1e6; });
+  let peakNeed = 0, qPeak = 0, qCfp = null, q100 = null, minCash = 1e18, qMin = 0;
+  const ttm = z();
+  for (let t = 0; t < N; t++) {
+    varCost[t] = cHw[t] + cInst[t] + cRun[t] + cChan[t];
+    gross[t] = totalRev[t] - varCost[t]; op[t] = gross[t] - fixed[t];
+    ocf[t] = (t ? totalRev[t - 1] : 0) - varCost[t] - fixed[t];
+    cumOcf[t] = (t ? cumOcf[t - 1] : 0) + ocf[t];
+    cash[t] = (t ? cash[t - 1] : 0) + ocf[t] + fin[t];
+    ttm[t] = totalRev.slice(Math.max(0, t - 3), t + 1).reduce((p, v) => p + v, 0);
+    if (-cumOcf[t] > peakNeed) { peakNeed = -cumOcf[t]; qPeak = t; }
+    if (cash[t] < minCash) { minCash = cash[t]; qMin = t; }
+    if (q100 === null && ttm[t] >= 100e6) q100 = t;
+  }
+  for (let t = 0; t + 3 < N; t++) if (ocf[t] > 0 && ocf[t + 1] > 0 && ocf[t + 2] > 0 && ocf[t + 3] > 0) { qCfp = t; break; }
+  const raised = ROUNDS.reduce((p, r) => p + (a[r.key] || 0) * 1e6, 0);
+  Object.assign(out, { rev, totalRev, ttm, cHw, cInst, cRun, cChan, varCost, gross, op, fixed, payroll, ocf, cumOcf, cash, fin,
+    sitesActive, sitesNew, largeActive, kitsActive, sellers, bookings, hEng, hSales, hField, hGA, heads,
+    cohorts, peakNeed, qPeak, qCfp, q100, minCash, qMin, raised, gap: Math.max(0, -minCash) });
+  return out;
+}
+
+// What a sale is worth to each round (median pre-money: PitchBook-NVCA Venture Monitor Q3 2026; pre-seed cap ASSUMPTION)
+const PRE_MONEY = { r1: 18.3e6, r2: 60.3e6 }, PRESEED_POST = 5e6;
+function investorReturns(m, a, q, mult) {
+  const rounds = ROUNDS.filter((r) => a[r.key] > 0 && r.q <= q).map((r) => {
+    const amt = a[r.key] * 1e6, pre = r.key === 'r0' ? PRESEED_POST - amt : PRE_MONEY[r.key];
+    return { ...r, amt, pre, post: pre + amt };
+  });
+  rounds.forEach((r, i) => { r.own = r.amt / r.post; for (let j = i + 1; j < rounds.length; j++) r.own *= rounds[j].pre / rounds[j].post; });
+  const price = Math.max(0, m.ttm[q] * mult + Math.max(0, m.cash[q]));
+  rounds.forEach((r) => { r.value = r.own * price; r.multiple = r.value / r.amt; });
+  return { rounds, price, founders: 1 - rounds.reduce((p, r) => p + r.own, 0) };
+}
+</script>
