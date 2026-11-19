@@ -72,7 +72,7 @@ const DEFAULTS = {
   sbir1: 50, sbir2: 50, diu: 40,
   faa: 0,                                      // FAA national GPS monitoring program, $M a year (scenario)
   // funding $M
-  r0: 0.25, r1: 5, r2: 12,   // Series A sized to need: covers the worst scenario (prices 30% lower, ~$9.6M needed) with ~$7.6M to spare (decision 2026-11-18)
+  r0: 0.25, r1: 5, r2: 12,   // Series A sized to need: covers the worst scenario (prices 30% lower, ~$12.7M needed with the platform sensor costs) with ~$4.5M to spare (decision 2026-11-18)
 };
 // how added salespeople are split across customer types (ASSUMPTION)
 const MIX = { doc: 0.25, jail: 0.15, kit: 0.2, dod: 0.25, cbp: 0.05, stad: 0.1 };
