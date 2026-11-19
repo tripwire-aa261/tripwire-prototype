@@ -15,6 +15,7 @@ Last updated 2026-11-13 by Sid. History is in `context/SESSION_LOG.md`.
 - **Platform prototype v1.0 (merged from `pivot-v1` on 2026-11-19; only `prototype/platform/` and model v2):** https://tripwire-aa261.github.io/tripwire-prototype/prototype/platform/ (static app; tabs Platform, Sites, Flight simulator, Sensor & parts, Products & cost, GPS monitoring, Incident timeline; seven sites incl. Robins AFB, Pharr-Reynosa port, Centennial Olympic Park). The code that builds its data (twin changes, `tools/platform_v1.py`, `tools/flight_demo_v1.py`) is on `pivot-v1`. Model v2 now uses the platform sensor costs and counts (cash needed $6.2M, gross margin 2031 82%, sale at end 2031 $515M-989M); Draft Report 6 still quotes the earlier model ($5.8M, 87%, $524M-998M) until Sid approves the update.
   - 2026-11-19: Draft 6 (Claude doc and Google tabs "Draft Report 6", "Product Prototype v2") updated to the platform-based model figures; its prototype links now point to the Pages URL above. Model page kit card: eight sensors.
   - 2026-11-19: GPS monitoring tab gains locator set-ups (clock sync to TV/cell signals, correlation detection, bearing calibration, atomic clock); details in the pivot-v1 handoff. Product Prototype v2 Google tab now walks through this app.
+  - 2026-11-19: financial model v2 now uses the platform app's large-site and kit costs (camera mounts, camera upkeep, one backhaul fee per large site); worst scenario needs $13.0M.
 - FCC tower file (Nov 8 2026) in `prototype/data/raw/fcc/` (git-ignored) for tower counts around candidate sites.
 - GitHub repo: https://github.com/tripwire-aa261/tripwire-prototype (public since 2026-11-13 so graders can open the doc's links; main includes v0.5.1, PR #2 merged 2026-11-12 as `24a184b`). Earlier versions: v0.4.4 = `e7bf0ea`, v0.4.5 = `7cb4715`.
 
@@ -82,4 +83,3 @@ Last updated 2026-11-13 by Sid. History is in `context/SESSION_LOG.md`.
 - SAFER SKIES: can prison staff operate a contractor's system, and must our sensor be on the federal authorized list?
 - Georgia HB 1230 (2026, felony to fly over a prison): signing seen only in news summaries; confirm.
 - Robin IRIS $396k price seen only in a search result; confirm.
-  - 2026-11-19: financial model v2 now uses the platform app's large-site and kit costs (camera mounts, camera upkeep, one backhaul fee per large site); worst scenario needs $13.0M.
