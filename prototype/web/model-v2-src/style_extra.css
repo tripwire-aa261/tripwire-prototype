@@ -1,0 +1,29 @@
+.drop summary { cursor: pointer; list-style: none; padding: 16px 18px; display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: baseline; }
+.drop summary::-webkit-details-marker { display: none; }
+.drop summary h2 { margin-right: auto; }
+.drop summary .more { color: var(--muted); font-size: 13px; }
+.drop summary::after { content: "+"; color: var(--ink); font: 500 14px var(--mono); }
+.drop[open] summary::after { content: "\2212"; }
+.drop > .notes, .drop > .gloss { padding: 0 18px 18px; }
+.notmodeled { margin-top: 16px; } .notmodeled h3 { font-size: 15px; margin: 0 0 6px; } .notmodeled ul { margin: 0; padding-left: 18px; } .notmodeled li { margin: 4px 0; line-height: 1.45; }
+    .chart text.round { font: 500 9px var(--mono); fill: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.econ { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.econ h2 { font-size: 20px; letter-spacing: -0.01em; }
+.econ-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 32px; }
+#costTable td:nth-child(2), #costTable td:nth-child(3), #costTable th { white-space: nowrap; }
+#costTable td.tag, #costTable th:last-child { display: none; }
+@media (max-width: 1000px) { .econ-grid { grid-template-columns: minmax(0, 1fr); } }
+.econ-grid h3 { color: var(--ink); padding-bottom: 7px; border-bottom: 1px solid var(--ink); }
+td.l, th.l { text-align: left; white-space: normal; font: 400 13px var(--sans); }
+td.tag { font: 500 9px var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); text-align: left; }
+.roster td:first-child { white-space: normal; }
+.bars { display: flex; flex-direction: column; gap: 9px; margin-top: 10px; }
+.brow { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 3px 12px; align-items: center; font-size: 13px; }
+@media (max-width: 560px) { .brow { grid-template-columns: minmax(0, 1fr); } }
+.brow .lab span { display: block; font-size: 11.5px; color: var(--muted); }
+.btrack { position: relative; height: 18px; }
+.bbar { position: absolute; top: 3px; height: 12px; background: var(--tone-2); border-radius: 1px; }
+.bbar.us { background: var(--ink); }
+.bbar.cost { background: var(--surface); border: 1.5px solid var(--ink); }
+.bwhisk { position: absolute; top: 8px; height: 2px; background: var(--tone-1); }
+.bval { position: absolute; top: 1px; font: 400 10.5px/16px var(--mono); color: var(--ink-2); white-space: nowrap; }

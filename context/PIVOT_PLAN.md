@@ -39,7 +39,15 @@ Course instructors (Nov 2026): the current plan is not venture scale. It raises 
 
 ## Milestones (check in with Sid after each)
 
-1. Research brief: buyers, contract sizes and timelines; GNSS monitoring market and prices; sensing ranges and heat cameras; answers to the VC questions.
-2. Financial model v2: by customer type and contract; service and sensor-sales lines; GNSS product; raise and 5-year targets (both readings); 20 dB case.
+1. **Done 2026-11-18.** Research brief (`context/research/`): buyers, contract sizes and timelines; GNSS monitoring market and prices; sensing ranges and heat cameras; answers to the VC questions.
+2. **Built 2026-11-18, for Sid's review.** Financial model v2 (`prototype/web/financial-model-v2.html`, sources in `prototype/web/model-v2-src/`; design in `context/PIVOT_MODEL_DESIGN.md`): by customer type and contract; service and sensor-sales lines; GNSS product; raise and 5-year targets (both readings); 20 dB case.
 3. Prototype v0.6 on this branch: new signal sources, GPS-jammer locator, heat-camera cueing, contraband-drop walkthrough, 0.9 kg results.
 4. Draft Report 6 (Claude doc, then Google tab), product prototype tab v2.
+
+## Model v2 results at plan settings (2026-11-18)
+
+- Raises $25.25M (pre-seed $0.25M 2027 Q1, Seed $5M 2027 Q3, Series A $20M 2028 Q4); peak cash need $12.2M; pays its own way 2031 Q3.
+- Sales $38.1M in 2031 (year 5), $65.0M in 2032; $100M a year in 2034 Q1 (year 8).
+- Exit reading met: a sale at the end of 2031 is worth $188M (4.5x sales) to $359M (9x); Seed 6.1x / 11.6x, Series A 2.3x / 4.5x.
+- Sales reading not met within 5 years in any scenario except with faster hiring plus an FAA program; best single lever: 14 salespeople a year ($46M in 2031, $100M a year 2033 Q3).
+- Scenarios: stuck at 20 dB barely moves year-5 results (the plan is limited by selling capacity, not by sites that work); government slow $28.5M in 2031; no integrator sales $28.7M; prices 30% lower $26.7M and $21.3M of cash needed.
