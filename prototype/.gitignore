@@ -24,6 +24,8 @@ web/runs/sweeps/custom-*
 !web/runs/hays-upgraded-m210.*
 !web/runs/cost_model.json
 !web/runs/calibration.json
+!web/runs/broadcast_study.json
+!web/runs/platform_v06.json
 # Run lists are rebuilt from the files present when serve.py starts.
 web/runs/index.json
 web/runs/sweeps/index.json

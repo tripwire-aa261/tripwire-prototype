@@ -66,3 +66,7 @@ Changes after Sid's review: 16 salespeople hired a year after Series A; two sell
 - **Heat camera (35 mm):** 5 kg drone recognisable at ~428 m, 0.9 kg at ~185 m (Johnson upper bounds).
 - **Walkthrough (Hays, 5 kg drone, 4 sensors, 20 dB):** first track 596 m from the drop point, 40.5 s of warning before the fence, ~50 s before the drop; camera recognition at 416 m.
 - **0.9 kg (VC):** Hays needs 12 own-receiver sensors at 20 dB (3x the 5 kg count): cost per small-drone site rises accordingly.
+
+## Model v2 after prototype v0.6 (2026-11-18)
+
+TV signals (from 2029 Q1, ASSUMPTION) now also open prisons, jails and stadiums that cell towers cannot cover, matching the v0.6 finding. Plan: $116.8M of sales in 2031, $100M a year from 2031 Q3; peak need $7.8M; a 2031 sale $585M-$1.11B; Seed 20.9x / 39.7x. Stuck at 20 dB (no TV, no 40 dB) unchanged at $106.2M in 2031. Selling capacity, not technology, limits the five-year plan.

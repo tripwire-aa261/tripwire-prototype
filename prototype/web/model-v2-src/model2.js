@@ -98,7 +98,9 @@ function runModel(a) {
   const rev = {}; lines.forEach((k) => { rev[k] = z(); });
   const cHw = z(), cInst = z(), cRun = z(), cChan = z();
   const sitesNew = z(), sitesActive = z(), largeActive = z(), kitsActive = z(), sellers = z(), bookings = z();
-  const workable = (s, t) => (s.needs40 ? (t >= a.q40 ? 1 : 0) : !s.tower ? (t >= a.tvQ || t >= a.q40 ? 1 : a.workable / 100) : (t >= a.q40 ? 1 : a.workable / 100));
+  // A site works with cell towers (a third before 40 dB) or, once our processing uses digital TV, with TV: prototype v0.6 finds TV
+  // covers all four sites because a TV channel has no co-channel neighbours (link-budget estimate, to be measured at Seed).
+  const workable = (s, t) => (t >= a.tvQ || t >= a.q40 ? 1 : s.needs40 ? 0 : a.workable / 100);
   const wins = { doc: a.winsDoc, jail: a.winsJail, kit: a.winsKit, dod: a.winsDod, cbp: a.winsCbp, stad: a.winsStad };
 
   // sellers: the named team first, then one more seller for every $bookingsPerSeller M of new contract value in the last year
