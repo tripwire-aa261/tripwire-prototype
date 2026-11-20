@@ -12,6 +12,7 @@ Open locally: from `prototype/`, `python -m http.server 8000` and go to http://l
 - **Sites**: coverage map, requirement checks and cost for any site, drone, interference level, build and sensor count.
 - **Flight simulator**: three contraband flights per site played frame by frame: which sensors hear the drone in cell or
   TV echoes, located frames, the track, alerts, warning distance and time. Any site, drone, signals, 20 or 40 dB.
+  A **3D terrain** view (`sim3d.js`, three.js 0.160 from unpkg.com) shows the same flight over the site's real terrain, buildings and registered towers (`../data/sites/<id>/`), with TV stations by direction, the echoes, the track and its error ring; the camera follows the drone until you drag it.
 - **Sensor & parts**: the 16-channel, three-bank board and the whole sensor, every line cited or labeled ASSUMPTION;
   the Seed sensor from off-the-shelf radios.
 - **Products & cost**: site, site with heat camera, large perimeter, mobile kit, sensor for integrators, GPS monitoring:
