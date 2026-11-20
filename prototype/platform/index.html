@@ -4,14 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tripwire Platform</title>
+  <link rel="icon" href="brand/logo-a.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }</script>
 </head>
 <body>
   <header>
-    <div class="brand"><span class="logo">◎</span> Tripwire <span class="tag">platform prototype v1.0</span></div>
+    <a class="brand" href="#home" data-go="home"><img src="brand/logo-a.svg" alt="" width="34" height="34"><span><b>Tripwire</b><small>Passive radar for drone incursions</small></span></a>
     <nav class="tabbar" role="tablist">
-      <button role="tab" data-tab="platform" class="on">Platform</button>
+      <button role="tab" data-tab="home" class="on">Home</button>
+      <button role="tab" data-tab="platform">Platform</button>
       <button role="tab" data-tab="sites">Sites</button>
       <button role="tab" data-tab="sim">Flight simulator</button>
       <button role="tab" data-tab="sensor">Sensor &amp; parts</button>
@@ -19,9 +23,93 @@
       <button role="tab" data-tab="gnss">GPS monitoring</button>
       <button role="tab" data-tab="timeline">Incident timeline</button>
     </nav>
+    <button class="pill ghost tourbtn" id="tourBtn">Take the tour</button>
   </header>
 
-  <section class="tab on" id="tab-platform"><div class="page">
+  <section class="tab on" id="tab-home">
+    <div class="story hero2">
+      <div id="hmHeroText">
+        <p class="kicker rv">AA261 · platform prototype v1.1</p>
+        <h1 class="rv">Hear the drone before it reaches the fence.</h1>
+        <p class="lead rv">Tripwire sensors transmit nothing. They listen for faint drone echoes in cell-tower and digital TV signals that are already in the air, place the drone, and alert the control room while there is still time to act.</p>
+        <div class="row rv"><button class="pill" id="hmWatch">Watch a flight →</button><button class="pill ghost" id="hmTour">Take the 1-minute tour</button></div>
+      </div>
+      <canvas id="hmHero" aria-label="Illustration: a tower broadcasts, the drone reflects, sensors hear the echo"></canvas>
+    </div>
+    <div class="story tight"><div class="stats" id="hmStats"></div></div>
+
+    <div class="story">
+      <p class="kicker rv">The problem</p>
+      <h2 class="big rv">Inmates reach the package before staff do.</h2>
+      <p class="lead rv">Drones drop phones and drugs into prisons, and staff often see them only after the package is on the ground. These are recent cases at the kinds of site we simulate.</p>
+      <div class="cases" id="hmCases"></div>
+    </div>
+
+    <div class="story">
+      <p class="kicker rv">How it works</p>
+      <h2 class="big rv">Three steps, no transmitter.</h2>
+      <div class="steps">
+        <article class="step rv"><i>1</i><h3>Towers already broadcast</h3><p>Cell towers and digital TV stations light up the sky around every site, day and night. Tripwire uses the strongest ones in the public FCC records.</p></article>
+        <article class="step rv"><i>2</i><h3>A drone reflects a faint echo</h3><p>Each sensor hears the direct signal and, far weaker, its echo off the drone, delayed and shifted in frequency by the drone’s motion.</p></article>
+        <article class="step rv"><i>3</i><h3>Sensors place it and alert</h3><p>Three or more transmitter-sensor pairs place the drone; two fixes out of three confirm a track and send the alert with a map. One sensor costs <b id="hmSensorCost">–</b> in parts at 1,000 units.</p></article>
+      </div>
+    </div>
+
+    <div class="story" id="hmExplorer">
+      <p class="kicker rv">Seven real sites</p>
+      <h2 class="big rv">From a prison fence to an Air Force flightline.</h2>
+      <div class="seg chips rv" id="hmSites"></div>
+      <div class="explorer rv"><canvas id="hmMap" width="520" height="520"></canvas><div id="hmSiteInfo"></div></div>
+      <p class="note small">Coverage for the 0.9 kg drone with cell + digital TV at today’s 20 dB of interference removal (ASSUMPTION). Green: located by 3+ pairs; amber: detected only. White line: the fence.</p>
+    </div>
+
+    <div class="story">
+      <p class="kicker rv">When the track drops</p>
+      <h2 class="big rv">Losing the echo still tells you where it is.</h2>
+      <div class="split">
+        <div class="rv">
+          <p class="lead">A hovering drone has no Doppler shift, so its echo is cancelled along with the direct signal and the track drops. But Tripwire knows where the drone was, how fast it can fly, and where it would have been seen. A particle filter keeps 1,000 guesses flying from the last fix; every frame with no echo removes the guesses that were moving through covered ground. What is left is where the drone can be.</p>
+          <div class="big3"><div><b>91%</b><span>of lost-track frames with the drone inside the 90% region</span></div><div><b>100%</b><span>while it hovers</span></div><div><b>6.8 ha</b><span>mean region, first 45 s</span></div></div>
+          <p class="note small">Over all 168 simulated flights (7 sites, 2 drones, 2 signal sets, 2 interference levels, 3 flights each). Motion and trust settings are ASSUMPTIONS tuned on the same flights; real detection rates would be measured with a test drone at commissioning.</p>
+          <button class="pill" id="hmLostGo">See it in the simulator →</button>
+        </div>
+        <div class="rv"><canvas id="hmLost" width="520" height="520"></canvas><p class="note small">Hays demo flight, <span id="hmLostWhen"></span>: red is the true drone, green the track, orange the possible region.</p></div>
+      </div>
+    </div>
+
+    <div class="story">
+      <p class="kicker rv">Many drones at once</p>
+      <h2 class="big rv">A swarm is many echoes, kept apart.</h2>
+      <p class="lead rv">Each drone makes its own echo, at its own delay and Doppler shift, in every transmitter-sensor pair. The tracker decides which echo belongs to which drone. This is the design; the twin does not simulate swarms yet.</p>
+      <div class="steps four">
+        <article class="step rv"><i>a</i><h3>Separate in range and Doppler</h3><p>Drones at different distances or speeds fall in different delay-Doppler cells, so each pair sees separate peaks.</p></article>
+        <article class="step rv"><i>b</i><h3>Match echoes across pairs</h3><p>Only the right combination of peaks from 3+ pairs meets at one point. Wrong pairings (“ghosts”) do not agree from frame to frame and are dropped.</p></article>
+        <article class="step rv"><i>c</i><h3>One track per drone</h3><p>A multi-target tracker (joint probabilistic or multiple-hypothesis association) keeps each drone’s identity through crossings, using speed and heading.</p></article>
+        <article class="step rv"><i>d</i><h3>Report the group</h3><p>Count, spread and heading go to the control room, with a search region for any drone that drops out, as for a single drone.</p></article>
+      </div>
+    </div>
+
+    <div class="story">
+      <p class="kicker rv">One sensor, every product</p>
+      <h2 class="big rv">Priced from the parts list up.</h2>
+      <div class="prods" id="hmProducts"></div>
+    </div>
+
+    <div class="story">
+      <p class="kicker rv">Explore</p>
+      <h2 class="big rv">Every number has a source.</h2>
+      <div class="tiles">
+        <button class="tile rv" data-go="sites"><b>Sites</b><span>Coverage and cost for any site, drone and sensor count</span></button>
+        <button class="tile rv" data-go="sim"><b>Flight simulator</b><span>Frame-by-frame flights, map or 3D terrain</span></button>
+        <button class="tile rv" data-go="sensor"><b>Sensor &amp; parts</b><span>The 16-channel board, every part cited</span></button>
+        <button class="tile rv" data-go="products"><b>Products &amp; cost</b><span>Our cost, price and the cheapest competitor</span></button>
+        <button class="tile rv" data-go="gnss"><b>GPS monitoring</b><span>Placing a car jammer at three sites</span></button>
+        <button class="tile rv" data-go="timeline"><b>Incident timeline</b><span>A contraband drop, second by second</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-platform"><div class="page">
     <div class="hero">
       <h1>One sensor, three signals, five products</h1>
       <p class="lead">Tripwire sensors only listen. They hear drone echoes in signals already in the air (cell towers and digital TV), find GPS jammers, and point a heat camera at the drone. This prototype simulates the platform at seven real sites, from a prison fence to an Air Force flightline, a border crossing and a park during an event, and costs every product from a parts list.</p>
@@ -70,7 +158,7 @@
     <div class="grid2">
       <div class="sec"><div class="seg" id="smView"></div><h2 id="smTitle">Flight</h2><canvas id="smMap" width="620" height="620"></canvas><div class="view3d" id="sm3d" style="display:none"></div>
         <div class="player"><button id="smPlay">Play</button><div class="seg" id="smSpeed"></div><input type="range" id="smTime" min="0" max="100" value="0"><span id="smClock" class="mono">0 s</span></div>
-        <div class="legend"><span><i class="ln cl"></i>sensor hears the drone in a cell-tower echo</span><span><i class="ln tvl"></i>in a TV echo</span><span><i class="dot dr"></i>drone (true position)</span><span><i class="dot tk"></i>Tripwire track</span><span><i class="dot lc"></i>located, track not confirmed yet</span><span><i class="tri"></i>cell tower (outline: beyond the view)</span><span><i class="dot tvd"></i>TV station direction</span><span><i class="sw s2"></i>coverage map behind</span></div>
+        <div class="legend"><span><i class="ln cl"></i>sensor hears the drone in a cell-tower echo</span><span><i class="ln tvl"></i>in a TV echo</span><span><i class="dot dr"></i>drone (true position)</span><span><i class="dot tk"></i>Tripwire track</span><span><i class="dot lc"></i>located, track not confirmed yet</span><span><i class="tri"></i>cell tower (outline: beyond the view)</span><span><i class="dot tvd"></i>TV station direction</span><span><i class="sw zn"></i>possible region after a lost track (90%)</span><span><i class="sw s2"></i>coverage map behind</span></div>
       </div>
       <div>
         <div class="sec"><h2>Now</h2><div class="cards" id="smNow"></div></div>
@@ -115,7 +203,7 @@
   </div></section>
 
   <footer>
-    <span>Tripwire platform prototype v1.0 · every number is cited or labeled an assumption.</span>
+    <span>Tripwire platform prototype v1.1 · every number is cited or labeled an assumption.</span>
     <span id="links"></span>
   </footer>
   <script type="module" src="app.js"></script>

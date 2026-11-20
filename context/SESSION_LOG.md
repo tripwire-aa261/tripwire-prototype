@@ -2,6 +2,24 @@
 
 One entry per Claude Code session, newest first. Written by the `/handoff` skill before each commit. The chat history from before this repo existed is in `Context_log.txt`.
 
+## 2026-11-19 · Sid · Platform app v1.1: lost-track search region, Home page, tour, logo
+
+**Asked for:** "based on last seen location find out where the drone must be" when the track drops while hovering ("would some filtering approach be useful"); how to handle drone swarms; a "more scrollable interactive fresh design" like https://sowsmart-nasa.vercel.app/home.html; a website tour; a logo with "spider web inspiration with radio wave or like a cell tower with a spiderweb ball shape on top". Then: commit and merge to main.
+
+**Done:**
+- `prototype/platform/searchzone.js`: particle filter with negative information (no echo over covered ground rules out a moving drone; hover is not ruled out because of the zero-Doppler notch in `twin/flights.py`). Detection rates per coverage class measured from the same flights. Drawn in the 2D map, the 3D view (`sim3d.js`, orange tiles + label), a Now card and the event list.
+- `prototype/platform/home.js`, `tour.js`, new header and Home tab in `index.html`, v1.1 styles in `style.css`, `brand/` logos. README updated.
+- Checked in the browser: no console errors in a fresh tab, all 14 tour steps land on their targets, Home has no horizontal scroll at 375 px.
+
+**Decided:**
+- Filter settings (trust 0.4, stop 0.03, go 0.1 per frame) chosen so the 90% region holds the drone ~90% of the time; the first guess (0.6 / 0.12 / 0.08) held it only 76% because too many guesses switched to hovering. Tuned on the same flights it is scored on: labeled ASSUMPTION.
+- Region dropped after 45 s without a track (it grows too large to help).
+- Swarms: written as a design (delay-Doppler separation, cross-pair association with ghost rejection, multi-target tracker, group report), clearly marked "not simulated yet"; no swarm simulation built.
+- Logo A chosen as the app logo and favicon; B and C kept as alternates.
+- The first reference link (mart-nasa) was a 404; the SowSmart page was used.
+
+**Left open:** the filter's detection rates would need measuring with a test drone at a real site; swarm simulation; the Google Doc tabs do not mention the search region or the new Home page yet.
+
 ## 2026-11-13 · Sid · Next-step ideas noted; teammate comments on Draft 5 and the prototype tab
 
 **Asked for:**

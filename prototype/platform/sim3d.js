@@ -180,9 +180,14 @@ trkBall.add(new THREE.Mesh(new THREE.SphereGeometry(9, 16, 12), new THREE.MeshBa
 const trkRing = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 64 }, (_, k) => new THREE.Vector3(Math.cos(k / 64 * 2 * Math.PI), 0, Math.sin(k / 64 * 2 * Math.PI)))), new THREE.LineBasicMaterial({ color: 0x34d399 }));
 trkBall.add(trkRing);
 const trkLabel = label('Tripwire track', 'trk');
-dyn.add(droneObj, droneLabel, dropLine, pathLine, cellLines, tvLines, locPts, trkBall, trkLabel);
+// Search region after a lost track (searchzone.js): flat 20 m tiles just above the ground, brighter = more likely.
+const ZMAX = 3000;
+const zoneTiles = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide }), ZMAX);
+zoneTiles.count = 0; zoneTiles.frustumCulled = false;
+const zoneLabel = label('possible region', 'zn');
+dyn.add(droneObj, droneLabel, dropLine, pathLine, cellLines, tvLines, locPts, trkBall, trkLabel, zoneTiles, zoneLabel);
 
-export function update({ g, geo, run, i, height }) {
+export function update({ g, geo, run, i, height, zone }) {
   if (!gridF || !run) { dyn.visible = false; return; }
   dyn.visible = true;
   const H = height || 60, at = (x, y, dz = H) => w(x, y, ground(x, y) + dz);
@@ -213,6 +218,16 @@ export function update({ g, geo, run, i, height }) {
     trkLabel.position.copy(e.clone().add(new THREE.Vector3(0, r + 26, 0)));
     trkLabel.element.textContent = `Tripwire track · ±${Math.round(run.err[i])} m`;
   }
+  const z = zone && !zone.lost ? zone : null, M = new THREE.Matrix4(), col = new THREE.Color(), hot = new THREE.Color(0xfb923c), cold = new THREE.Color(0x3b2410);
+  zoneTiles.count = z ? Math.min(z.cells.length, ZMAX) : 0;
+  for (let k = 0; k < zoneTiles.count; k++) {
+    const [x, y, wt] = z.cells[k], cx = x + z.cell / 2, cy = y + z.cell / 2, p = at(cx, cy, 4);
+    M.makeScale(z.cell * 0.94, 1, z.cell * 0.94).setPosition(p); zoneTiles.setMatrixAt(k, M);
+    zoneTiles.setColorAt(k, col.copy(cold).lerp(hot, Math.sqrt(wt)));
+  }
+  zoneTiles.instanceMatrix.needsUpdate = true; if (zoneTiles.instanceColor) zoneTiles.instanceColor.needsUpdate = true;
+  zoneLabel.visible = !!z;
+  if (z) { zoneLabel.position.copy(at(z.cx, z.cy, 40)); zoneLabel.element.textContent = `possible region · ${z.area_ha.toFixed(1)} ha · ${Math.round(z.frames * (g.dt || 1.5))} s since the track`; }
   if (follow) {   // keep the site and the drone in view
     const tgt = at((dx + centre[0]) / 2, (dy + centre[1]) / 2, 0);
     const shift = tgt.clone().sub(controls.target).multiplyScalar(0.15);
