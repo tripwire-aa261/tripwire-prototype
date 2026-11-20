@@ -1,5 +1,8 @@
 // Tripwire platform prototype v1.0. Data: data/explore.json (twin/explore_v1.py), data/bom.json (twin/platform_bom.py),
 // data/products.json, data/gnss.json, data/timeline.json (tools/platform_v1.py), data/flights.json (tools/flight_demo_v1.py).
+import { zonesFor } from './searchzone.js';
+import { renderHome } from './home.js';
+import { initTour, startTour } from './tour.js';
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const usd = (v) => (v === null || v === undefined ? '–' : v >= 1e6 ? `$${(v / 1e6).toFixed(v >= 1e7 ? 0 : 1)}M` : v >= 1e4 ? `$${Math.round(v / 1e3)}k` : `$${Math.round(v).toLocaleString('en-US')}`);
@@ -69,8 +72,8 @@ function renderPlatform() {
 }
 
 // ---------------------------------------------------------------- Sites
-function drawMap(m, site) {
-  const cv = $('stMap'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+function drawMap(m, site, cv = $('stMap')) {
+  const ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
   ctx.clearRect(0, 0, W, H);
   if (!m) { ctx.fillStyle = '#8396a8'; ctx.font = '14px sans-serif'; ctx.fillText('No coverage map for this choice yet.', 14, 30); return; }
   const span = m.step * m.n, sc = Math.min(W, H) / span;
@@ -254,7 +257,10 @@ function simEvents(geo, run) {
   if (hov >= 0 && geo.hover_s > 1) ev.push({ k: hov, kind: 'drone', who: 'Drone', what: `Hovers ${Math.round(geo.hover_s)} s over the drop point${run.trk[hov] ? ' (track held)' : ''}.` });
   if (ft >= 0) {
     for (let k = ft + 1; k < T; k++) {
-      if (run.trk[k - 1] && !run.trk[k]) ev.push({ k, kind: 'people', who: 'Tripwire', what: `Track lost ${geo.inside[k] ? 'inside the fence' : `${geo.fence_m[k]} m outside`}.` });
+      if (run.trk[k - 1] && !run.trk[k]) {
+        const z = (sim.zones || [])[Math.min(k + 3, T - 1)], hov = z && !z.lost && z.hover > 0.5;
+        ev.push({ k, kind: 'people', who: 'Tripwire', what: `Track lost ${geo.inside[k] ? 'inside the fence' : `${geo.fence_m[k]} m outside`}; a search region grows from the last fix${hov ? '. No echo over covered ground: most likely hovering, so the region stays tight' : ''}.` });
+      }
       if (!run.trk[k - 1] && run.trk[k]) ev.push({ k, kind: 'detect', who: 'Tripwire', what: 'Track picked up again.' });
     }
   }
@@ -309,6 +315,10 @@ function simDraw() {
   const i = Math.min(sim.i, geo.t.length - 1), [dx, dy] = geo.xy[i];
   ctx.setLineDash([4, 5]); ctx.strokeStyle = 'rgba(248,113,113,.35)'; ctx.lineWidth = 1.2; ctx.beginPath();
   geo.xy.forEach(([x, y], k) => (k ? ctx.lineTo(px(x), py(y)) : ctx.moveTo(px(x), py(y)))); ctx.stroke(); ctx.setLineDash([]);
+  const zn = (sim.zones || [])[i];
+  if (zn && !zn.lost) {  // where the drone can be after the track dropped (searchzone.js)
+    zn.cells.forEach(([x, y, wt]) => { ctx.fillStyle = `rgba(251,146,60,${(0.18 + 0.6 * Math.sqrt(wt)).toFixed(2)})`; ctx.fillRect(px(x), py(y + zn.cell), zn.cell * sc + 0.5, zn.cell * sc + 0.5); });
+  }
   for (let k = Math.max(0, i - 60); k <= i; k++) {  // Tripwire's position estimates (track trail)
     if (!run.loc[k]) continue;
     ctx.fillStyle = run.trk[k] ? 'rgba(52,211,153,.8)' : 'rgba(251,191,36,.75)';
@@ -329,11 +339,14 @@ function simDraw() {
   const heard = run.n_cell[i] + run.n_tv[i];
   const state = run.trk[i] ? ['Tracked', 'live'] : run.loc[i] ? ['Located', 'warnc'] : heard ? ['Heard, not located', 'warnc'] : ['Not seen', 'off'];
   $('smNow').innerHTML = [[state[0], 'Tripwire', state[1]], [geo.inside[i] ? 'inside the fence' : `${geo.fence_m[i]} m outside`, 'Drone', ''],
-    [`${run.n_cell[i]} cell · ${run.n_tv[i]} TV`, 'Transmitter-sensor pairs that hear it', ''], [run.loc[i] ? `${Math.round(run.err[i])} m` : '–', 'Expected position error', '']]
+    [`${run.n_cell[i]} cell · ${run.n_tv[i]} TV`, 'Transmitter-sensor pairs that hear it', ''],
+    zn && !zn.lost ? [`${zn.area_ha.toFixed(1)} ha`, `Possible region, ${Math.round(zn.frames * g.dt)} s after the track (drone ${zn.inside ? 'inside' : 'outside'} it)`, 'zonec']
+      : zn && zn.lost ? ['lost', 'Over 45 s without a track: region dropped', 'off']
+      : [run.loc[i] ? `${Math.round(run.err[i])} m` : '–', 'Expected position error', '']]
     .map(([b, sm, cl]) => `<div class="card ${cl}"><small>${esc(sm)}</small><b>${esc(b)}</b></div>`).join('');
   $('smClock').textContent = `${Math.round(geo.t[i])} s / ${Math.round(geo.t[geo.t.length - 1])} s`;
   $('smTime').value = i;
-  if (sim.view === '3d' && S3) S3.update({ g, geo, run, i, height: F.height_m });
+  if (sim.view === '3d' && S3) S3.update({ g, geo, run, i, height: F.height_m, zone: zn });
   document.querySelectorAll('#smEvents .ev').forEach((li) => li.classList.toggle('past', +li.dataset.k <= i));
 }
 
@@ -354,6 +367,7 @@ function renderSim() {
   seg($('smFlight'), 'Flight', g.flights.map((f, k) => [k, `${k + 1}: from ${f.from_deg}°`]), () => sim.fl, (v) => { sim.fl = +v; reset(); });
   seg($('smSpeed'), 'Speed', [[1, '1x'], [4, '4x'], [10, '10x']], () => sim.speed, (v) => { sim.speed = +v; });
   const { geo, run } = simData();
+  sim.zones = run ? zonesFor(F, E, `${sim.site}|${sim.drone}|${sim.sig}|${sim.interf}`, sim.fl).zones : [];
   $('smTitle').textContent = `${E.sites[sim.site].name} · ${DRONES[sim.drone]} · ${SIG_NAMES[sim.sig].toLowerCase()} · ${sim.interf} dB · ${g.n} platform sensors`;
   $('smTime').max = geo.t.length - 1;
   if (run) {
@@ -402,8 +416,30 @@ async function boot() {
   simInit();
   $('links').innerHTML = `${link(LINKS.model, 'Financial model v2')} · ${link(LINKS.twin, 'Cell-tower twin v0.5 (3D signal replays)')} · ${link(LINKS.repo, 'Code')}`;
   renderPlatform(); renderSensor(); renderProducts(); renderTimeline(); renderAll();
-  const show = (t) => { document.querySelectorAll('.tabbar button').forEach((b) => b.classList.toggle('on', b.dataset.tab === t)); document.querySelectorAll('.tab').forEach((s) => s.classList.toggle('on', s.id === `tab-${t}`)); history.replaceState(null, '', `#${t}`); };
   document.querySelectorAll('.tabbar button').forEach((b) => (b.onclick = () => show(b.dataset.tab)));
+  document.querySelectorAll('header [data-go]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); show('home'); }));
+  const api = { E, B, P, T, F, usd, rec, drawMap, SITE_ORDER, show, openSite, openSim, tour: startTour, pause: () => { sim.playing = false; $('smPlay').textContent = 'Play'; } };
+  initTour(api);
+  $('tourBtn').onclick = startTour;
+  if (F) renderHome(api);
   const h = location.hash.slice(1); if (h && $(`tab-${h}`)) show(h);
+}
+
+function show(t) {
+  document.querySelectorAll('.tabbar button').forEach((b) => b.classList.toggle('on', b.dataset.tab === t));
+  document.querySelectorAll('.tab').forEach((s) => s.classList.toggle('on', s.id === `tab-${t}`));
+  history.replaceState(null, '', `#${t}`);
+  if (t !== 'sim' && sim.playing) { sim.playing = false; $('smPlay').textContent = 'Play'; }
+  if (t === 'sim' && sim.view === '3d') show3d();
+  window.scrollTo({ top: 0 });
+}
+function openSite(k) { st.site = k; st.n = null; renderSites(); show('sites'); }
+// Jump the flight simulator to a site (Hays demo settings), optionally to a frame, to the first lost-track hover, or playing.
+function openSim({ site = 'hays', i = 0, play = false, lost = false } = {}) {
+  Object.assign(sim, { site, fl: 0, drone: 'mavic', sig: 'cell+tv', interf: 20 });
+  renderSim();
+  if (lost) { const z = sim.zones.findIndex((zz) => zz && !zz.lost && zz.hover > 0.5); if (z >= 0) i = z + 2; }
+  sim.i = i; sim.playing = play; $('smPlay').textContent = play ? 'Pause' : 'Play';
+  show('sim'); simDraw();
 }
 boot().catch((e) => { document.querySelector('.page').innerHTML = `<p class="bad">Could not load the data (${esc(e.message)}). Run twin/platform_bom.py, twin/explore_v1.py and tools/platform_v1.py.</p>`; });

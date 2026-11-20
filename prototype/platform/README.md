@@ -1,4 +1,4 @@
-# Tripwire platform prototype v1.0
+# Tripwire platform prototype v1.1
 
 A static web app (no build step) for the pivot in Draft Report 6: one receive-only sensor with three receive banks (cell,
 digital TV, GPS), five products, seven real sites. The cell-tower twin v0.5 (`../web/`, https://tripwire-cyan.vercel.app)
@@ -7,12 +7,17 @@ stays as submitted with Draft Report 5; its 3D signal replays are cell-only and 
 Open locally: from `prototype/`, `python -m http.server 8000` and go to http://localhost:8000/platform/.
 
 ## Tabs
+- **Home** (v1.1, `home.js`): a scroll-through story of the platform: the problem (real cases), how it works, a site
+  explorer for all seven sites, the lost-track search region, how swarms would be handled (design only, not simulated),
+  the products, and links into every tab. **Take the tour** (`tour.js`) walks through 14 steps across the tabs.
+  Logo: `brand/logo-a.svg` (alternates `logo-b.svg`, `logo-c.svg`; `brand/preview.html` shows all three).
 - **Platform**: the seven sites; with cell towers only, the interference removal and sensors each needs for the 5 kg and
   the 0.9 kg drone; with cell + TV, the sensors for the 0.9 kg drone today.
 - **Sites**: coverage map, requirement checks and cost for any site, drone, interference level, build and sensor count.
 - **Flight simulator**: three contraband flights per site played frame by frame: which sensors hear the drone in cell or
   TV echoes, located frames, the track, alerts, warning distance and time. Any site, drone, signals, 20 or 40 dB.
   A **3D terrain** view (`sim3d.js`, three.js 0.160 from unpkg.com) shows the same flight over the site's real terrain, buildings and registered towers (`../data/sites/<id>/`), with TV stations by direction, the echoes, the track and its error ring; the camera follows the drone until you drag it.
+  **Lost-track search region** (`searchzone.js`): when the track drops, a particle filter (1,000 guesses) flies on from the last fix; each frame with no echo removes guesses moving through covered ground (a hovering drone sits in the zero-Doppler notch, so a miss says nothing against a hover). The orange 90% region holds the true drone 91% of the time over all 168 flights in the first 45 s after a loss (100% while hovering, 96% inside the fence + 150 m), mean 6.8 ha. Motion and trust settings are ASSUMPTIONS tuned on the same flights.
 - **Sensor & parts**: the 16-channel, three-bank board and the whole sensor, every line cited or labeled ASSUMPTION;
   the Seed sensor from off-the-shelf radios.
 - **Products & cost**: site, site with heat camera, large perimeter, mobile kit, sensor for integrators, GPS monitoring:
