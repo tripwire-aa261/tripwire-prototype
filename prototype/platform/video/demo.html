@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tripwire demo video</title>
+<style>
+  html, body { margin: 0; background: #000; }
+  canvas { display: block; width: 100vw; height: auto; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+/* Tripwire demo video: the platform app's flight simulator (data/flights.json) drawn as a presentation film.
+   Every number on screen is computed from the app's data files. Open with ?play to watch in real time;
+   tools in this folder render it frame by frame (window.render(t)) to an MP4. */
+const W = 1920, H = 1080;
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const SANS = "'Segoe UI', 'Helvetica Neue', Arial, sans-serif", MONO = "Consolas, 'SF Mono', Menlo, monospace";
+const C = {
+  bg: '#05090f', map: '#0a121c', grid: 'rgba(148,163,184,0.07)', fence: '#e8eef5', cell: '#38bdf8', tv: '#c4b5fd',
+  drone: '#fb7185', trk: '#34d399', loc: '#fbbf24', text: '#eef3f8', dim: '#8796a8', faint: '#4a5868', panel: 'rgba(13,21,32,0.92)',
+};
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ease = (t) => { t = clamp(t); return t * t * (3 - 2 * t); };
+const lerp = (a, b, t) => a + (b - a) * t;
+const fmtT = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+let F, E, A, B, REC;
+
+// ------------------------------------------------------------------ data
+function prep(site, sig) {
+  const g = F.sites[site], geo = g.flights[0], run = F.runs[`${site}|mavic|${sig}|20`][0];
+  const fence = E.sites[site].fence;
+  const cx = fence.reduce((a, p) => a + p[0], 0) / fence.length, cy = fence.reduce((a, p) => a + p[1], 0) / fence.length;
+  let half = 0;
+  geo.xy.concat(fence).forEach(([x, y]) => (half = Math.max(half, Math.abs(x - cx), Math.abs(y - cy))));
+  half = Math.ceil((half + 120) / 100) * 100;
+  const T = geo.t.length, ft = run.trk.indexOf(1), cross = geo.inside.indexOf(1), leave = geo.inside.lastIndexOf(1) + 1;
+  let hov = -1;
+  for (let k = 1; k < T; k++) if (geo.xy[k][0] === geo.xy[k - 1][0] && geo.xy[k][1] === geo.xy[k - 1][1]) { hov = k - 1; break; }
+  const heard = run.loc.indexOf(1);   // first located frame (3+ pairs from 2+ sensors)
+  let hend = hov; if (hov >= 0) while (hend + 1 < T && geo.xy[hend + 1][0] === geo.xy[hov][0] && geo.xy[hend + 1][1] === geo.xy[hov][1]) hend++;
+  let reacq = -1; if (ft >= 0) for (let k = ft + 1; k < T; k++) if (!run.trk[k - 1] && run.trk[k]) { reacq = k; break; }
+  const m = E.maps.find((mm) => mm.k[0] === site && mm.k[1] === 'mavic' && mm.k[2] === 'ring8_enh_hist' && mm.k[4] === 20 && mm.k[5] === g.n && (mm.signals || 'cell') === sig);
+  let per = 0; for (let k = 1; k < fence.length; k++) per += Math.hypot(fence[k][0] - fence[k - 1][0], fence[k][1] - fence[k - 1][1]);
+  const early = ft >= 0 && (cross < 0 || ft < cross);
+  return { site, sig, g, geo, run, fence, per, cx, cy, half, T, ft, cross, leave, hov, hend, reacq, heard, m, early,
+    warnM: early ? geo.fence_m[ft] : null, warnS: early && cross > ft ? Math.round(geo.t[cross] - geo.t[ft]) : null, name: E.sites[site].name };
+}
+
+// ------------------------------------------------------------------ drawing helpers
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function text(s, x, y, { size = 28, weight = 400, color = C.text, align = 'left', font = SANS, alpha = 1, spacing = 0, base = 'alphabetic' } = {}) {
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = base;
+  ctx.font = `${weight} ${size}px ${font}`;
+  if (spacing) { try { ctx.letterSpacing = spacing + 'px'; } catch (e) {} }
+  ctx.fillText(s, x, y); ctx.restore();
+}
+function wrap(s, x, y, maxW, lh, opts) {
+  ctx.save(); ctx.font = `${opts.weight || 400} ${opts.size || 28}px ${SANS}`;
+  const words = s.split(' '); let line = '', yy = y;
+  for (const w of words) { const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { text(line, x, yy, opts); line = w; yy += lh; } else line = t; }
+  if (line) text(line, x, yy, opts); ctx.restore(); return yy;
+}
+function glowLine(x1, y1, x2, y2, color, w, blur) { ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.shadowColor = color; ctx.shadowBlur = blur; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore(); }
+function dot(x, y, r, color, blur = 0) { ctx.save(); ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = blur; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.restore(); }
+
+// ------------------------------------------------------------------ the site map
+// o: { idx (fractional frame), t (seconds, for animation), fence, sensors, towers, tv, cov, labels, flight, glow }
+// Camera: centred between the prison and the drone, zoomed so both stay in view.
+function cam(d, idx) {
+  if (idx == null) return { cx: d.cx, cy: d.cy, half: 520 };
+  const i0 = Math.min(Math.floor(idx), d.T - 1), i1 = Math.min(i0 + 1, d.T - 1), fr = idx - Math.floor(idx);
+  const dx = lerp(d.geo.xy[i0][0], d.geo.xy[i1][0], fr), dy = lerp(d.geo.xy[i0][1], d.geo.xy[i1][1], fr);
+  const dist = Math.hypot(dx - d.cx, dy - d.cy), k = 0.42 * clamp((dist - 250) / 600);
+  return { cx: d.cx + (dx - d.cx) * k, cy: d.cy + (dy - d.cy) * k, half: Math.max(470, dist * (1 - k) + 260) };
+}
+
+function drawMap(d, box, o) {
+  const v = o.view || cam(d, o.idx);
+  const { x: bx, y: by, s } = box, sc = s / (2 * v.half);
+  const px = (x) => bx + s / 2 + (x - v.cx) * sc, py = (y) => by + s / 2 - (y - v.cy) * sc;
+  ctx.save(); rr(bx, by, s, s, 18); ctx.fillStyle = C.map; ctx.fill(); ctx.clip();
+  // grid, every 100 m
+  ctx.strokeStyle = C.grid; ctx.lineWidth = 1;
+  for (let g = Math.floor((v.cx - v.half) / 100) * 100; g <= v.cx + v.half; g += 100) { ctx.beginPath(); ctx.moveTo(px(g), by); ctx.lineTo(px(g), by + s); ctx.stroke(); }
+  for (let g = Math.floor((v.cy - v.half) / 100) * 100; g <= v.cy + v.half; g += 100) { ctx.beginPath(); ctx.moveTo(bx, py(g)); ctx.lineTo(bx + s, py(g)); ctx.stroke(); }
+  // radar-style range rings around the site, every 500 m
+  ctx.strokeStyle = 'rgba(148,163,184,0.13)'; ctx.setLineDash([2, 8]);
+  for (let r = 500; r < 3000; r += 500) { ctx.beginPath(); ctx.arc(px(d.cx), py(d.cy), r * sc, 0, 7); ctx.stroke(); }
+  ctx.setLineDash([]);
+  // coverage map: where this build tracks a 0.9 kg drone
+  if (d.m && o.cov > 0) {
+    if (!d.covImg) {   // the twin's coverage grid as a small image, drawn smoothed so it reads as a soft glow
+      const n = d.m.n, oc = document.createElement('canvas'); oc.width = n; oc.height = n;
+      const ox = oc.getContext('2d'), im = ox.createImageData(n, n);
+      for (let a = 0; a < n; a++) for (let b = 0; b < n; b++) {
+        const st = +d.m.state[a * n + b], p = ((n - 1 - a) * n + b) * 4;
+        if (st === 2) { im.data[p] = 52; im.data[p + 1] = 211; im.data[p + 2] = 153; im.data[p + 3] = 70; }
+        else if (st === 1) { im.data[p] = 251; im.data[p + 1] = 191; im.data[p + 2] = 36; im.data[p + 3] = 30; }
+      }
+      ox.putImageData(im, 0, 0); d.covImg = oc;
+    }
+    const st = d.m.step, n = d.m.n;
+    ctx.save(); ctx.globalAlpha = o.cov; ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.filter = 'blur(6px)';
+    ctx.drawImage(d.covImg, px(d.m.x0 - st / 2), py(d.m.y0 + (n - 1) * st + st / 2), n * st * sc, n * st * sc);
+    ctx.restore();
+  }
+  // cell towers, with a slow broadcast pulse
+  if (o.towers > 0) {
+    d.g.towers.forEach(([x, y], j) => {
+      let X = px(x), Y = py(y); const out = X < bx + 14 || X > bx + s - 14 || Y < by + 14 || Y > by + s - 14;
+      X = clamp(X, bx + 14, bx + s - 14); Y = clamp(Y, by + 14, by + s - 14);
+      ctx.save(); ctx.globalAlpha = o.towers;
+      for (let q = 0; q < 2; q++) {
+        const ph = ((o.t * 0.45 + j * 0.23 + q * 0.5) % 1);
+        ctx.strokeStyle = `rgba(56,189,248,${0.35 * (1 - ph)})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(X, Y, 10 + ph * 70 * (s / 1000), 0, 7); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.moveTo(X, Y - 11); ctx.lineTo(X - 8, Y + 7); ctx.lineTo(X + 8, Y + 7); ctx.closePath();
+      if (out) { ctx.strokeStyle = C.cell; ctx.lineWidth = 1.5; ctx.stroke(); } else { ctx.fillStyle = C.cell; ctx.fill(); }
+      ctx.restore();
+    });
+  }
+  // TV stations: tens of km away, shown by direction on the rim
+  if (d.sig.includes('tv') && o.tv > 0) {
+    const tvs = [...d.g.tv].sort((p, q) => p.bearing_deg - q.bearing_deg);
+    tvs.forEach((t, j) => {
+      const a = (t.bearing_deg * Math.PI) / 180, r = s / 2 - 26, X = bx + s / 2 + r * Math.sin(a), Y = by + s / 2 - r * Math.cos(a);
+      ctx.save(); ctx.globalAlpha = o.tv;
+      const ph = (o.t * 0.4 + j * 0.31) % 1;
+      ctx.strokeStyle = `rgba(196,181,253,${0.45 * (1 - ph)})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(X, Y, 8 + ph * 40, 0, 7); ctx.stroke();
+      dot(X, Y, 6, C.tv, 12);
+      ctx.restore();
+    });
+    if (o.labels > 0) {   // one label block next to the stations
+      const a = (tvs[0].bearing_deg * Math.PI) / 180, r = s / 2 - 26, X = bx + s / 2 + r * Math.sin(a), Y = by + s / 2 - r * Math.cos(a);
+      ctx.save(); ctx.globalAlpha = o.tv * o.labels;
+      tvs.forEach((t, j) => text(`${t.call} · ${Math.round(t.distance_km)} km`, X + 34, Y + 34 + j * 26, { size: 19, color: C.tv, font: MONO }));
+      text('TV stations, by direction', X + 34, Y + 34 + tvs.length * 26 + 4, { size: 16, color: C.dim });
+      ctx.restore();
+    }
+  }
+  // fence, drawn progressively in the intro
+  if (o.fence > 0) {
+    ctx.save(); ctx.strokeStyle = C.fence; ctx.lineWidth = 3; ctx.shadowColor = 'rgba(232,238,245,0.6)'; ctx.shadowBlur = 10;
+    ctx.setLineDash([d.per * sc * o.fence, 1e5]); ctx.beginPath();
+    d.fence.forEach(([x, y], k) => (k ? ctx.lineTo(px(x), py(y)) : ctx.moveTo(px(x), py(y)))); ctx.stroke(); ctx.restore();
+  }
+  const idx = o.idx;
+  if (o.flight && idx != null) {
+    const i0 = Math.min(Math.floor(idx), d.T - 1), i1 = Math.min(i0 + 1, d.T - 1), fr = idx - Math.floor(idx);
+    const dx = lerp(d.geo.xy[i0][0], d.geo.xy[i1][0], fr), dy = lerp(d.geo.xy[i0][1], d.geo.xy[i1][1], fr);
+    const run = d.run;
+    // true path flown so far
+    ctx.save(); ctx.strokeStyle = 'rgba(251,113,133,0.35)'; ctx.lineWidth = 2; ctx.setLineDash([6, 8]); ctx.beginPath();
+    for (let k = 0; k <= i0; k++) (k ? ctx.lineTo(px(d.geo.xy[k][0]), py(d.geo.xy[k][1])) : ctx.moveTo(px(d.geo.xy[k][0]), py(d.geo.xy[k][1])));
+    ctx.lineTo(px(dx), py(dy)); ctx.stroke(); ctx.restore();
+    // echoes: each sensor that hears the drone now; dashes run from the drone to the sensor
+    d.g.sensors.forEach(([x, y], j) => {
+      const c = (run.cell[i0] >> j) & 1, t = (run.tv[i0] >> j) & 1;
+      if (!c && !t) return;
+      [[c, C.cell, 0], [t, C.tv, 7]].forEach(([on, col, off]) => {
+        if (!on) return;
+        ctx.save(); ctx.strokeStyle = col; ctx.globalAlpha = 0.85; ctx.lineWidth = 2.2; ctx.shadowColor = col; ctx.shadowBlur = 10;
+        ctx.setLineDash([10, 12]); ctx.lineDashOffset = -(o.t * 90) + off;
+        ctx.beginPath(); ctx.moveTo(px(dx), py(dy)); ctx.lineTo(px(x), py(y)); ctx.stroke(); ctx.restore();
+      });
+    });
+    // Tripwire's estimates: located (amber) and tracked (green)
+    for (let k = Math.max(0, i0 - 70); k <= i0; k++) {
+      if (!run.loc[k]) continue;
+      ctx.save(); ctx.globalAlpha = 0.25 + 0.75 * (1 - (i0 - k) / 70);
+      dot(px(run.est[k][0]), py(run.est[k][1]), run.trk[k] ? 3.2 : 2.6, run.trk[k] ? C.trk : C.loc, 0); ctx.restore();
+    }
+    if (run.trk[i0]) {
+      const e0 = run.est[i0], e1 = run.loc[i1] ? run.est[i1] : e0;
+      const ex = px(lerp(e0[0], e1[0], fr)), ey = py(lerp(e0[1], e1[1], fr)), rr_ = Math.max(14, run.err[i0] * sc);
+      ctx.save(); ctx.strokeStyle = C.trk; ctx.lineWidth = 2.5; ctx.shadowColor = C.trk; ctx.shadowBlur = 16;
+      ctx.beginPath(); ctx.arc(ex, ey, rr_, 0, 7); ctx.stroke();
+      // corner brackets, like a target box
+      const b = rr_ + 12, L = 10; ctx.lineWidth = 2;
+      [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([sx, sy]) => { ctx.beginPath(); ctx.moveTo(ex + sx * b, ey + sy * (b - L)); ctx.lineTo(ex + sx * b, ey + sy * b); ctx.lineTo(ex + sx * (b - L), ey + sy * b); ctx.stroke(); });
+      ctx.restore();
+    }
+    // sensors
+    d.g.sensors.forEach(([x, y], j) => {
+      const hear = ((run.cell[i0] | run.tv[i0]) >> j) & 1;
+      dot(px(x), py(y), hear ? 9 : 7.5, hear ? '#7dd3fc' : C.cell, hear ? 18 : 6);
+      ctx.save(); ctx.strokeStyle = '#04121c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(px(x), py(y), hear ? 9 : 7.5, 0, 7); ctx.stroke(); ctx.restore();
+    });
+    // the drone
+    const hx = d.geo.xy[i1][0] - d.geo.xy[i0][0], hy = d.geo.xy[i1][1] - d.geo.xy[i0][1], ang = Math.atan2(-hy, hx);
+    const X = px(dx), Y = py(dy), pul = 0.5 + 0.5 * Math.sin(o.t * 6);
+    dot(X, Y, 18 + 6 * pul, 'rgba(251,113,133,0.18)');
+    ctx.save(); ctx.translate(X, Y); ctx.rotate(ang + Math.PI / 4); ctx.strokeStyle = C.drone; ctx.lineWidth = 3; ctx.shadowColor = C.drone; ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.moveTo(-9, -9); ctx.lineTo(9, 9); ctx.moveTo(9, -9); ctx.lineTo(-9, 9); ctx.stroke();
+    ctx.lineWidth = 2; [[-9, -9], [9, 9], [9, -9], [-9, 9]].forEach(([a, b]) => { ctx.beginPath(); ctx.arc(a, b, 4.5, 0, 7); ctx.stroke(); });
+    ctx.restore();
+  } else if (o.sensors > 0) {
+    d.g.sensors.forEach(([x, y], j) => {
+      const k = clamp(o.sensors * d.g.sensors.length - j), r = 7.5 * ease(k) * (1 + 0.6 * (1 - k));
+      if (k <= 0) return;
+      dot(px(x), py(y), r, C.cell, 10);
+      if (k < 1) { ctx.save(); ctx.strokeStyle = `rgba(56,189,248,${1 - k})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(px(x), py(y), 8 + 30 * k, 0, 7); ctx.stroke(); ctx.restore(); }
+    });
+  }
+  // scale bar
+  const sb = [100, 200, 250, 500, 1000].filter((m) => m * sc <= s * 0.28).pop() || 100;
+  ctx.fillStyle = C.dim; ctx.fillRect(bx + 24, by + s - 30, sb * sc, 3);
+  text(`${sb} m`, bx + 24, by + s - 40, { size: 17, color: C.dim, font: MONO });
+  ctx.restore();
+  // frame and glow
+  ctx.save(); rr(bx, by, s, s, 18); ctx.lineWidth = 2;
+  if (o.glow) { ctx.strokeStyle = o.glow; ctx.shadowColor = o.glow; ctx.shadowBlur = 30; } else ctx.strokeStyle = 'rgba(148,163,184,0.25)';
+  ctx.stroke(); ctx.restore();
+  return { px, py, sc };
+}
+
+function bg(t) {
+  ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(W * 0.3, H * 0.5, 50, W * 0.3, H * 0.5, 1100);
+  g.addColorStop(0, 'rgba(56,189,248,0.07)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+
+// ------------------------------------------------------------------ scenes
+function stateOf(d, i) {
+  const r = d.run, heard = r.n_cell[i] + r.n_tv[i];
+  return r.trk[i] ? ['TRACKED', C.trk] : r.loc[i] ? ['LOCATED', C.loc] : heard ? ['HEARD', C.loc] : ['NOT SEEN', C.faint];
+}
+
+function hud(d, i, x, y, w) {
+  const [st, col] = stateOf(d, i), geo = d.geo, r = d.run;
+  // status chip
+  ctx.save(); rr(x, y, w, 96, 14); ctx.fillStyle = C.panel; ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 2;
+  if (st === 'TRACKED') { ctx.shadowColor = col; ctx.shadowBlur = 24; } ctx.stroke(); ctx.restore();
+  dot(x + 40, y + 48, 11, col, st === 'NOT SEEN' ? 0 : 16);
+  text('TRIPWIRE', x + 70, y + 36, { size: 17, color: C.dim, weight: 600, spacing: 3 });
+  text(st, x + 70, y + 74, { size: 38, weight: 700, color: col === C.faint ? C.dim : col, spacing: 2 });
+  text(`T+ ${fmtT(geo.t[i])}`, x + w - 28, y + 62, { size: 30, color: C.text, align: 'right', font: MONO });
+  // stat cards
+  let lastLoc = -1; for (let k = i; k >= 0; k--) if (r.loc[k]) { lastLoc = k; break; }
+  const cards = [
+    [geo.inside[i] ? 'inside' : `${geo.fence_m[i].toLocaleString('en-US')} m`, geo.inside[i] ? 'drone over the prison' : 'drone to the fence', C.drone],
+    [`${r.n_cell[i]} · ${r.n_tv[i]}`, 'cell · TV echoes heard', C.cell],
+    [lastLoc >= 0 ? `±${Math.round(r.err[lastLoc])} m` : '–', 'position accuracy', C.trk],
+  ];
+  const cw = (w - 24) / 3;
+  cards.forEach(([b, sm, c], k) => {
+    const cx = x + k * (cw + 12), cy = y + 112;
+    ctx.save(); rr(cx, cy, cw, 112, 12); ctx.fillStyle = C.panel; ctx.fill(); ctx.restore();
+    ctx.fillStyle = c; ctx.fillRect(cx, cy + 16, 3, 80);
+    text(b, cx + 20, cy + 56, { size: 36, weight: 600, font: MONO });
+    wrap(sm, cx + 20, cy + 86, cw - 30, 20, { size: 17, color: C.dim });
+  });
+}
+
+function caption(title, body, x, y, w, a, tint = C.text) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * 14);
+  text(title, x, y, { size: 44, weight: 700, color: tint });
+  wrap(body, x, y + 52, w, 38, { size: 28, color: '#c4cfdb' });
+  ctx.restore();
+}
+
+// Flight scene timing: seconds into the scene -> fractional frame, with holds at the key moments.
+function warp(keys, s) {
+  for (let k = 1; k < keys.length; k++) if (s <= keys[k][0]) {
+    const [t0, i0] = keys[k - 1], [t1, i1] = keys[k], u = (s - t0) / (t1 - t0);
+    return lerp(i0, i1, i0 === i1 ? 0 : u);
+  }
+  return keys[keys.length - 1][1];
+}
+
+let FLIGHT_KEYS, CAPS;
+function setupFlight() {
+  const d = A, last = d.T - 1;
+  FLIGHT_KEYS = [[0, 0], [3, d.heard], [9.5, d.ft], [13, d.ft], [15.5, d.reacq], [20, d.cross], [21.5, d.cross],
+    [24, d.hov], [26.5, d.hend + 1], [29.5, d.leave + 2], [33, last]];
+  const g = d.geo;
+  CAPS = [
+    [0, 'A drone heads for the prison', `It takes off ${g.fence_m[0].toLocaleString('en-US')} m from the fence, 60 m up, flying in at ${g.speed_mps} m/s with a contraband drop. It sends us nothing.`, C.text],
+    [3, 'Sensors hear its echoes', `Cell-tower and TV signals bounce off the drone; the sensors pick up the faint echoes (blue: cell, purple: TV) and first fix its position ${g.fence_m[d.heard].toLocaleString('en-US')} m out.`, C.text],
+    [9.5, 'Track confirmed: alert sent', `${d.warnM} m outside the fence, ${d.warnS} s before it crosses. The control room and the response team get the alert on their phones.`, C.trk],
+    [14, 'Held all the way to the fence', `The track drops for a few seconds, picks the drone up again ${g.fence_m[d.reacq]} m out and holds as it crosses the fence.`, C.text],
+    [21.5, 'Over the prison', `It hovers ${Math.round(g.hover_s)} s over the drop point. The track drops while it hangs still and comes back as soon as it moves off.`, C.text],
+    [27, 'It leaves; the track follows it out', 'Its heading back toward the pilot is kept as evidence for the police.', C.text],
+  ];
+}
+
+function sceneFlight(s) {
+  const d = A, idx = warp(FLIGHT_KEYS, s), i = Math.min(Math.floor(idx), d.T - 1);
+  const tracked = d.run.trk[i];
+  bg(s);
+  const box = { x: 70, y: 40, s: 1000 };
+  const flash = s > 9.5 && s < 13.5 ? 0.5 + 0.5 * Math.sin((s - 9.5) * 7) : 0;
+  drawMap(d, box, { idx, t: s, fence: 1, towers: 1, tv: 1, labels: 0, cov: 0.6, flight: true, glow: tracked ? (flash ? `rgba(52,211,153,${0.4 + 0.6 * flash})` : 'rgba(52,211,153,0.55)') : null });
+  // phone-style alert on the map
+  const aIn = ease((s - 9.7) / 0.5) * (1 - ease((s - 15.5) / 0.6));
+  if (aIn > 0) {
+    ctx.save(); ctx.globalAlpha = aIn; ctx.translate(0, (1 - aIn) * -30);
+    const x = box.x + 220, y = box.y + 30, w = 560;
+    rr(x, y, w, 104, 18); ctx.fillStyle = 'rgba(16,26,38,0.97)'; ctx.fill(); ctx.strokeStyle = C.trk; ctx.lineWidth = 2; ctx.shadowColor = C.trk; ctx.shadowBlur = 20; ctx.stroke();
+    ctx.restore(); ctx.save(); ctx.globalAlpha = aIn; ctx.translate(0, (1 - aIn) * -30);
+    dot(x + 40, y + 52, 18, C.trk, 10); text('!', x + 40, y + 63, { size: 30, weight: 800, color: '#04121c', align: 'center' });
+    text('TRIPWIRE ALERT · now', x + 76, y + 38, { size: 18, color: C.dim, weight: 600, spacing: 1 });
+    text(`Drone tracked ${d.warnM} m outside the fence`, x + 76, y + 68, { size: 24, weight: 600 });
+    text(`About ${d.warnS} s until it reaches the fence`, x + 76, y + 94, { size: 20, color: '#c4cfdb' });
+    ctx.restore();
+  }
+  // right panel
+  const px0 = 1130, pw = 720;
+  text('FLIGHT SIMULATOR · TRIPWIRE PLATFORM PROTOTYPE v1.0', px0, 78, { size: 17, color: C.dim, weight: 600, spacing: 2 });
+  text(`${d.name}, Georgia`, px0, 124, { size: 40, weight: 700 });
+  text(`0.9 kg drone · ${d.g.n} receive-only sensors on the fence · cell + TV`, px0, 160, { size: 22, color: C.dim });
+  hud(d, i, px0, 196, pw);
+  // captions
+  let cur = 0; CAPS.forEach((c, k) => { if (s >= c[0]) cur = k; });
+  const c = CAPS[cur], next = CAPS[cur + 1], a = ease((s - c[0]) / 0.6) * (next ? 1 - ease((s - next[0] + 0.4) / 0.4) : 1);
+  caption(c[1], c[2], px0, 520, pw, a, c[3]);
+  // event log
+  const log = [[0, 'drone', `Takes off ${d.geo.fence_m[0].toLocaleString('en-US')} m out`], [d.heard, 'heard', `First position fix, ${d.geo.fence_m[d.heard].toLocaleString('en-US')} m out`],
+    [d.ft, 'trk', `Track confirmed, ${d.warnM} m out: alert`], [d.reacq, 'trk', `Track held from ${d.geo.fence_m[d.reacq]} m`], [d.cross, 'drone', 'Crosses the fence (tracked)'],
+    [d.hov, 'drone', 'Hovers over the drop point'], [d.leave, 'trk', 'Leaves; heading kept as evidence']];
+  text('WHAT HAPPENED', px0, 800, { size: 17, color: C.dim, weight: 600, spacing: 2 });
+  log.filter((e) => e[0] >= 0 && e[0] <= idx + 0.01).forEach((e, k) => {
+    const y = 836 + k * 34, col = e[1] === 'trk' ? C.trk : e[1] === 'heard' ? C.cell : C.drone;
+    dot(px0 + 8, y - 8, 6, col, 8);
+    text(`T+ ${fmtT(d.geo.t[e[0]])}`, px0 + 28, y, { size: 20, color: C.dim, font: MONO });
+    text(e[2], px0 + 130, y, { size: 22 });
+  });
+}
+
+function sceneTitle(s) {
+  bg(s);
+  const cx = W / 2, cy = H / 2 - 40;
+  for (let q = 0; q < 6; q++) {
+    const ph = (s * 0.25 + q / 6) % 1;
+    ctx.save(); ctx.strokeStyle = `rgba(56,189,248,${0.22 * (1 - ph)})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, 80 + ph * 700, 0, 7); ctx.stroke(); ctx.restore();
+  }
+  const a = ease(s / 1.0);
+  text('TRIPWIRE', cx, cy + 20, { size: 150, weight: 800, align: 'center', alpha: a, spacing: 28 });
+  text('Drone detection that transmits nothing', cx, cy + 100, { size: 40, weight: 400, align: 'center', color: '#c4cfdb', alpha: ease((s - 0.6) / 1) });
+  text('It listens to the cell towers and TV stations already on the air', cx, cy + 150, { size: 28, align: 'center', color: C.dim, alpha: ease((s - 1.2) / 1) });
+  text('FLIGHT SIMULATOR DEMO · PLATFORM PROTOTYPE v1.0', cx, H - 70, { size: 18, align: 'center', color: C.faint, weight: 600, spacing: 3, alpha: ease((s - 1.2) / 1) });
+}
+
+function sceneIntro(s) {
+  const d = A; bg(s);
+  const box = { x: 70, y: 40, s: 1000 };
+  drawMap(d, box, { idx: null, t: s, fence: ease(s / 1.6), sensors: ease((s - 1.4) / 1.6), towers: ease((s - 3.0) / 0.8), tv: ease((s - 4.0) / 0.8), labels: 1 - ease((s - 7.2) / 0.6), cov: 0.6 * ease((s - 5.6) / 1.0), flight: false });
+  const px0 = 1130, pw = 720;
+  text('THE SITE', px0, 78, { size: 17, color: C.dim, weight: 600, spacing: 2, alpha: ease(s / 0.6) });
+  text(`${d.name}, Georgia`, px0, 124, { size: 40, weight: 700, alpha: ease(s / 0.6) });
+  const steps = [
+    [0.3, 'The prison fence', `${E.sites[d.site].fence_area_ha} ha inside the wire.`, C.fence],
+    [1.4, `${d.g.n} receive-only sensors`, 'Small boxes on fence poles. They listen; they never transmit, so they need no spectrum license.', C.cell],
+    [3.0, 'Cell towers nearby', 'Their signals light up the sky over the prison all day.', C.cell],
+    [4.0, `${d.g.tv.length} digital TV stations`, 'Tens of km away, much stronger, and they fill the gaps between cell towers.', C.tv],
+    [5.6, 'Where a 0.9 kg drone is tracked', 'Green: tracked with today’s processing, from the twin’s coverage map.', C.trk],
+  ];
+  steps.forEach(([t0, h, b, col], k) => {
+    const a = ease((s - t0) / 0.6); if (a <= 0) return;
+    const y = 210 + k * 150;
+    ctx.save(); ctx.globalAlpha = a; ctx.translate((1 - a) * 30, 0);
+    ctx.fillStyle = col; ctx.fillRect(px0, y - 30, 4, 100);
+    text(h, px0 + 26, y, { size: 32, weight: 700 });
+    wrap(b, px0 + 26, y + 40, pw - 30, 32, { size: 24, color: '#c4cfdb' });
+    ctx.restore();
+  });
+}
+
+let CMP_END;
+function sceneCompare(s) {
+  bg(s);
+  const last = Math.max(A.T, B.T) - 1, idx = clamp(s / CMP_END) * last;
+  text('Why TV signals matter', W / 2, 74, { size: 46, weight: 700, align: 'center' });
+  text(`Same flight, same ${A.g.n} sensors. Cell towers alone would need ${REC.platform_cell.n} sensors to protect this prison.`, W / 2, 116, { size: 26, color: '#c4cfdb', align: 'center' });
+  [[B, 110, 'CELL TOWERS ONLY'], [A, 1010, 'CELL + TV']].forEach(([d, x, lab]) => {
+    const box = { x, y: 150, s: 800 }, i = Math.min(Math.floor(idx), d.T - 1);
+    drawMap(d, box, { idx: Math.min(idx, d.T - 1), t: s, fence: 1, towers: 1, tv: 1, labels: 0, cov: 0.5, flight: true, glow: d.run.trk[i] ? 'rgba(52,211,153,0.6)' : null });
+    const [st, col] = stateOf(d, i);
+    ctx.save(); rr(x + 18, 168, 300, 50, 10); ctx.fillStyle = 'rgba(5,9,15,0.85)'; ctx.fill(); ctx.restore();
+    text(lab, x + 34, 202, { size: 20, weight: 700, spacing: 2, color: d.sig === 'cell' ? C.cell : C.tv });
+    ctx.save(); rr(x + 800 - 230, 168, 212, 50, 10); ctx.fillStyle = 'rgba(5,9,15,0.85)'; ctx.fill(); ctx.restore();
+    dot(x + 800 - 205, 193, 8, col, 10); text(st, x + 800 - 185, 202, { size: 22, weight: 700, color: col === C.faint ? C.dim : col });
+    // verdict once the drone reaches the fence
+    const v = ease((idx - d.cross) / 6);
+    if (v > 0) {
+      const good = d.early, msg = good ? `Warned ${d.warnS} s before the fence (${d.warnM} m out)` : d.run.trk.indexOf(1) >= 0 ? 'No warning: tracked only once it was inside' : 'Never tracked';
+      ctx.save(); ctx.globalAlpha = v; rr(x, 975, 800, 70, 14); ctx.fillStyle = good ? 'rgba(52,211,153,0.14)' : 'rgba(251,113,133,0.14)'; ctx.fill();
+      ctx.strokeStyle = good ? C.trk : C.drone; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+      text(msg, x + 400, 1020, { size: 28, weight: 600, align: 'center', color: good ? C.trk : C.drone, alpha: v });
+    }
+  });
+}
+
+function sceneEnd(s) {
+  bg(s);
+  text('What the simulator shows', W / 2, 170, { size: 30, color: C.dim, align: 'center', weight: 600, spacing: 2, alpha: ease(s / 0.6) });
+  const stats = [[`${A.warnS} s`, 'warning before the drone\nreaches the fence', C.trk], [`${A.warnM} m`, 'out, when the track\nis confirmed', C.cell], [`${A.g.n}`, 'receive-only sensors\nfor the whole prison', C.tv], ['0 W', 'transmitted: nothing to\nlicense, nothing to detect', C.text]];
+  stats.forEach(([b, sm, col], k) => {
+    const a = ease((s - 0.4 - k * 0.35) / 0.6), x = 240 + k * 480;
+    ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * 30);
+    text(b, x, 400, { size: 110, weight: 800, align: 'center', color: col });
+    sm.split('\n').forEach((l, j) => text(l, x, 470 + j * 38, { size: 28, align: 'center', color: '#c4cfdb' }));
+    ctx.restore();
+  });
+  const a2 = ease((s - 2.2) / 0.8);
+  text('A full service for $25,000 + $25,000 a year per prison: sensors, 24/7 alerts, evidence records, upkeep.', W / 2, 690, { size: 30, align: 'center', alpha: a2 });
+  text('TRIPWIRE', W / 2, 830, { size: 72, weight: 800, align: 'center', spacing: 16, alpha: ease((s - 3) / 0.8) });
+  text('tripwire-aa261.github.io/tripwire-prototype/prototype/platform', W / 2, 885, { size: 24, align: 'center', color: C.cell, font: MONO, alpha: ease((s - 3) / 0.8) });
+  text('Simulated in the Tripwire digital twin: 0.9 kg drone, today’s 20 dB of interference removal, one random draw per 1.5 s frame. Field tests at Seed.', W / 2, H - 50, { size: 19, align: 'center', color: C.faint, alpha: ease((s - 3) / 0.8) });
+}
+
+// ------------------------------------------------------------------ timeline
+let SCENES, TOTAL;
+function setup() {
+  A = prep('hays', 'cell+tv'); B = prep('hays', 'cell'); REC = E.recommended['hays|mavic|20'];
+  setupFlight(); CMP_END = 11;
+  SCENES = [[sceneTitle, 4.5], [sceneIntro, 9], [sceneFlight, 34], [sceneCompare, 15], [sceneEnd, 8]];
+  TOTAL = SCENES.reduce((a, s) => a + s[1], 0);
+}
+window.render = (t) => {
+  let t0 = 0;
+  for (const [fn, dur] of SCENES) {
+    if (t < t0 + dur || fn === SCENES[SCENES.length - 1][0]) {
+      const s = t - t0; ctx.save(); fn(s); ctx.restore();
+      const vg = ctx.createRadialGradient(W / 2, H / 2, H * 0.55, W / 2, H / 2, H * 1.15);   // vignette
+      vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.55)'); ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+      const fade = Math.min(clamp(s / 0.5), clamp((dur - s) / 0.5));   // fade through black between scenes
+      if (fade < 1) { ctx.fillStyle = `rgba(0,0,0,${1 - fade})`; ctx.fillRect(0, 0, W, H); }
+      return;
+    }
+    t0 += dur;
+  }
+};
+(async () => {
+  const load = (f) => fetch(`../data/${f}.json`).then((r) => r.json());
+  [F, E] = await Promise.all([load('flights'), load('explore')]);
+  setup(); window.TOTAL = TOTAL; window.READY = true;
+  const q = new URLSearchParams(location.search);
+  if (q.has('t')) window.render(+q.get('t'));
+  else if (q.has('play')) { const st = performance.now() - 1000 * (+q.get('play') || 0); const loop = () => { window.render(((performance.now() - st) / 1000) % TOTAL); requestAnimationFrame(loop); }; loop(); }
+  else window.render(14);
+})();
+</script>
+</body>
+</html>
