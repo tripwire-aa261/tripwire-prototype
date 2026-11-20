@@ -17,6 +17,7 @@ Last updated 2026-11-13 by Sid. History is in `context/SESSION_LOG.md`.
   - 2026-11-19: GPS monitoring tab gains locator set-ups (clock sync to TV/cell signals, correlation detection, bearing calibration, atomic clock); details in the pivot-v1 handoff. Product Prototype v2 Google tab now walks through this app.
   - 2026-11-19: financial model v2 now uses the platform app's large-site and kit costs (camera mounts, camera upkeep, one backhaul fee per large site); worst scenario needs $13.0M.
   - 2026-11-19: demo video for presentations in `prototype/platform/video/` (`tripwire_demo.mp4`, 70 s, 1080p, no audio), drawn from the flight simulator data by `demo.html` and rendered by `render.py`; details in the pivot-v1 handoff.
+  - 2026-11-19: flight simulator gains a 3D terrain view (`prototype/platform/sim3d.js`, three.js from unpkg; terrain, buildings and towers from `prototype/data/sites/`).
 - FCC tower file (Nov 8 2026) in `prototype/data/raw/fcc/` (git-ignored) for tower counts around candidate sites.
 - GitHub repo: https://github.com/tripwire-aa261/tripwire-prototype (public since 2026-11-13 so graders can open the doc's links; main includes v0.5.1, PR #2 merged 2026-11-12 as `24a184b`). Earlier versions: v0.4.4 = `e7bf0ea`, v0.4.5 = `7cb4715`.
 

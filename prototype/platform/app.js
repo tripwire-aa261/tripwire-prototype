@@ -217,7 +217,20 @@ function renderTimeline() {
 
 // ---------------------------------------------------------------- Flight simulator (data/flights.json, tools/flight_demo_v1.py)
 let F = null;
-const sim = { site: 'hays', drone: 'mavic', sig: 'cell+tv', interf: 20, fl: 0, i: 0, playing: false, speed: 4, last: 0 };
+const sim = { site: 'hays', drone: 'mavic', sig: 'cell+tv', interf: 20, fl: 0, i: 0, playing: false, speed: 4, last: 0, view: '2d' };
+let S3 = null, S3fail = null;   // 3D view module (sim3d.js), loaded on first use
+
+async function show3d() {
+  const box = $('sm3d');
+  if (!S3 && !S3fail) {
+    try { S3 = await import('./sim3d.js'); S3.init(box); }
+    catch (e) { S3fail = e; box.innerHTML = '<div class="msg">The 3D view needs WebGL and the three.js library from unpkg.com, which did not load here. The map view has the same flight.</div>'; }
+  }
+  if (!S3) return;
+  const { g } = simData();
+  await S3.setSite(E.sites[sim.site].id, g, sim.sig);
+  simDraw();
+}
 const SIG_NAMES = { 'cell+tv': 'Cell + TV', cell: 'Cell towers only' };
 
 function simData() {
@@ -320,6 +333,7 @@ function simDraw() {
     .map(([b, sm, cl]) => `<div class="card ${cl}"><small>${esc(sm)}</small><b>${esc(b)}</b></div>`).join('');
   $('smClock').textContent = `${Math.round(geo.t[i])} s / ${Math.round(geo.t[geo.t.length - 1])} s`;
   $('smTime').value = i;
+  if (sim.view === '3d' && S3) S3.update({ g, geo, run, i, height: F.height_m });
   document.querySelectorAll('#smEvents .ev').forEach((li) => li.classList.toggle('past', +li.dataset.k <= i));
 }
 
@@ -327,6 +341,10 @@ function renderSim() {
   if (!F) { $('smTitle').textContent = 'Flight simulator data not built yet (python -m tools.flight_demo_v1)'; return; }
   const sites = SITE_ORDER.filter((k) => F.sites[k]);
   const reset = () => { sim.i = 0; };
+  seg($('smView'), 'View', [['2d', 'Map'], ['3d', '3D terrain']], () => sim.view, (v) => { sim.view = v; });
+  $('smMap').style.display = sim.view === '3d' ? 'none' : '';
+  $('sm3d').style.display = sim.view === '3d' ? '' : 'none';
+  if (sim.view === '3d') show3d();
   const short = (k) => E.sites[k].name.replace(' State Prison', '').replace(' Memorial Stadium', '').replace(' County Jail', ' Jail').replace(' flightline apron', '').replace(' Port of Entry', ' port');
   seg($('smSite'), 'Site', sites.map((k) => [k, short(k)]), () => sim.site, (v) => { sim.site = v; sim.fl = 0; reset(); });
   seg($('smDrone'), 'Drone', Object.entries(DRONES), () => sim.drone, (v) => { sim.drone = v; reset(); });

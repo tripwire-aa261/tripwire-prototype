@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tripwire Platform</title>
   <link rel="stylesheet" href="style.css" />
+  <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }</script>
 </head>
 <body>
   <header>
@@ -67,7 +68,7 @@
       <div class="seg" id="smFlight"></div>
     </div>
     <div class="grid2">
-      <div class="sec"><h2 id="smTitle">Flight</h2><canvas id="smMap" width="620" height="620"></canvas>
+      <div class="sec"><div class="seg" id="smView"></div><h2 id="smTitle">Flight</h2><canvas id="smMap" width="620" height="620"></canvas><div class="view3d" id="sm3d" style="display:none"></div>
         <div class="player"><button id="smPlay">Play</button><div class="seg" id="smSpeed"></div><input type="range" id="smTime" min="0" max="100" value="0"><span id="smClock" class="mono">0 s</span></div>
         <div class="legend"><span><i class="ln cl"></i>sensor hears the drone in a cell-tower echo</span><span><i class="ln tvl"></i>in a TV echo</span><span><i class="dot dr"></i>drone (true position)</span><span><i class="dot tk"></i>Tripwire track</span><span><i class="dot lc"></i>located, track not confirmed yet</span><span><i class="tri"></i>cell tower (outline: beyond the view)</span><span><i class="dot tvd"></i>TV station direction</span><span><i class="sw s2"></i>coverage map behind</span></div>
       </div>
